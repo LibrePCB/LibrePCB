@@ -63,7 +63,8 @@ public:
   // Constructors / Destructor
   SQLiteDatabase() = delete;
   SQLiteDatabase(const SQLiteDatabase& other) = delete;
-  SQLiteDatabase(const FilePath& filepath, QObject* parent = nullptr);
+  SQLiteDatabase(const FilePath& filepath, bool readOnly = false,
+                 QObject* parent = nullptr);
   ~SQLiteDatabase() noexcept override;
 
   // SQL Commands

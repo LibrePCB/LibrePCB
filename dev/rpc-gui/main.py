@@ -20,6 +20,7 @@ from pages.rule_check import RuleCheckPage
 from pages.graphics_export import GraphicsExportPage
 from pages.undo_stack import UndoStackPage
 from pages.remote_library import RemoteLibraryPage
+from pages.workspace import WorkspacePage
 from pages.workspace_db import WorkspaceDbPage
 
 # A project to pre-fill the project path edit with (developer comfort).
@@ -28,6 +29,10 @@ DEFAULT_PROJECT_PATH = os.path.normpath(os.path.join(
     "..", "..", "tests", "data", "projects", "Gerber Test",
     "project.lpp",
 ))
+
+# Maximum number of log lines to keep. The log widget only shows a few lines,
+# so a large history just makes each update re-render a lot of text.
+MAX_LOG_LINES = 100
 
 # The page index for each class of api.CLASSES (unknown classes get the
 # "no page yet" placeholder).
@@ -43,6 +48,7 @@ PAGES = {
     "RemoteLibrary": 4,
     "WorkspaceDb": 5,
     "GraphicsExport": 6,
+    "Workspace": 7,
 }
 
 ns = slint.load_file("app.slint")
@@ -61,6 +67,7 @@ class Gui(ns.AppWindow):
         self.create_name = ""
         self.client = None
         self._log_lines = []
+        self._log_dirty = False
         self.log = ""
         self.projects = slint.ListModel([])
         self.libraries = slint.ListModel([])
@@ -71,11 +78,14 @@ class Gui(ns.AppWindow):
         self.quick = False
         self.ge_entries = slint.ListModel([])
         self.ge_status = ""
+        self.workspace_details = ""
+        self.db_details = ""
         self._pages = {
             "Protocol": ProtocolPage(self),
             "ProjectEditor": ProjectEditorPage(self),
             "RuleCheck": RuleCheckPage(self),
             "GraphicsExport": GraphicsExportPage(self),
+            "Workspace": WorkspacePage(self),
             "UndoStack": UndoStackPage(self),
             "RemoteLibrary": RemoteLibraryPage(self),
             "WorkspaceDb": WorkspaceDbPage(self),
@@ -258,6 +268,16 @@ class Gui(ns.AppWindow):
     def db_wait_clicked(self):
         self._pages["WorkspaceDb"].wait_clicked()
 
+    @slint.callback
+    def db_query_clicked(self):
+        self._pages["WorkspaceDb"].query_clicked()
+
+    # --- Workspace page -----------------------------------------------------
+
+    @slint.callback
+    def ws_get_clicked(self):
+        self._pages["Workspace"].get_clicked()
+
     # --- GraphicsExport page -------------------------------------------------
 
     @slint.callback
@@ -288,38 +308,42 @@ class Gui(ns.AppWindow):
         return msgid
 
     def poll(self):
-        if not self.client:
-            return
-        while True:
-            try:
-                received_at, msg = self.client.received.get_nowait()
-            except queue.Empty:
+        try:
+            if not self.client:
                 return
-            if msg is None:
-                self.client = None
-                self.connected = False
-                self.authenticated = False
-                self.pending = False
-                self._log("  Connection closed.")
-                return
-            if isinstance(msg, list) and len(msg) == 3 and msg[0] == 2:
-                # A notification for a pending request (e.g. progress).
-                method = self.client.handlers.get(msg[1], (None,))[0]
-                if method:
-                    self._log(f"☼ {method}: {fmt_value(msg[2])}")
+            while True:
+                try:
+                    received_at, msg = self.client.received.get_nowait()
+                except queue.Empty:
+                    return
+                if msg is None:
+                    self.client = None
+                    self.connected = False
+                    self.authenticated = False
+                    self.pending = False
+                    self._log("  Connection closed.")
+                    return
+                if isinstance(msg, list) and len(msg) == 3 and msg[0] == 2:
+                    # A notification for a pending request (e.g. progress).
+                    method = self.client.handlers.get(msg[1], (None,))[0]
+                    if method:
+                        self._log(f"☼ {method}: {fmt_value(msg[2])}")
+                    else:
+                        self._log(f"☼ {fmt_value(msg[2])}")
+                    self.progress = msg[2].get("progress", 0)
+                    continue
+                if isinstance(msg, list) and len(msg) == 4 and msg[0] == 1:
+                    self._handle_response(received_at, msg[1], msg[2], msg[3])
+                elif isinstance(msg, list) and len(msg) == 2 and msg[0] == 3:
+                    # A cancel for one of our requests (sent by the callee).
+                    self._log(f"⊗ cancel: {msg[1]}")
                 else:
-                    self._log(f"☼ {fmt_value(msg[2])}")
-                self.progress = msg[2].get("progress", 0)
-                continue
-            if isinstance(msg, list) and len(msg) == 4 and msg[0] == 1:
-                self._handle_response(received_at, msg[1], msg[2], msg[3])
-            elif isinstance(msg, list) and len(msg) == 2 and msg[0] == 3:
-                # A cancel for one of our requests (sent by the callee).
-                self._log(f"⊗ cancel: {msg[1]}")
-            else:
-                # Any other message (e.g. a method call initiated by the
-                # application, which the GUI does not support yet).
-                self._log(f"? unhandled: {fmt_value(msg)}")
+                    # Any other message (e.g. a method call initiated by the
+                    # application, which the GUI does not support yet).
+                    self._log(f"? unhandled: {fmt_value(msg)}")
+        finally:
+            # Render the accumulated log lines only once per poll cycle.
+            self._flush_log()
 
     def _handle_response(self, received_at, msgid, status, payload):
         method, handler, sent_at = self.client.handlers.pop(
@@ -342,9 +366,18 @@ class Gui(ns.AppWindow):
             handler(status, payload)
 
     def _log(self, text):
-        line = f"[{time.strftime('%H:%M:%S')}] {text}"
-        self._log_lines.append(line)
-        self._log_lines = self._log_lines[-200:]
+        self._log_lines.append(f"[{time.strftime('%H:%M:%S')}] {text}")
+        if len(self._log_lines) > MAX_LOG_LINES:
+            del self._log_lines[:-MAX_LOG_LINES]
+        self._log_dirty = True
+
+    def _flush_log(self):
+        """Update the log widget only when new lines arrived. Called once at
+        the end of each poll cycle, so bursts of messages do not cause a full
+        text re-render for every single line."""
+        if not self._log_dirty:
+            return
+        self._log_dirty = False
         self.log = "\n".join(self._log_lines)
 
 

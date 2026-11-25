@@ -74,6 +74,18 @@ public:
    */
   static void wait(GuiApplication& app, RpcObjectRegistry& registry,
                    RpcRequest& request);
+
+  /**
+   * @brief Search library elements.
+   */
+  static void search(GuiApplication& app, RpcObjectRegistry& registry,
+                     RpcRequest& request);
+
+  /**
+   * @brief Query the SQLite database directly (read-only).
+   */
+  static void query_sql(GuiApplication& app, RpcObjectRegistry& registry,
+                        RpcRequest& request);
 };
 
 /*******************************************************************************

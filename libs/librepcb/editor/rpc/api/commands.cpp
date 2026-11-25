@@ -33,6 +33,7 @@
 #include "rulecheckrpc.h"
 #include "undostackrpc.h"
 #include "workspacedbrpc.h"
+#include "workspacerpc.h"
 
 #include <QtCore>
 
@@ -68,6 +69,7 @@ void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
       {"RuleCheck/run", &RuleCheckRpc::run},
       {"RuleCheck/set", &RuleCheckRpc::set},
       {"GraphicsExport/run", &GraphicsExportRpc::run},
+      {"Workspace/get", &WorkspaceRpc::get},
       {"UndoStack/get", &UndoStackRpc::get},
       {"UndoStack/undo", &UndoStackRpc::undo},
       {"UndoStack/redo", &UndoStackRpc::redo},
@@ -75,6 +77,8 @@ void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
       {"RemoteLibrary/apply", &RemoteLibraryRpc::apply},
       {"RemoteLibrary/get", &RemoteLibraryRpc::get},
       {"WorkspaceDb/wait", &WorkspaceDbRpc::wait},
+      {"WorkspaceDb/search", &WorkspaceDbRpc::search},
+      {"WorkspaceDb/query_sql", &WorkspaceDbRpc::query_sql},
   };
   if (auto func = commands.value(request.getMethod(), nullptr)) {
     func(app, registry, request);

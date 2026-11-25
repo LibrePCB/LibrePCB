@@ -1,13 +1,15 @@
-import { Button, ProgressIndicator } from "std-widgets.slint";
+import { Button, LineEdit, ProgressIndicator, TextEdit } from "std-widgets.slint";
 
 export component WorkspaceDbPage {
     in property <bool> authenticated;
     in property <int> progress;
+    in-out property <string> query;
+    in property <string> details;
     callback wait-clicked();
+    callback query-clicked();
 
     VerticalLayout {
-        alignment: start;
-        spacing: 12px;
+        spacing: 8px;
 
         Button {
             text: "Wait For Library Scan";
@@ -17,6 +19,31 @@ export component WorkspaceDbPage {
 
         ProgressIndicator {
             progress: root.progress / 100;
+        }
+
+        HorizontalLayout {
+            spacing: 6px;
+
+            LineEdit {
+                text <=> root.query;
+                placeholder-text: "SQL Query";
+                horizontal-stretch: 1;
+            }
+
+            Button {
+                text: "Execute";
+                enabled: root.authenticated;
+                clicked => { root.query-clicked(); }
+            }
+        }
+
+        TextEdit {
+            vertical-stretch: 3;
+            min-height: 180px;
+            text: root.details;
+            read-only: true;
+            font-family: "DejaVu Sans Mono";
+            font-size: 12px;
         }
     }
 }

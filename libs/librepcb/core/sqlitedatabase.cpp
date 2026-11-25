@@ -60,7 +60,8 @@ SQLiteDatabase::TransactionScopeGuard::~TransactionScopeGuard() noexcept {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SQLiteDatabase::SQLiteDatabase(const FilePath& filepath, QObject* parent)
+SQLiteDatabase::SQLiteDatabase(const FilePath& filepath, bool readOnly,
+                               QObject* parent)
   : QObject(parent) {
   // create database (use random UUID as connection name)
   mDb = QSqlDatabase::addDatabase("QSQLITE", Uuid::createRandom().toStr());
@@ -70,6 +71,11 @@ SQLiteDatabase::SQLiteDatabase(const FilePath& filepath, QObject* parent)
   if (!mDb.isValid()) {
     throw RuntimeError(__FILE__, __LINE__,
                        tr("Invalid database: \"%1\"").arg(filepath.toNative()));
+  }
+
+  // Set connection options.
+  if (readOnly) {
+    mDb.setConnectOptions("QSQLITE_OPEN_READONLY");
   }
 
   // open the database

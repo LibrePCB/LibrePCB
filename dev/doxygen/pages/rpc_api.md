@@ -172,6 +172,19 @@ The state of a document's undo stack.
 
 ---
 
+## WorkspaceDetails {#doc_rpc_api_type_WorkspaceDetails}
+
+Information about a workspace.
+
+**Fields:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `path` | `string` | Absolute file path to the workspace. |
+| `projects_path` | `string` | Absolute file path to the projects root directory in the workspace. |
+
+---
+
 ## WorkspaceDbDetails {#doc_rpc_api_type_WorkspaceDbDetails}
 
 Information about the workspace library database.
@@ -230,7 +243,6 @@ Handshake and authentication. The first message of a connection must be this req
 | `server` | `string` | Always "librepcb", so clients can verify the server. |
 | `version` | `string` | The application version. |
 | `session` | `string` | A UUID identifying the running application process (changes on every application restart). |
-| `workspace` | `string` | The absolute path of the currently opened workspace. |
 | `token` | `string` | The token to be used for subsequent connections of this client (see the transport protocol documentation). |
 
 
@@ -426,6 +438,7 @@ Run a graphics export of a complete schematic, a single sheet, or a board.
 | `dpi` | `integer` (default: `300`) | Resolution. |
 | `flip` | `bool` | If true, the rendering will be flipped to the bottom side. Only supported for boards. |
 | `realistic` | `bool` | If true, a realistic rendering will be done. Only supported for boards. |
+| `background` | `string` (default: `#00000000`) | Hex RGB(A) background color. |
 
 **Result:**
 
@@ -437,6 +450,22 @@ Run a graphics export of a complete schematic, a single sheet, or a board.
 | `files` | `array` of `binary` | Output files (image or PDF) in the requested format as binary blobs. Only provided if `path` was not passed. |
 | `errors` | `array` of `string` | Any occurred rendering errors if the image could be rendered partially. If the image could not be rendered at all, an RPC error is returned instead. |
 
+
+**Since:** 2.2.0
+
+---
+
+## Class Workspace {#doc_rpc_api_class_Workspace}
+
+Access to the currently opened workspace.
+
+### Workspace/get {#doc_rpc_api_method_Workspace_get}
+
+Get information about the workspace.
+
+**Params:** None
+
+**Result:** [`WorkspaceDetails`](@ref doc_rpc_api_type_WorkspaceDetails)
 
 **Since:** 2.2.0
 
@@ -541,4 +570,52 @@ Wait for the library rescan to complete. If the database is already up-to-date, 
 **Params:** None
 
 **Result:** [`WorkspaceDbDetails`](@ref doc_rpc_api_type_WorkspaceDbDetails)
+
+---
+
+### WorkspaceDb/search {#doc_rpc_api_method_WorkspaceDb_search}
+
+Search library elements.
+
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `type` | `LibraryElementType` | Type of library elements to find. |
+| `query` | `string` | Keyword to search for. If omitted or empty, all elements will be returned. |
+| `library` | `string` | If provided, only list elements contained in this library, specified by its absolute file path. |
+| `category` | `uuid?` | If provided, only list elements or categories within this category. If `null`, it means the root category, or elements without a valid category. |
+| `package` | [`uuid`](@ref doc_rpc_api_ext_types) | If provided, only list devices or parts for this package. |
+| `component` | [`uuid`](@ref doc_rpc_api_ext_types) | If provided, only list devices or parts for this component. |
+| `device` | [`uuid`](@ref doc_rpc_api_ext_types) | If provided, only list parts for this device. |
+| `limit` | `int` | Max. number of results to return. |
+
+**Result:**
+
+**Fields:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `matches` | `array` of `WorkspaceDbSearchResult` | Search results. |
+
+
+---
+
+### WorkspaceDb/query_sql {#doc_rpc_api_method_WorkspaceDb_query_sql}
+
+Query the SQLite database directly (read-only).
+
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `query` | `string` | SQL query. |
+
+**Result:**
+
+**Fields:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `rows` | `array` of `any` | Result rows. |
 

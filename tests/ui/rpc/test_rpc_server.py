@@ -100,15 +100,23 @@ def test_rpc_server(librepcb, helpers):
             assert result["format"] == "1.0", result
             assert result["server"] == "librepcb", result
             assert isinstance(result["version"], str), result
-            # Verify that we're connected to the expected application
-            # instance (the port fallback could have chosen a different
-            # port if a stale instance was still listening).
-            assert result["workspace"] == librepcb.workspace_path.replace(
-                "\\", "/"
-            ), result
+            # The workspace path is not part of initialize anymore.
+            assert "workspace" not in result, result
             # A token was issued, to be used for future connections.
             token = result["token"]
             assert isinstance(token, str) and len(token) > 10, result
+
+            # Workspace/get → details about the currently opened workspace.
+            # Also verifies that we're connected to the expected application
+            # instance (the port fallback could have chosen a different port
+            # if a stale instance was still listening).
+            status, result = rpc.request(30, "Workspace/get", {})
+            assert status == 0, result
+            workspace_path = librepcb.workspace_path.replace("\\", "/")
+            assert result["path"] == workspace_path, result
+            assert result["projects_path"] == (
+                workspace_path + "/projects"
+            ), result
 
             # A second connection can authenticate with the issued token,
             # without any user interaction.

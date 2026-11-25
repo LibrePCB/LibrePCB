@@ -1,0 +1,523 @@
+# LibrePCB MCP tools (PR #1912, librepcb-mcp), 58 tools, derived from tools/list
+#
+# Notation
+#   args: "name: type" ; trailing * = required ; "= x" = default
+#   ro: true  -> readOnlyHint (does not modify anything)
+#   returns: only what the tool descriptions state. The MCP schema has no
+#            output schema, so "unspecified" means the description says nothing.
+#
+# Shared types
+#   xy:        [x, y] in mm
+#   vertex:    [x, y] or [x, y, angle]  # angle in deg = arc to next vertex (positive = CCW)
+#   ref:       string | integer         # name or index
+#   Optional board / schematic args are of type ref, default = the first one.
+#   Polygons given by vertices are closed automatically.
+
+library_get:
+  ro: true
+  desc: >
+    Details of a library element: symbol pins; component signals, symbol variants,
+    attributes, devices; package pads, footprints, pad geometry, courtyard, keep-outs,
+    holes (of one footprint, relative to origin); device additionally pad-signal-map and parts.
+  args:
+    type*: "component | device | symbol | package"
+    element*: "string  # name or UUID"
+    footprint: "string  # of package/device, default first"
+  returns: unspecified  # details as described
+
+library_create:
+  ro: false
+  desc: Create a new local library in the workspace for own parts.
+  args:
+    name*: "string  # e.g. 'Custom Parts'"
+    description: string
+    dependencies: "[string]  # libraries whose elements are used"
+  returns: unspecified
+
+symbol_create:
+  ro: false
+  desc: >
+    Create a schematic symbol with pins and a rectangular body in a local library.
+    Name and value texts are added automatically above and below the body.
+  args:
+    library*: "string  # local library name"
+    name*: "string  # e.g. 'LM317'"
+    pins*:
+      - name*: "string  # e.g. 'VCC'"
+        position*: "xy  # outer end of pin where wires connect, on 2.54mm grid"
+        rotation*: "number  # direction from outer end toward body: 0=right (pin on left side), 180=left (pin on right side), 90=up, 270=down"
+        length: "number = 2.54  # mm"
+    bodyFrom*: "xy  # one corner of body rectangle"
+    bodyTo*: "xy  # opposite corner"
+    categories: "[string]  # name or UUID"
+    description: string
+  returns: result of the symbol check
+
+package_create:
+  ro: false
+  desc: >
+    Create a package with one footprint in a local library: pads, package outline from body size,
+    courtyard around body and pads, name/value texts, optionally holes, keep-outs and a silkscreen
+    outline with pin 1 marker. Origin should be the body center.
+  args:
+    library*: string
+    name*: "string  # e.g. 'QFN-16 3x3'"
+    pads*:
+      - name*: "string  # e.g. '1'"
+        position*: "xy  # relative to package origin"
+        size*: "xy  # [width, height]"
+        shape: "rect | roundrect | round | octagon | custom  # default roundrect (SMT) / round (THT); round with w!=h = oblong; custom uses 'vertices'"
+        rotation: "number  # deg"
+        side: "top | bottom = top  # SMT pads"
+        paste: "boolean = true  # solder paste on SMT pad"
+        drill: "number  # mm; makes it a plated THT pad"
+        slotLength: "number  # total slot length along pad x axis; 'drill' is the width"
+        vertices: "[vertex]  # outline of custom pad, relative to pad center"
+    body: "xy  # [width, height] centered at origin; default: around the pads"
+    assemblyType: "smt | tht | mixed | none | other  # default derived from pads; 'none' e.g. test pads"
+    courtyardMargin: "number = 0.25"
+    legend: "boolean = false  # body outline + pin 1 marker on top silkscreen"
+    holes:
+      - position*: xy
+        diameter*: number  # non-plated
+    keepouts:
+      - vertices*: "[vertex]"
+        layers: "top | bottom | inner | all = top  # mirrored on bottom side"
+        rules: "[keepout_rule] = [noCopper, noPlanes]"
+    categories: "[string]"
+    description: string
+  returns: result of the package check
+
+component_create:
+  ro: false
+  desc: >
+    Create a component from one symbol, or several gates (e.g. dual op-amp halves + supply).
+    One signal per symbol pin, named like the pin; a pin name used in several gates gets the
+    gate suffix ('OUT_A'). Signals are passive and optional unless set in 'signals'.
+  args:
+    library*: string
+    name*: string
+    prefix*: "string  # designator prefix, e.g. 'U'"
+    symbol: "string  # name/UUID of the symbol (single gate)"
+    gates:
+      - symbol*: "string  # name/UUID"
+        suffix*: "string  # e.g. 'A'"
+        position: "xy = [0,0]  # gate position when placing the part"
+    signals: "{signalName: {role: passive|power|input|output|inout|opendrain = passive, required: boolean = false}}"
+    defaultValue: "string  # e.g. '{{MPN or DEVICE}}'"
+    categories: "[string]"
+    description: string
+  returns: result of the component check  # note: ERC reports unconnected required signals
+
+device_create:
+  ro: false
+  desc: Create a device mapping the signals of a component to the pads of a package.
+  args:
+    library*: string
+    name*: "string  # e.g. 'LM317 SOT-223'"
+    component*: "string  # name/UUID"
+    package*: "string  # name/UUID"
+    padSignalMap*: "{padName: signalName}  # e.g. {'1': 'ADJ'}"
+    parts: "[{mpn*: string, manufacturer: string}]  # orderable parts"
+    categories: "[string]"
+    description: string
+  returns: result of the device check
+
+# ───────────── Project ─────────────
+
+parts_list:
+  ro: true
+  desc: List all parts with designator, value, library component and placement in schematics and boards (mm).
+  args: {}
+  returns: "per part: designator, value, component, schematic/board placement"
+
+netlist_get:
+  ro: true
+  desc: List all nets with connected pins ('<designator>.<signal>').
+  args: {}
+  returns: "nets -> pins as '<designator>.<signal>'"
+
+# ───────────── Schematic ─────────────
+schematic_add_part:
+  ro: false
+  desc: Add a part (component from workspace libraries) to a schematic page. Choose a device to define footprint/part number now, or later via board_place_device.
+  args:
+    component*: "string  # name/UUID, e.g. 'Capacitor'"
+    position*: "xy  # on 2.54mm grid"
+    schematic: ref
+    designator: "string  # e.g. 'R1'"
+    device: "string  # name/UUID"
+    part: "part_spec  # MPN of device (required if device has several parts), or any part, or null for none"
+    value: string
+    attributes: "{NAME: 'value with unit suffix'}  # e.g. {RESISTANCE: '100k'}, {CAPACITANCE: '4.7u'}"
+    symbolVariant: "string  # as listed by library_get"
+    rotation: "number  # deg"
+    mirror: boolean
+  returns: designator and pin positions
+
+schematic_connect:
+  ro: false
+  desc: >
+    Connect pins to one net. Each pin gets a short wire with a net label (same label = connected).
+    Pins that already have a wire are kept. Supply symbols force their net name. Pins in an
+    automatic net like 'N1' join the net of the given/forced name.
+  args:
+    pins*: "[string]  # 'U1.VCC', 'R1.1'"
+    net: "string  # default: automatic name like 'N3'"
+  returns: unspecified
+
+schematic_draw_wire:
+  ro: false
+  desc: >
+    Draw a wire between two pins on the same page, optionally via corners, and connect them to one net.
+    A pin without net joins the other's net, else a new net is created. Pins of different nets cannot
+    be wired (disconnect first). Supply symbols force net name; auto-named nets join it.
+  args:
+    from*: "string  # pin, e.g. 'U1.VCC'"
+    to*: "string  # pin"
+    points: "[xy]  # optional corners, on 2.54mm grid"
+  returns: the net
+
+schematic_add_text:
+  ro: false
+  desc: Add a text (note, block title) to a schematic page.
+  args:
+    text*: string
+    position*: "xy  # bottom-left corner"
+    schematic: ref
+    height: "number = 2.5  # mm"
+    rotation: number
+  returns: unspecified
+
+schematic_add_page:
+  ro: false
+  desc: Add a schematic page. Nets with the same name connect across pages.
+  args:
+    name*: "string  # e.g. 'Power Supply'"
+  returns: unspecified
+
+schematic_set_part_text:
+  ro: false
+  desc: Move, rotate, resize, hide or show the designator ('name') or value text of a part's symbol in the schematic.
+  args:
+    designator*: "string  # e.g. 'R1'"
+    text*: "name | value"
+    gate: "string  # symbol suffix for multi-symbol parts, e.g. 'A'"
+    position: xy
+    rotation: number
+    height: "number  # mm"
+    visible: boolean
+  returns: unspecified
+
+schematic_disconnect:
+  ro: false
+  desc: Remove all wires from pins and disconnect them from their net.
+  args:
+    pins*: "[string]  # e.g. 'U1.VCC'"
+  returns: unspecified
+
+schematic_move_part:
+  ro: false
+  desc: >
+    Move, rotate or mirror the symbol of a part (one gate). Short wires with net labels from
+    schematic_connect move along; other wires stay attached to pins. Board traces unaffected.
+  args:
+    designator*: string
+    position*: xy
+    gate: string
+    rotation: number
+    mirror: boolean
+  returns: unspecified
+
+part_get:
+  ro: true
+  desc: Value, symbols and pins (position and net) of a part.
+  args:
+    designator*: "string  # e.g. 'U1'"
+  returns: "value, symbols, pins (position, net)"
+
+part_set_properties:
+  ro: false
+  desc: Change designator, value, attributes or ordered part number of a part.
+  args:
+    designator*: "string  # current"
+    newDesignator: string
+    value: string
+    attributes: "{NAME: string|null}  # new names add text attributes, null removes"
+    part: "part_spec  # MPN of chosen device, any part, or null for none"
+  returns: unspecified
+
+part_remove:
+  ro: false
+  desc: Remove a part from schematics (and boards) incl. its wires.
+  args:
+    designator*: string
+  returns: unspecified
+
+net_rename:
+  ro: false
+  desc: Rename a net. An auto-named net ('N1') merges into an existing net of the new name.
+  args:
+    net*: "string  # current name"
+    name*: "string  # new name, e.g. 'SPI_SCK'"
+  returns: unspecified
+
+net_class_set:
+  ro: false
+  desc: >
+    Create or change a net class and move nets into it. Nets start in 'default'. Trace width and via
+    drill are defaults for new traces/vias (board_route, board_add_via); clearance/width/drill minimums
+    are checked by DRC in addition to the board's DRC settings.
+  args:
+    name*: "string  # e.g. 'Power'"
+    newName: string
+    nets: "[string]  # nets to move here"
+    defaultTraceWidth: "number|null  # mm, null = board default"
+    defaultViaDrill: "number|null  # mm, null = board default"
+    minClearance: "number  # mm, copper to other nets"
+    minWidth: "number  # mm"
+    minViaDrill: "number  # mm"
+  returns: unspecified
+
+# ───────────── Board ─────────────
+board_set_outline:
+  ro: false
+  desc: Replace the board outline by a rectangle (0,0)-(width,height) or a polygon. Use board_add_cutout for holes/slots inside.
+  args:
+    board: ref
+    width: "number  # mm, rectangle"
+    height: "number  # mm, rectangle"
+    vertices: "[vertex]  # polygon"
+  returns: unspecified
+
+board_add_cutout:
+  ro: false
+  desc: Add a cutout (hole/slot milled into the board), polygon or circle.
+  args:
+    board: ref
+    vertices: "[vertex]  # polygon"
+    center: "xy  # round cutout"
+    diameter: "number  # round cutout"
+  returns: unspecified
+
+board_place_device:
+  ro: false
+  desc: Place a part on the board, or move it if already placed. Device/package comes from the schematic part if chosen there, otherwise must be given.
+  args:
+    designator*: string
+    position*: "xy  # part origin"
+    board: ref
+    device: "string  # name/UUID, e.g. 'Capacitor 3216 (1206)'"
+    footprint: "string  # footprint name of the package"
+    rotation: number
+    side: "top | bottom = top"
+  returns: pads with positions and nets
+
+board_get_part:
+  ro: true
+  desc: Device, footprint, placement, pads (position, net, layers), courtyard, keep-outs and holes of a placed part, in board coordinates.
+  args:
+    designator*: string
+    board: ref
+  returns: "device, footprint, placement, pads (position, net, layers), courtyard, keep-outs, holes"
+
+board_route:
+  ro: false
+  desc: >
+    Draw a trace on one copper layer between two points of the same net, optionally via corners.
+    An end is a pad ('U1.8'), a via/junction ID ('via:...', 'point:...'), or a position [x,y] on a
+    trace/junction/via of the net on that layer (a trace there is split in two with new IDs for a
+    T-junction). To change layer, end at a via. Without 'width', net class default, else board design
+    rules default (0.5 mm unless changed). board_query shows free layers along a planned path.
+  args:
+    from*: "string | xy  # e.g. 'R1.1'"
+    to*: "string | xy  # e.g. 'U1.7' or [12.5, 8]"
+    layer*: copper_layer
+    points: "[xy]  # optional corners"
+    width: "number  # mm"
+    check: "boolean = true  # clearance check of new copper"
+    board: ref
+  returns: IDs of the new traces, the width, clearance violations from a quick check (trace is kept; revert with board_remove_items or undo)
+
+board_add_via:
+  ro: false
+  desc: Add a through via (all copper layers) to a net.
+  args:
+    net*: "string  # e.g. 'GND'"
+    position*: xy
+    drill: "number  # mm, default from net class / design rules"
+    size: "number  # outer diameter mm, default from annular ring rule"
+    check: "boolean = true"
+    board: ref
+  returns: its ID (for board_route) and clearance violations from a quick check
+
+board_add_plane:
+  ro: false
+  desc: Add a copper plane of a net on a layer, whole board or given area. Auto-filled around other nets' pads/traces and clipped by keep-outs.
+  args:
+    net*: string
+    layer*: copper_layer
+    vertices: "[vertex]  # default: whole board"
+    priority: "number = 0  # higher priority filled first"
+    clearance: "number  # mm"
+    connectStyle: "thermal | solid | none = thermal  # how pads connect"
+    board: ref
+  returns: unspecified
+
+board_add_keepout:
+  ro: false
+  desc: Add a keep-out zone (copper, planes, stop mask openings or devices not allowed), e.g. under an antenna or around a mounting hole.
+  args:
+    vertices*: "[vertex]"
+    layers: "'both' (top+bottom) | 'all' (incl. inner) | single layer e.g. 'top'  # default both"
+    rules: "[keepout_rule] = [noCopper, noPlanes]  # noCopper: traces/vias/pads; noExposure: stop mask openings"
+    board: ref
+  returns: unspecified
+
+board_add_text:
+  ro: false
+  desc: Add a text to the board (e.g. silkscreen). Bottom-layer texts are mirrored automatically. Placeholders {{PROJECT}}, {{VERSION}}, {{BOARD}} are substituted.
+  args:
+    text*: string
+    position*: "xy  # anchor, always at bottom of text, see align"
+    layer: "top_legend | bot_legend | top_cu | bot_cu | top_documentation | bot_documentation | brd_documentation = top_legend"
+    height: "number = 1.0  # mm"
+    strokeWidth: "number = 0.15  # mm"
+    rotation: number
+    align: "left | center | right = left"
+    board: ref
+  returns: unspecified
+
+board_set_part_text:
+  ro: false
+  desc: Move, rotate, resize, hide or show the designator ('name') or value text of placed parts. Several parts can be changed alike.
+  args:
+    designator*: "string | [string]  # 'R1' or ['R1','R2']"
+    text*: "name | value"
+    position: "xy  # new anchor"
+    rotation: number
+    height: number
+    align: "left | center | right  # anchor at bottom of text"
+    visible: boolean
+    board: ref
+  returns: unspecified
+
+board_add_hole:
+  ro: false
+  desc: Add a non-plated hole (NPTH), e.g. mounting screw without footprint.
+  args:
+    position*: "xy  # center"
+    diameter*: "number  # mm"
+    board: ref
+  returns: unspecified
+
+board_list_items:
+  ro: true
+  desc: List board items with IDs (for board_modify_item, board_remove_items, board_route), optionally filtered by type, net, layer or area.
+  args:
+    types: "[traces|vias|points|planes|keepouts|polygons|texts|holes|pads]  # default all except pads and points; points = junctions/corners; polygons = outline, cutouts, drawings; texts incl. part name/value"
+    net: string
+    layer: "string  # copper layer or layer ID like 'top_legend', 'brd_cutouts'"
+    area: "{from*: xy, to*: xy}"
+    board: ref
+  returns: items with IDs (e.g. 'trace:<uuid>', 'via:<uuid>', 'point:<..>')
+
+board_query:
+  ro: true
+  desc: >
+    Show what is inside a board rectangle, to find free space. Items count when their actual shape
+    overlaps. To check whether a trace/via fits, query the area it would cover, enlarged by the
+    clearance, with its net. Keep the rectangle small.
+  args:
+    from*: xy
+    to*: xy
+    net: "string  # own copper of this net does not count as blocking in 'free'"
+    board: ref
+  returns: >
+    parts reaching in (courtyard box, pads inside); traces as whole paths (end to end, ordered trace IDs);
+    vias; holes; keep-outs (also of parts); texts with box; planes covering it;
+    'free' per copper layer (no pad/trace/via of any net; planes keep clearance themselves);
+    'withinBoard' (inside outline and off cutouts)
+
+board_remove_items:
+  ro: false
+  desc: Remove board items by ID. 'net:<name>' removes all traces and vias of a net. Removing a junction removes its traces. Pads go with their part (part_remove).
+  args:
+    ids*: "[string]  # min 1; 'trace:<uuid>' or 'net:<name>'"
+    board: ref
+  returns: unspecified
+
+board_modify_item:
+  ro: false
+  desc: >
+    Change a board item by ID. Fields per type -- trace: width, layer. via: position, drill, size.
+    point: position. plane: vertices, layer, net, priority, connectStyle, clearance.
+    keepout: vertices, layers, rules. polygon: vertices. text: text, position, rotation, height, align, layer.
+    hole: position, diameter. Traces follow moved vias/points.
+  args:
+    id*: "string  # e.g. 'via:<uuid>'"
+    board: ref
+    width: "number  # trace width mm"
+    layer: "string  # copper layer (trace/plane) or layer ID (text)"
+    position: xy
+    drill: "number  # via drill mm"
+    size: "number  # via outer diameter mm"
+    diameter: "number  # hole diameter mm"
+    vertices: "[vertex]  # plane/keepout/polygon outline"
+    net: "string  # plane net"
+    priority: number
+    connectStyle: "thermal | solid | none"
+    clearance: "number  # plane clearance mm"
+    layers: "string  # keep-out layers: 'both' | 'all' | one layer"
+    rules: "[keepout_rule]"
+    text: string
+    rotation: number
+    height: "number  # text height mm"
+    align: "left | center | right"
+  returns: unspecified
+
+board_get_settings:
+  ro: true
+  desc: Board setup.
+  args:
+    board: ref
+  returns: >
+    inner copper layer count, PCB thickness, design rules (defaults for new traces/vias),
+    DRC settings (minimums), net classes with their nets, available manufacturer design rule presets
+
+board_set_settings:
+  ro: false
+  desc: Change board setup. Net classes are set via net_class_set.
+  args:
+    board: ref
+    preset: "string  # manufacturer preset from board_get_settings, or 'default'; applied first, then other values"
+    innerLayers: "integer 0..62  # named 'inner1'... elsewhere"
+    thickness: "number  # PCB thickness mm"
+    defaultTraceWidth: "number  # mm (if net class has none)"
+    defaultViaDrill: "number  # mm (if net class has none)"
+    minCopperBoardClearance: "number  # DRC min mm: copper to board edge"
+    minCopperClearance: "number  # copper to copper of other nets"
+    minCopperNpthClearance: "number  # copper to non-plated holes"
+    minCopperWidth: number
+    minDrillBoardClearance: "number  # drill to board edge"
+    minDrillDrillClearance: "number  # drill to drill"
+    minNpthDrill: "number  # drill diameter of NPTH"
+    minPthDrill: "number  # drill diameter of plated holes"
+    minPthAnnularRing: "number  # annular ring of plated holes"
+    minOutlineToolDiameter: "number  # milling tool diameter for inner corners"
+    minSilkscreenTextHeight: number
+    minSilkscreenWidth: number
+  returns: unspecified
+
+board_status:
+  ro: true
+  desc: Routing status of a board (planes filled first).
+  args:
+    board: ref
+  returns: unplaced parts, placed parts, unrouted connections (air wires)
+
+output_jobs_run:
+  ro: false
+  desc: Generate production data (Gerber/Excellon, assembly and schematic PDFs, pick&place, BOM, archives) into the project's output directory. Adds the default output jobs if the project has none (saved with project_save).
+  args: {}
+  returns: unspecified

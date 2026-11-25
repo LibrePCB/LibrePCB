@@ -66,7 +66,8 @@ void GraphicsExportRpc::run(GuiApplication& app, RpcObjectRegistry& registry,
   auto settings = std::make_shared<GraphicsExportSettings>();
   settings->setPixmapDpi(getOptionalArg<qint64>(request, "dpi").value_or(300));
   settings->setMirror(getOptionalArg<bool>(request, "flip").value_or(false));
-  settings->setBackgroundColor(getOptionalArg<QColor>(request, "background").value_or(Qt::transparent));
+  settings->setBackgroundColor(
+      getOptionalArg<QColor>(request, "background").value_or(Qt::transparent));
 
   QStringList painterErrors;
   std::shared_ptr<GraphicsPagePainter> painter;

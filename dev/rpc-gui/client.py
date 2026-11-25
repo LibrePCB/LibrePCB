@@ -86,8 +86,11 @@ def _detail_lines(value, indent):
         lines = []
         for item in value:
             if isinstance(item, (dict, list)) and item:
-                lines.append(f"{pad}-")
-                lines += _detail_lines(item, indent + 1)
+                nested = _detail_lines(item, indent + 1)
+                # Put the first nested line on the same line as the dash
+                # instead of emitting a bare "-" line.
+                nested[0] = f"{pad}- {nested[0].lstrip()}"
+                lines += nested
             else:
                 lines.append(f"{pad}- {_fmt(item)}")
         return lines

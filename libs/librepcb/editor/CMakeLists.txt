@@ -899,6 +899,8 @@ add_library(
   rpc/api/undostackrpc.h
   rpc/api/workspacedbrpc.cpp
   rpc/api/workspacedbrpc.h
+  rpc/api/workspacerpc.cpp
+  rpc/api/workspacerpc.h
   rpc/rpcerror.h
   rpc/rpcnotification.h
   rpc/rpcobjectregistry.cpp

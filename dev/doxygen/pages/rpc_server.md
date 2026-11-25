@@ -62,8 +62,7 @@ The success result is a map with some application information:
 ~~~{.msgpack}
 [1, 1, 0, {"format": "1.0", "server": "librepcb", "session":
 "783ea436-b2bc-4a1e-95a1-d5600c4a26d6", "token":
-"0f0e7d09-457c-4924-a21f-d8d5341f8d55", "version": "2.1.2",
-"workspace": "~/LibrePCB-Workspace"}]
+"0f0e7d09-457c-4924-a21f-d8d5341f8d55", "version": "2.1.2"}]
 ~~~
 
 The fields have the following meaning:
@@ -77,7 +76,9 @@ The fields have the following meaning:
   whenever the application is restarted, so clients can detect that.
 - `token`: The access token for this connection — either the one provided
   in the request, or a freshly issued one (see above).
-- `workspace`: The path of the currently opened workspace.
+
+Information about the currently opened workspace is available through the
+`Workspace/get` method instead.
 
 Clients use `version` together with the per-method `since`
 from the specification file to determine which methods the server

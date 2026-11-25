@@ -190,8 +190,7 @@ A request's `params` is a **string-keyed msgpack map**:
     dismisses the prompt or the client cancels the request (type 3), the
     request is replied with `AccessDenied`.
 - Success result (a map): `{"format": "1.0", "server": "librepcb",
-  "version": "<app version>", "session": "<uuid>", "workspace": "<path>",
-  "token": "<token>"}`.
+  "version": "<app version>", "session": "<uuid>", "token": "<token>"}`.
   - `format` is the RPC interface format version (currently `"1.0"`).
     Clients must verify the major version; a higher minor version means
     additive, backward-compatible changes.

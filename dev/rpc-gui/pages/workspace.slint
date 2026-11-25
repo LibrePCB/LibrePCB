@@ -1,0 +1,25 @@
+import { Button, TextEdit } from "std-widgets.slint";
+
+export component WorkspacePage {
+    in property <bool> authenticated;
+    in property <string> details;
+    callback get-clicked();
+
+    VerticalLayout {
+        spacing: 8px;
+
+        Button {
+            text: "Get";
+            enabled: root.authenticated;
+            clicked => { root.get-clicked(); }
+        }
+
+        TextEdit {
+            vertical-stretch: 1;
+            text: root.details;
+            read-only: true;
+            font-family: "DejaVu Sans Mono";
+            font-size: 12px;
+        }
+    }
+}

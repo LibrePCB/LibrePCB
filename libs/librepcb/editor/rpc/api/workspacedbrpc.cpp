@@ -26,7 +26,9 @@
 #include "../rpcnotification.h"
 #include "../rpcrequest.h"
 #include "rpcerrors.h"
+#include "rpchelpers.h"
 
+#include <librepcb/core/sqlitedatabase.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 
@@ -69,6 +71,40 @@ void WorkspaceDbRpc::wait(GuiApplication& app, RpcObjectRegistry& registry,
                    [&db, &request]() { request.send(details(db)); });
   QObject::connect(&request, &RpcRequest::cancelled, &request,
                    [&request]() { request.send(RpcCancelled()); });
+}
+
+void WorkspaceDbRpc::search(GuiApplication& app, RpcObjectRegistry& registry,
+                            RpcRequest& request) {
+  Q_UNUSED(app);
+  Q_UNUSED(registry);
+  Q_UNUSED(request);
+  throw RpcCommandFailed();
+}
+
+void WorkspaceDbRpc::query_sql(GuiApplication& app, RpcObjectRegistry& registry,
+                               RpcRequest& request) {
+  Q_UNUSED(registry);
+  const QString queryStr = getArg<QString>(request, "query");
+
+  // IMPORTANT: Open the database in read-only mode!
+  SQLiteDatabase db(app.getWorkspace().getLibraryDb().getFilePath(), true);
+  QSqlQuery query = db.prepareQuery(queryStr);
+  query.setForwardOnly(true);
+  db.exec(query);
+
+  QSqlRecord rec = query.record();
+  const int columns = rec.count();
+
+  QVariantList rows;
+  while (query.next()) {
+    QVariantMap values;
+    for (int i = 0; i < columns; ++i) {
+      values.insert(rec.fieldName(i), query.value(i));
+    }
+    rows.append(values);
+  }
+
+  request.send({{"rows", rows}});
 }
 
 /*******************************************************************************

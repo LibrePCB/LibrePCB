@@ -363,6 +363,17 @@ structs:
           will be executed by `redo()`. If there is no command to redo, this is
           `nil`.
 
+  - name: WorkspaceDetails
+    description: Information about a workspace.
+    fields:
+      - name: path
+        type: string
+        description: Absolute file path to the workspace.
+      - name: projects_path
+        type: string
+        description: >-
+          Absolute file path to the projects root directory in the workspace.
+
   - name: WorkspaceDbDetails
     description: Information about the workspace library database.
     fields: []
@@ -411,9 +422,6 @@ classes:
             description: >-
               A UUID identifying the running application process (changes
               on every application restart).
-          - name: workspace
-            type: string
-            description: The absolute path of the currently opened workspace.
           - name: token
             type: string
             description: >-
@@ -644,6 +652,16 @@ classes:
               partially. If the image could not be rendered at all, an RPC
               error is returned instead.
 
+  - name: Workspace
+    description: Access to the currently opened workspace.
+    since: "2.2.0"
+    methods:
+      - name: get
+        description: Get information about the workspace.
+        static: true
+        params: []
+        result: WorkspaceDetails
+
   - name: UndoStack
     description: >-
       The undo stack of an open document. The handle may point to a project or
@@ -730,3 +748,60 @@ classes:
         static: true
         params: []
         result: WorkspaceDbDetails
+
+      - name: search
+        description: Search library elements.
+        static: true
+        params:
+          - name: type
+            type: LibraryElementType
+            description: Type of library elements to find.
+          - name: query
+            type: string
+            description: >-
+              Keyword to search for. If omitted or empty, all elements will
+              be returned.
+          - name: library
+            type: string
+            description: >-
+              If provided, only list elements contained in this library,
+              specified by its absolute file path.
+          - name: category
+            type: uuid?
+            description: >-
+              If provided, only list elements or categories within this
+              category. If `null`, it means the root category, or elements
+              without a valid category.
+          - name: package
+            type: uuid
+            description: >-
+              If provided, only list devices or parts for this package.
+          - name: component
+            type: uuid
+            description: >-
+              If provided, only list devices or parts for this component.
+          - name: device
+            type: uuid
+            description: >-
+              If provided, only list parts for this device.
+          - name: limit
+            type: int
+            description: Max. number of results to return.
+        result:
+          - name: matches
+            type: array
+            items: WorkspaceDbSearchResult
+            description: Search results.
+
+      - name: query_sql
+        description: Query the SQLite database directly (read-only).
+        static: true
+        params:
+          - name: query
+            type: string
+            description: SQL query.
+        result:
+          - name: rows
+            type: array
+            items: any
+            description: Result rows.

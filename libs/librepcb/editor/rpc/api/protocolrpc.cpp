@@ -31,7 +31,6 @@
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/types/uuid.h>
-#include <librepcb/core/workspace/workspace.h>
 
 #include <QtCore>
 
@@ -71,7 +70,7 @@ void ProtocolRpc::initialize(GuiApplication& app, RpcObjectRegistry& registry,
       getArg<QString>(request, "name").simplified().left(32);
   const QVariant token = request.getArg("token");
 
-  auto sendResponse = [clientName, &app, &request](QString token) {
+  auto sendResponse = [clientName, &request](QString token) {
     static const Uuid session = Uuid::createRandom();
     if (token.isEmpty()) {
       token = Uuid::createRandom().toStr();
@@ -83,7 +82,6 @@ void ProtocolRpc::initialize(GuiApplication& app, RpcObjectRegistry& registry,
         {"server", "librepcb"},
         {"version", Application::getVersion()},
         {"session", session.toStr()},
-        {"workspace", app.getWorkspace().getPath().toStr()},
         {"token", token},
     });
   };

@@ -16,6 +16,7 @@ import {
     LibraryRowData,
 } from "pages/remote_library.slint";
 import { RuleCheckPage, RuleCheckMessageData } from "pages/rule_check.slint";
+import { WorkspacePage } from "pages/workspace.slint";
 import { WorkspaceDbPage } from "pages/workspace_db.slint";
 
 export component AppWindow inherits Window {
@@ -94,7 +95,14 @@ export component AppWindow inherits Window {
     callback rc-unapprove-clicked();
 
     // --- WorkspaceDb page --------------------------------------------------
+    in-out property <string> db-query: "SELECT sql FROM sqlite_schema WHERE sql IS NOT NULL";
+    in property <string> db-details;
     callback db-wait-clicked();
+    callback db-query-clicked();
+
+    // --- Workspace page ----------------------------------------------------
+    in property <string> workspace-details;
+    callback ws-get-clicked();
 
     // --- GraphicsExport page -----------------------------------------------
     in property <[string]> ge-entries;
@@ -284,7 +292,10 @@ export component AppWindow inherits Window {
                 vertical-stretch: 1;
                 authenticated: root.authenticated;
                 progress: root.progress;
+                query <=> root.db-query;
+                details: root.db-details;
                 wait-clicked => { root.db-wait-clicked(); }
+                query-clicked => { root.db-query-clicked(); }
             }
             if root.current-page == 6: GraphicsExportPage {
                 vertical-stretch: 1;
@@ -300,6 +311,12 @@ export component AppWindow inherits Window {
                 select-render(value) => { root.ge-select-render(value); }
                 refresh-clicked => { root.ge-refresh-clicked(); }
                 render-clicked => { root.ge-render-clicked(); }
+            }
+            if root.current-page == 7: WorkspacePage {
+                vertical-stretch: 1;
+                authenticated: root.authenticated;
+                details: root.workspace-details;
+                get-clicked => { root.ws-get-clicked(); }
             }
             if root.current-page < 0: Text {
                 vertical-stretch: 1;
