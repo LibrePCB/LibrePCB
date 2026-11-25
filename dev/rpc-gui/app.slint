@@ -14,7 +14,7 @@ import {
     RemoteLibraryPage,
     LibraryRowData,
 } from "pages/remote_library.slint";
-import { RuleCheckPage } from "pages/rule_check.slint";
+import { RuleCheckPage, RuleCheckMessageData } from "pages/rule_check.slint";
 import { WorkspaceDbPage } from "pages/workspace_db.slint";
 
 export component AppWindow inherits Window {
@@ -30,6 +30,7 @@ export component AppWindow inherits Window {
 
     // --- Navigation (sidebar) ---------------------------------------------
     in property <[string]> classes;
+    in property <int> selected-class: -1;
     in property <int> current-page: -1;
     callback select-class(int);
 
@@ -181,7 +182,7 @@ export component AppWindow inherits Window {
 
                 for class-name[i] in root.classes: Button {
                     text: class-name;
-                    primary: i == root.current-page;
+                    primary: i == root.selected-class;
                     clicked => { root.select-class(i); }
                 }
             }
@@ -213,7 +214,7 @@ export component AppWindow inherits Window {
                 save-clicked(i) => { root.pe-save-clicked(i); }
                 close-clicked(i) => { root.pe-close-clicked(i); }
             }
-            if root.current-page == 2: UndoStackPage {
+            if root.current-page == 3: UndoStackPage {
                 vertical-stretch: 1;
                 authenticated: root.authenticated;
                 project-entries: root.project-entries;
@@ -225,7 +226,7 @@ export component AppWindow inherits Window {
                 undo-clicked => { root.undo-undo-clicked(); }
                 redo-clicked => { root.undo-redo-clicked(); }
             }
-            if root.current-page == 3: RemoteLibraryPage {
+            if root.current-page == 4: RemoteLibraryPage {
                 vertical-stretch: 1;
                 authenticated: root.authenticated;
                 libraries: root.libraries;
@@ -235,7 +236,23 @@ export component AppWindow inherits Window {
                 apply-clicked => { root.rl-apply-clicked(); }
                 get-clicked(i) => { root.rl-get-clicked(i); }
             }
-            if root.current-page == 4: WorkspaceDbPage {
+            if root.current-page == 2: RuleCheckPage {
+                vertical-stretch: 1;
+                authenticated: root.authenticated;
+                running: root.rulecheck-running;
+                progress: root.progress;
+                check-entries: root.check-entries;
+                check-index <=> root.check-index;
+                quick <=> root.quick;
+                messages: root.check-messages;
+                select-check(value) => { root.rc-select-check(value); }
+                run-clicked => { root.rc-run-clicked(); }
+                cancel-clicked => { root.rc-cancel-clicked(); }
+                check-toggled(i, checked) => { root.rc-check-toggled(i, checked); }
+                approve-clicked => { root.rc-approve-clicked(); }
+                unapprove-clicked => { root.rc-unapprove-clicked(); }
+            }
+            if root.current-page == 5: WorkspaceDbPage {
                 vertical-stretch: 1;
                 authenticated: root.authenticated;
                 progress: root.progress;

@@ -418,6 +418,7 @@ Render a single graphics scene to an image and return it.
 |------|------|-------------|
 | `image` | `binary` | Rendered image in the requested format as a binary blob. |
 | `region` | `array` of `Point` | Region represented by the image (coordinates of pixels at [0,0] and [N,N]). |
+| `errors` | `array` of `string` | Any occurred rendering errors if the image could be rendered partially. If the image could not be rendered at all, an RPC error is returned instead. |
 
 
 **Since:** 2.2.0

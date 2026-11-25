@@ -18,7 +18,8 @@ class ProjectEditorPage:
         path = self.app.project_path.strip()
         if not path:
             return
-        self.app.call("ProjectEditor/open", {"path": path})
+        self.app.call("ProjectEditor/open", {"path": path},
+                      self._on_opened)
 
     def list_clicked(self):
         self.app.call("ProjectEditor/list", {}, self._on_list)
@@ -58,7 +59,8 @@ class ProjectEditorPage:
         if params:
             self.app.call(
                 "ProjectEditor/set", {"obj": self._details_obj, **params},
-                self._on_details)
+                lambda status, payload: self._on_details(
+                    status, payload, self._details_obj))
 
     # --- Response handlers ---------------------------------------------
 

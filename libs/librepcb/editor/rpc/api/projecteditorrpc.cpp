@@ -23,8 +23,10 @@
 #include "projecteditorrpc.h"
 
 #include "../../guiapplication.h"
+#include "../../project/board/boardeditor.h"
 #include "../../project/cmd/cmdprojectedit.h"
 #include "../../project/projecteditor.h"
+#include "../../project/schematic/schematiceditor.h"
 #include "../../undostack.h"
 #include "../rpcobjectregistry.h"
 #include "../rpcrequest.h"
@@ -60,19 +62,23 @@ static QVariantMap summary(const Attribute& obj) {
   return result;
 }
 
-static QVariantMap summary(Schematic& obj, RpcObjectRegistry& registry) {
+static QVariantMap summary(SchematicEditor& obj, RpcObjectRegistry& registry) {
+  Schematic& schematic = obj.getSchematic();
+
   QVariantMap result;
   result.insert("obj", registry.getHandle(obj));
-  result.insert("uuid", toVariant(obj.getUuid()));
-  result.insert("name", *obj.getName());
+  result.insert("uuid", toVariant(schematic.getUuid()));
+  result.insert("name", *schematic.getName());
   return result;
 }
 
-static QVariantMap summary(Board& obj, RpcObjectRegistry& registry) {
+static QVariantMap summary(BoardEditor& obj, RpcObjectRegistry& registry) {
+  Board& board = obj.getBoard();
+
   QVariantMap result;
   result.insert("obj", registry.getHandle(obj));
-  result.insert("uuid", toVariant(obj.getUuid()));
-  result.insert("name", *obj.getName());
+  result.insert("uuid", toVariant(board.getUuid()));
+  result.insert("name", *board.getName());
   return result;
 }
 
@@ -103,12 +109,15 @@ static QVariantMap details(ProjectEditor& obj, RpcObjectRegistry& registry) {
   result.insert("locale_order", toVariant(project.getLocaleOrder()));
   result.insert("norm_order", toVariant(project.getNormOrder()));
   result.insert("sheets",
-                toVariant(project.getSchematics(), [&](Schematic* obj) {
-                  return summary(*obj, registry);
-                }));
-  result.insert("boards", toVariant(project.getBoards(), [&](Board* obj) {
-                  return summary(*obj, registry);
-                }));
+                toVariant(obj.getSchematics(),
+                          [&](const std::shared_ptr<SchematicEditor>& obj) {
+                            return summary(*obj, registry);
+                          }));
+  result.insert(
+      "boards",
+      toVariant(obj.getBoards(), [&](const std::shared_ptr<BoardEditor>& obj) {
+        return summary(*obj, registry);
+      }));
   return result;
 }
 

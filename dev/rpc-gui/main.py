@@ -30,13 +30,17 @@ DEFAULT_PROJECT_PATH = os.path.normpath(os.path.join(
 
 # The page index for each class of api.CLASSES (unknown classes get the
 # "no page yet" placeholder).
+# The page index of each class of api.CLASSES (classes without a page
+# show the "no page yet" placeholder). Note: The slint page area refers
+# to these fixed indices, so they must not depend on the order of
+# api.CLASSES.
 PAGES = {
     "Protocol": 0,
     "ProjectEditor": 1,
-    "UndoStack": 2,
-    "RemoteLibrary": 3,
-    "WorkspaceDb": 4,
-    "RuleCheck": 5,
+    "RuleCheck": 2,
+    "UndoStack": 3,
+    "RemoteLibrary": 4,
+    "WorkspaceDb": 5,
 }
 
 ns = slint.load_file("app.slint")
@@ -135,6 +139,7 @@ class Gui(ns.AppWindow):
 
     @slint.callback
     def select_class(self, index):
+        self.selected_class = index
         self.current_page = PAGES.get(api.CLASSES[index], -1)
 
     # --- Protocol page ----------------------------------------------------

@@ -30,8 +30,8 @@ class RuleCheckPage:
                     {"name": p["name"], "obj": p["obj"], "board": False})
         self._update_model()
 
-    def set_boards(self, project, boards):
-        """Update the board entries (DRC) of the given project."""
+    def set_boards(self, boards):
+        """Update the board entries (DRC)."""
         self._objects = [
             entry
             for entry in self._objects
@@ -60,7 +60,7 @@ class RuleCheckPage:
         params = {"obj": self._selected}
         if self.app.quick:
             params["quick"] = True
-        self.app.running = True
+        self.app.rulecheck_running = True
         self.app.progress = 0
         self._running_msgid = self.app.call(
             "RuleCheck/run", params, self._on_run)
@@ -98,7 +98,7 @@ class RuleCheckPage:
 
     def _on_run(self, status, payload):
         self._running_msgid = None
-        self.app.running = False
+        self.app.rulecheck_running = False
         self.app.progress = 0
         if status != 0:
             return
@@ -109,7 +109,11 @@ class RuleCheckPage:
     def _update_model(self):
         self.app.check_entries = slint.ListModel(
             [_label(entry) for entry in self._objects])
-        self.app.messages = slint.ListModel([
+        # Auto-select the first entry (the Run button needs a selection).
+        if (self._selected is None) and self._objects:
+            self._selected = self._objects[0]["obj"]
+            self.app.check_index = 0
+        self.app.check_messages = slint.ListModel([
             {
                 "checked": message["obj"] in self._checked,
                 "severity": message.get("severity", ""),
