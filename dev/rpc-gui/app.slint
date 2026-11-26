@@ -96,9 +96,23 @@ export component AppWindow inherits Window {
 
     // --- WorkspaceDb page --------------------------------------------------
     in-out property <string> db-query: "SELECT sql FROM sqlite_schema WHERE sql IS NOT NULL";
+    in property <[string]> db-get-entries: [
+        "library",
+        "component_category",
+        "package_category",
+        "symbol",
+        "package",
+        "component",
+        "device",
+        "organization",
+    ];
+    in-out property <int> db-get-index: 0;
+    in-out property <string> db-get-type: "library";
+    in-out property <string> db-get-input: "";
     in property <string> db-details;
     callback db-wait-clicked();
     callback db-query-clicked();
+    callback db-get-clicked();
 
     // --- Workspace page ----------------------------------------------------
     in property <string> workspace-details;
@@ -293,9 +307,14 @@ export component AppWindow inherits Window {
                 authenticated: root.authenticated;
                 progress: root.progress;
                 query <=> root.db-query;
+                get-entries: root.db-get-entries;
+                get-index <=> root.db-get-index;
+                get-type <=> root.db-get-type;
+                get-input <=> root.db-get-input;
                 details: root.db-details;
                 wait-clicked => { root.db-wait-clicked(); }
                 query-clicked => { root.db-query-clicked(); }
+                get-clicked => { root.db-get-clicked(); }
             }
             if root.current-page == 6: GraphicsExportPage {
                 vertical-stretch: 1;

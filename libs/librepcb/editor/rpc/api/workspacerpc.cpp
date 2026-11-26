@@ -44,7 +44,9 @@ void WorkspaceRpc::get(GuiApplication& app, RpcObjectRegistry& registry,
   const Workspace& workspace = app.getWorkspace();
   request.send({
       {"path", workspace.getPath().toStr()},
-      {"projects_path", workspace.getProjectsPath().toStr()},
+      // Currently not exposed for privacy/security reasons.
+      //{"libraries_path", workspace.getLibrariesPath().toStr()},
+      //{"projects_path", workspace.getProjectsPath().toStr()},
   });
 }
 

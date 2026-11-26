@@ -86,6 +86,18 @@ public:
    */
   static void query_sql(GuiApplication& app, RpcObjectRegistry& registry,
                         RpcRequest& request);
+
+  /**
+   * @brief Get details about a specific library element. This accesses not
+   *        only the database, but also loads the library element from disk.
+   *        So this is a more heavy operation and may take a few milliseconds
+   *        up to maybe a second. The data will be cached - any further call
+   *        on the same library element will be responded from memory, as long
+   *        as no library rescan was started in the mean time (rescan
+   *        invalidates the cache).
+   */
+  static void get(GuiApplication& app, RpcObjectRegistry& registry,
+                  RpcRequest& request);
 };
 
 /*******************************************************************************

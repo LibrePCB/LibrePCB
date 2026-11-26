@@ -75,7 +75,7 @@ A summary of an open project.
 | `name` | `string` | The project name. |
 | `author` | `string` | The project author. |
 | `version` | `string` | The project version. |
-| `path` | `string` | The absolute path of the project file. |
+| `path` | `string` | The file path of the project file. If the project is located within the workspace projects folder, a relative path is returned, otherwise an absolute path. |
 | `dirty` | `bool` | Whether the project has unsaved changes (i.e. its undo stack is not clean, or any manual, untracked changes have been made). |
 
 ---
@@ -530,6 +530,8 @@ Fetch all remote libraries. If the application already has the list ready, this 
 | `libraries` | `array` of [`RemoteLibrarySummary`](@ref doc_rpc_api_type_RemoteLibrarySummary) | All remote libraries, in an unspecified (but stable) order. |
 
 
+**Since:** 2.2.0
+
 ---
 
 ### RemoteLibrary/apply {#doc_rpc_api_method_RemoteLibrary_apply}
@@ -546,6 +548,8 @@ IMPORTANT: After calling this method, use `WorkspaceDb.wait()` to wait for the l
 
 **Result:** None
 
+**Since:** 2.2.0
+
 ---
 
 ### RemoteLibrary/get {#doc_rpc_api_method_RemoteLibrary_get}
@@ -555,6 +559,8 @@ Get details about a remote library.
 **Params:** None
 
 **Result:** `RemoteLibraryDetails`
+
+**Since:** 2.2.0
 
 ---
 
@@ -570,6 +576,8 @@ Wait for the library rescan to complete. If the database is already up-to-date, 
 **Params:** None
 
 **Result:** [`WorkspaceDbDetails`](@ref doc_rpc_api_type_WorkspaceDbDetails)
+
+**Since:** 2.2.0
 
 ---
 
@@ -599,6 +607,8 @@ Search library elements.
 | `matches` | `array` of `WorkspaceDbSearchResult` | Search results. |
 
 
+**Since:** 2.2.0
+
 ---
 
 ### WorkspaceDb/query_sql {#doc_rpc_api_method_WorkspaceDb_query_sql}
@@ -617,5 +627,26 @@ Query the SQLite database directly (read-only).
 
 | Name | Type | Description |
 |------|------|-------------|
-| `rows` | `array` of `any` | Result rows. |
+| `rows` | `array` of `map` | Result rows. |
+
+
+**Since:** 2.2.0
+
+---
+
+### WorkspaceDb/get {#doc_rpc_api_method_WorkspaceDb_get}
+
+Get details about a specific library element. This accesses not only the database, but also loads the library element from disk. So this is a more heavy operation and may take a few milliseconds up to maybe a second. The data will be cached - any further call on the same library element will be responded from memory, as long as no library rescan was started in the mean time (rescan invalidates the cache).
+
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `type` | `string` | Type of library element to open ("library", "component_category", "package_category", "symbol", "package", "component", "device", "organization"). |
+| `path` | `string` | File path to the library elements directory, relative to the workspace libraries root folder. If omitted, the `uuid` argument must be passed instead. |
+| `uuid` | [`uuid`](@ref doc_rpc_api_ext_types) | UUID of the library element. If there exist multiple library elements with that UUID, the one with the highest version number will be returned. If omitted, the `path` argument must be passed instead. |
+
+**Result:** None
+
+**Since:** 2.2.0
 

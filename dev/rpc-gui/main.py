@@ -272,6 +272,10 @@ class Gui(ns.AppWindow):
     def db_query_clicked(self):
         self._pages["WorkspaceDb"].query_clicked()
 
+    @slint.callback
+    def db_get_clicked(self):
+        self._pages["WorkspaceDb"].get_clicked()
+
     # --- Workspace page -----------------------------------------------------
 
     @slint.callback

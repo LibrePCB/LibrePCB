@@ -238,7 +238,10 @@ structs:
         description: The project version.
       - name: path
         type: string
-        description: The absolute path of the project file.
+        description: >-
+          The file path of the project file. If the project is located within
+          the workspace projects folder, a relative path is returned, otherwise
+          an absolute path.
       - name: dirty
         type: bool
         description: >-
@@ -828,8 +831,9 @@ classes:
           - name: path
             type: string
             description: >-
-              Absolute file path to the library elements directory. If omitted,
-              the `uuid` argument must be passed instead.
+              File path to the library elements directory, relative to the
+              workspace libraries root folder. If omitted, the `uuid` argument
+              must be passed instead.
           - name: uuid
             type: uuid
             description: >-

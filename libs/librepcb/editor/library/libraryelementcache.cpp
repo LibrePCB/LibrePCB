@@ -195,7 +195,7 @@ std::shared_ptr<const T> LibraryElementCache::getElement(
     bool throwIfNotFound) const {
   std::shared_ptr<const T> element = container.value(fp);
   QString errMsg = "Unknown error, please open an bug report.";
-  if ((!element) && mDb) {
+  if (!element) {
     try {
       element.reset(T::open(std::make_unique<TransactionalDirectory>(
                                 TransactionalFileSystem::openRO(fp)))

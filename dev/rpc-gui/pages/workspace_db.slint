@@ -1,12 +1,17 @@
-import { Button, LineEdit, ProgressIndicator, TextEdit } from "std-widgets.slint";
+import { Button, ComboBox, LineEdit, ProgressIndicator, TextEdit } from "std-widgets.slint";
 
 export component WorkspaceDbPage {
     in property <bool> authenticated;
     in property <int> progress;
     in-out property <string> query;
+    in property <[string]> get-entries;
+    in-out property <int> get-index: 0;
+    in-out property <string> get-type;
+    in-out property <string> get-input;
     in property <string> details;
     callback wait-clicked();
     callback query-clicked();
+    callback get-clicked();
 
     VerticalLayout {
         spacing: 8px;
@@ -34,6 +39,28 @@ export component WorkspaceDbPage {
                 text: "Execute";
                 enabled: root.authenticated;
                 clicked => { root.query-clicked(); }
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 6px;
+
+            ComboBox {
+                model: root.get-entries;
+                current-index <=> root.get-index;
+                selected(value) => { root.get-type = value; }
+            }
+
+            LineEdit {
+                text <=> root.get-input;
+                placeholder-text: "Path or UUID";
+                horizontal-stretch: 1;
+            }
+
+            Button {
+                text: "Get";
+                enabled: root.authenticated;
+                clicked => { root.get-clicked(); }
             }
         }
 

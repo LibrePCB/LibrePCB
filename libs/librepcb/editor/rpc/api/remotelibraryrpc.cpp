@@ -30,6 +30,8 @@
 #include "rpcerrors.h"
 #include "rpchelpers.h"
 
+#include <librepcb/core/workspace/workspace.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -66,7 +68,8 @@ static QSet<Uuid> getLibraryUuids(const LibrariesModel& model) {
   return set;
 }
 
-static QVariantMap summary(const ui::LibraryInfoData& obj) {
+static QVariantMap summary(GuiApplication& app,
+                           const ui::LibraryInfoData& obj) {
   auto optionalString = [](const slint::SharedString& s) {
     return s.empty() ? QVariant() : QVariant::fromValue(s2q(s));
   };
@@ -74,14 +77,17 @@ static QVariantMap summary(const ui::LibraryInfoData& obj) {
       {"uuid", toVariant(Uuid::fromString(s2q(obj.uuid)))},
       {"name", s2q(obj.name)},
       {"description", s2q(obj.description)},
-      {"path", toVariant(FilePath(s2q(obj.path)))},
+      {"path",
+       toPrivacyPath(FilePath(s2q(obj.path)),
+                     app.getWorkspace().getLibrariesPath())},
       {"installed_version", optionalString(obj.installed_version)},
       {"online_version", optionalString(obj.online_version)},
   };
 }
 
-static QVariantMap details(const ui::LibraryInfoData& obj) {
-  QVariantMap result = summary(obj);
+static QVariantMap details(GuiApplication& app,
+                           const ui::LibraryInfoData& obj) {
+  QVariantMap result = summary(app, obj);
   // TODO: Add more properties.
   return result;
 }
@@ -102,12 +108,13 @@ void RemoteLibraryRpc::list(GuiApplication& app, RpcObjectRegistry& registry,
   auto& model = app.getRemoteLibraries();
   model.ensurePopulated(false);
 
-  auto sendResponse = [&request, &model]() {
+  auto sendResponse = [&app, &request, &model]() {
     request.send({
         {"libraries",
-         modelToVariant(
-             model,
-             [](const ui::LibraryInfoData& obj) { return summary(obj); })},
+         modelToVariant(model,
+                        [&app](const ui::LibraryInfoData& obj) {
+                          return summary(app, obj);
+                        })},
     });
   };
 
@@ -196,7 +203,7 @@ void RemoteLibraryRpc::get(GuiApplication& app, RpcObjectRegistry& registry,
 
   auto& model = app.getRemoteLibraries();
   const auto obj = getObj(request, model);
-  request.send(details(obj));
+  request.send(details(app, obj));
 }
 
 /*******************************************************************************

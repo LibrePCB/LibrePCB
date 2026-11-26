@@ -13,18 +13,6 @@
 #   Optional board / schematic args are of type ref, default = the first one.
 #   Polygons given by vertices are closed automatically.
 
-library_get:
-  ro: true
-  desc: >
-    Details of a library element: symbol pins; component signals, symbol variants,
-    attributes, devices; package pads, footprints, pad geometry, courtyard, keep-outs,
-    holes (of one footprint, relative to origin); device additionally pad-signal-map and parts.
-  args:
-    type*: "component | device | symbol | package"
-    element*: "string  # name or UUID"
-    footprint: "string  # of package/device, default first"
-  returns: unspecified  # details as described
-
 library_create:
   ro: false
   desc: Create a new local library in the workspace for own parts.

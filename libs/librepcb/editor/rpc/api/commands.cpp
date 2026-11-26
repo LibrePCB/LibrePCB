@@ -79,6 +79,7 @@ void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
       {"WorkspaceDb/wait", &WorkspaceDbRpc::wait},
       {"WorkspaceDb/search", &WorkspaceDbRpc::search},
       {"WorkspaceDb/query_sql", &WorkspaceDbRpc::query_sql},
+      {"WorkspaceDb/get", &WorkspaceDbRpc::get},
   };
   if (auto func = commands.value(request.getMethod(), nullptr)) {
     func(app, registry, request);

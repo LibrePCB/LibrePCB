@@ -114,9 +114,6 @@ def test_rpc_server(librepcb, helpers):
             assert status == 0, result
             workspace_path = librepcb.workspace_path.replace("\\", "/")
             assert result["path"] == workspace_path, result
-            assert result["projects_path"] == (
-                workspace_path + "/projects"
-            ), result
 
             # A second connection can authenticate with the issued token,
             # without any user interaction.

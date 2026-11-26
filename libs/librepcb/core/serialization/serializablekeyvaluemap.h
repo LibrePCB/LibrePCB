@@ -101,6 +101,9 @@ public:
   ~SerializableKeyValueMap() noexcept {}
 
   // Getters
+  const QMap<QString, typename T::ValueType>& values() const noexcept {
+    return mValues;
+  }
   QStringList keys() const noexcept { return mValues.keys(); }
   const typename T::ValueType& getDefaultValue() const noexcept {
     auto i = mValues.find(QString(""));

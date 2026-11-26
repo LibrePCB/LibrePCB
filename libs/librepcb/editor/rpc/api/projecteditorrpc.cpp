@@ -56,15 +56,6 @@ namespace rpc {
  *  Helper Functions
  ******************************************************************************/
 
-static QVariantMap summary(const Attribute& obj) {
-  return {
-      {"name", *obj.getKey()},
-      {"type", obj.getType().getName()},
-      {"value", obj.getValue()},
-      {"unit", obj.getUnit() ? obj.getUnit()->getName() : QVariant()},
-  };
-}
-
 static QVariantMap summary(SchematicEditor& obj, RpcObjectRegistry& registry) {
   Schematic& schematic = obj.getSchematic();
   return {
@@ -88,7 +79,7 @@ static QVariantMap summary(ProjectEditor& obj, RpcObjectRegistry& registry) {
   return {
       {"obj", registry.getHandle(obj)},
       {"name", *project.getName()},
-      {"path", project.getFilepath().toStr()},
+      {"path", toVariant(project.getFilepath())},
       {"dirty", obj.hasUnsavedChanges()},
   };
 }
@@ -97,7 +88,7 @@ static QVariantMap details(ProjectEditor& obj, RpcObjectRegistry& registry) {
   const Project& project = obj.getProject();
   const auto attributes =
       toVariant(project.getAttributes(),
-                [&](const Attribute& obj) { return summary(obj); });
+                [&](const Attribute& obj) { return toVariant(obj); });
   const auto sheets = toVariant(
       obj.getSchematics(), [&](const std::shared_ptr<SchematicEditor>& obj) {
         return summary(*obj, registry);
@@ -109,7 +100,7 @@ static QVariantMap details(ProjectEditor& obj, RpcObjectRegistry& registry) {
   return {
       {"uuid", toVariant(project.getUuid())},
       {"name", *project.getName()},
-      {"path", project.getFilepath().toStr()},
+      {"path", toVariant(project.getFilepath())},
       {"dirty", obj.hasUnsavedChanges()},
       {"author", project.getAuthor()},
       {"version", *project.getVersion()},
@@ -137,7 +128,8 @@ void ProjectEditorRpc::list(GuiApplication& app, RpcObjectRegistry& registry,
 void ProjectEditorRpc::create(GuiApplication& app, RpcObjectRegistry& registry,
                               RpcRequest& request) {
   Q_UNUSED(registry);
-  const FilePath fp(getArg<QString>(request, "path"));
+  const FilePath fp = parseFilePath(getArg<QString>(request, "path"),
+                                    app.getWorkspace().getProjectsPath());
   const auto name = getOptionalArg<ElementName>(request, "name")
                         .value_or(ElementName(fp.getCompleteBasename()));
   const auto license =
@@ -154,7 +146,8 @@ void ProjectEditorRpc::create(GuiApplication& app, RpcObjectRegistry& registry,
 
 void ProjectEditorRpc::open(GuiApplication& app, RpcObjectRegistry& registry,
                             RpcRequest& request) {
-  const FilePath fp(getArg<QString>(request, "path"));
+  const FilePath fp = parseFilePath(getArg<QString>(request, "path"),
+                                    app.getWorkspace().getProjectsPath());
   const auto backupRestoreMode =
       getOptionalArg<BackupRestoreMode>(request, "backup")
           .value_or(BackupRestoreMode::Abort);

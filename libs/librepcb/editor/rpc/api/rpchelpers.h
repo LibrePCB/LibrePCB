@@ -29,7 +29,17 @@
 
 #include <librepcb/core/attribute/attribute.h>
 #include <librepcb/core/attribute/attributetype.h>
+#include <librepcb/core/attribute/attributeunit.h>
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/geometry/circle.h>
+#include <librepcb/core/geometry/hole.h>
+#include <librepcb/core/geometry/polygon.h>
+#include <librepcb/core/geometry/stroketext.h>
+#include <librepcb/core/geometry/text.h>
+#include <librepcb/core/geometry/zone.h>
+#include <librepcb/core/library/pkg/footprintpad.h>
+#include <librepcb/core/library/resource.h>
+#include <librepcb/core/library/sym/symbolpin.h>
 #include <librepcb/core/types/elementname.h>
 #include <librepcb/core/types/fileproofname.h>
 #include <librepcb/core/types/uuid.h>
@@ -51,6 +61,14 @@ namespace rpc {
 /*******************************************************************************
  *  RPC Helpers
  ******************************************************************************/
+
+inline QVariant toPrivacyPath(const FilePath& fp, const FilePath& base) {
+  if (fp.isValid() && base.isValid() && fp.isLocatedInDir(base)) {
+    return fp.toRelative(base);
+  } else {
+    return fp.toStr();
+  }
+}
 
 /// Convert a string list into the protocol's list-of-strings
 /// representation (QStringList is not part of the protocol's value
@@ -84,8 +102,230 @@ inline QVariant toVariant(const Uuid& obj) noexcept {
       rs::MsgPackExt(kMsgPackExtTypeUuid, QUuid(obj.toStr()).toRfc4122()));
 }
 
+inline QVariant toVariant(const std::optional<Uuid>& obj) noexcept {
+  return obj ? toVariant(*obj) : QVariant();
+}
+
 inline QVariant toVariant(const FilePath& obj) noexcept {
   return obj.isValid() ? obj.toStr() : QVariant();
+}
+
+inline QVariant toVariant(const Length& obj) noexcept {
+  return obj.toMm();
+}
+
+inline QVariant toVariant(const Point& obj) noexcept {
+  return QVariantList{
+      toVariant(obj.getX()),
+      toVariant(obj.getY()),
+  };
+}
+
+inline QVariant toVariant(const Angle& obj) noexcept {
+  return obj.toDeg();
+}
+
+inline QVariant toVariant(const Ratio& obj) noexcept {
+  return obj.toNormalized();
+}
+
+inline QVariant toVariant(const Vertex& obj) noexcept {
+  if (obj.getAngle() == 0) {
+    return QVariantList{
+        toVariant(obj.getPos().getX()),
+        toVariant(obj.getPos().getY()),
+    };
+  } else {
+    return QVariantList{
+        toVariant(obj.getPos().getX()),
+        toVariant(obj.getPos().getY()),
+        toVariant(obj.getAngle()),
+    };
+  }
+}
+
+inline QVariant toVariant(const Attribute& obj) {
+  return QVariantMap{
+      {"name", *obj.getKey()},
+      {"type", obj.getType().getName()},
+      {"value", obj.getValue()},
+      {"unit", obj.getUnit() ? obj.getUnit()->getName() : QVariant()},
+  };
+}
+
+inline QVariant toVariant(const Path& obj) noexcept {
+  return toVariant(obj.getVertices(),
+                   [](const Vertex& obj) { return toVariant(obj); });
+}
+
+inline QVariant toVariant(const HAlign& obj) noexcept {
+  if (obj == HAlign::left()) {
+    return "left";
+  } else if (obj == HAlign::right()) {
+    return "right";
+  } else {
+    return "center";
+  }
+}
+
+inline QVariant toVariant(const VAlign& obj) noexcept {
+  if (obj == VAlign::top()) {
+    return "top";
+  } else if (obj == VAlign::bottom()) {
+    return "bottom";
+  } else {
+    return "center";
+  }
+}
+
+inline QVariant toVariant(const Alignment& obj) noexcept {
+  const auto h = toVariant(obj.getH());
+  const auto v = toVariant(obj.getV());
+  return (h == v) ? h : (h.toString() + "_" + v.toString());
+}
+
+inline QVariant toVariant(const Resource& obj) noexcept {
+  return QVariantMap({
+      {"name", *obj.getName()},
+      {"media_type", obj.getMediaType()},
+      {"url", obj.getUrl().toString(QUrl::FullyDecoded)},
+  });
+}
+
+inline QVariant toVariant(const Polygon& obj) noexcept {
+  return QVariantMap({
+      {"uuid", toVariant(obj.getUuid())},
+      {"layer", obj.getLayer().getId()},
+      {"line_width", toVariant(*obj.getLineWidth())},
+      {"fill", obj.isFilled()},
+      {"grab_area", obj.isGrabArea()},
+      {"vertices", toVariant(obj.getPath())},
+  });
+}
+
+inline QVariant toVariant(const Circle& obj) noexcept {
+  return QVariantMap({
+      {"uuid", toVariant(obj.getUuid())},
+      {"layer", obj.getLayer().getId()},
+      {"line_width", toVariant(*obj.getLineWidth())},
+      {"fill", obj.isFilled()},
+      {"grab_area", obj.isGrabArea()},
+      {"center", toVariant(obj.getCenter())},
+      {"diameter", toVariant(*obj.getDiameter())},
+  });
+}
+
+inline QVariant toVariant(const Text& obj) noexcept {
+  return QVariantMap({
+      {"uuid", toVariant(obj.getUuid())},
+      {"layer", obj.getLayer().getId()},
+      {"text", obj.getText()},
+      {"position", toVariant(obj.getPosition())},
+      {"rotation", toVariant(obj.getRotation())},
+      {"height", toVariant(*obj.getHeight())},
+      {"alignment", toVariant(obj.getAlign())},
+      {"lock", obj.isLocked()},
+  });
+}
+
+inline QVariant toVariant(const StrokeText& obj) noexcept {
+  return QVariantMap({
+      {"uuid", toVariant(obj.getUuid())},
+      {"layer", obj.getLayer().getId()},
+      {"text", obj.getText()},
+      {"position", toVariant(obj.getPosition())},
+      {"rotation", toVariant(obj.getRotation())},
+      {"height", toVariant(*obj.getHeight())},
+      {"stroke_width", toVariant(*obj.getStrokeWidth())},
+      {"alignment", toVariant(obj.getAlign())},
+      {"mirror", obj.getMirrored()},
+      {"auto_rotate", obj.getAutoRotate()},
+      {"lock", obj.isLocked()},
+  });
+}
+
+inline QVariant toVariant(const SymbolPin& obj) noexcept {
+  return QVariantMap({
+      {"uuid", toVariant(obj.getUuid())},
+      {"name", *obj.getName()},
+      {"position", toVariant(obj.getPosition())},
+      {"rotation", toVariant(obj.getRotation())},
+      {"length", toVariant(*obj.getLength())},
+      {"name_position", toVariant(obj.getNamePosition())},
+      {"name_rotation", toVariant(obj.getNameRotation())},
+      {"name_height", toVariant(*obj.getNameHeight())},
+      {"name_alignment", toVariant(obj.getNameAlignment())},
+  });
+}
+
+inline QVariant toVariant(const Hole& obj) noexcept {
+  return QVariantMap({
+      {"uuid", toVariant(obj.getUuid())},
+      {"diameter", toVariant(*obj.getDiameter())},
+      {"vertices", toVariant(*obj.getPath())},
+      {"stop_mask", serialize(obj.getStopMaskConfig())->getValue()},
+  });
+}
+
+inline QVariant toVariant(const Pad& obj) noexcept {
+  const auto holes = toVariant(obj.getHoles(), [](const PadHole& obj) {
+    return QVariantMap{
+        {"uuid", toVariant(obj.getUuid())},
+        {"diameter", toVariant(*obj.getDiameter())},
+        {"vertices", toVariant(*obj.getPath())},
+    };
+  });
+
+  return QVariantMap({
+      {"uuid", toVariant(obj.getUuid())},
+      {"position", toVariant(obj.getPosition())},
+      {"rotation", toVariant(obj.getRotation())},
+      {"shape", serialize(obj.getShape())->getValue()},
+      {"width", toVariant(*obj.getWidth())},
+      {"height", toVariant(*obj.getHeight())},
+      {"corner_radius", toVariant(*obj.getRadius())},
+      {"custom_outline", toVariant(obj.getCustomShapeOutline())},
+      {"stop_mask", serialize(obj.getStopMaskConfig())->getValue()},
+      {"solder_paste", serialize(obj.getSolderPasteConfig())->getValue()},
+      {"copper_clearance", toVariant(*obj.getCopperClearance())},
+      {"component_side", serialize(obj.getComponentSide())->getValue()},
+      {"function", serialize(obj.getFunction())->getValue()},
+      {"holes", holes},
+  });
+}
+
+inline QVariant toVariant(const FootprintPad& obj) noexcept {
+  QVariantMap result = toVariant(static_cast<const Pad&>(obj)).toMap();
+  result.insert({
+      {"package_pad", toVariant(obj.getPackagePadUuid())},
+  });
+  return result;
+}
+
+inline QVariant toVariant(const Zone::Layers& obj) noexcept {
+  return QVariantMap({
+      {"top", obj.testFlag(Zone::Layer::Top)},
+      {"inner", obj.testFlag(Zone::Layer::Inner)},
+      {"bottom", obj.testFlag(Zone::Layer::Bottom)},
+  });
+}
+
+inline QVariant toVariant(const Zone::Rules& obj) noexcept {
+  return QVariantMap({
+      {"no_copper", obj.testFlag(Zone::Rule::NoCopper)},
+      {"no_planes", obj.testFlag(Zone::Rule::NoPlanes)},
+      {"no_exposure", obj.testFlag(Zone::Rule::NoExposure)},
+      {"no_devices", obj.testFlag(Zone::Rule::NoDevices)},
+  });
+}
+
+inline QVariant toVariant(const Zone& obj) noexcept {
+  return QVariantMap({
+      {"uuid", toVariant(obj.getUuid())},
+      {"layers", toVariant(obj.getLayers())},
+      {"rules", toVariant(obj.getRules())},
+      {"vertices", toVariant(obj.getOutline())},
+  });
 }
 
 template <typename T, typename F>
@@ -176,6 +416,15 @@ struct RpcArgTraits<QVariantMap> {
     return std::nullopt;
   }
 };
+
+// template <>
+// struct RpcArgTraits<FilePath> {
+//   static constexpr const char* NAME = "FilePath";
+//   static std::optional<FilePath> tryFromVariant(const QVariant& v) noexcept {
+//     const FilePath fp(v.toString());
+//     return fp.isValid() ? std::make_optional(fp) : std::nullopt;
+//   }
+// };
 
 /// The protocol's "uuid" extension type — strictly the ext value, i.e.
 /// a 36-character string is *not* accepted (see the API specification).
@@ -335,6 +584,18 @@ T getArg(const RpcRequest& request, const QString& argName) {
   }
   throw RpcInvalidArgs(QString("Missing value for argument '%1' (expected %2).")
                            .arg(argName, RpcArgTraits<T>::NAME));
+}
+
+inline FilePath parseFilePath(const QString& path, const FilePath& base) {
+  FilePath fp = FilePath(path);
+  if ((!fp.isValid()) && base.isValid()) {
+    fp = base.getPathTo(path);
+  }
+  if (fp.isValid() && (fp != base)) {
+    return fp;
+  }
+  throw RpcInvalidArgs(
+      QString("The value '%1' is not a valid file path.").arg(path));
 }
 
 /*******************************************************************************

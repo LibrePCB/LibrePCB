@@ -9,6 +9,7 @@ import queue
 import socket
 import threading
 import time
+import uuid
 
 import umsgpack
 
@@ -42,6 +43,15 @@ def _fmt(value):
         # distinguished from non-string objects (e.g. UUID ext values).
         return "'" + value + "'"
     return str(value)
+
+
+def ext_uuid(value):
+    """Encode a string as the protocol's uuid extension value. Returns None
+    if the string is not a valid UUID."""
+    try:
+        return umsgpack.Ext(2, uuid.UUID(value).bytes)
+    except (ValueError, TypeError):
+        return None
 
 
 def fmt_uuid(value):
