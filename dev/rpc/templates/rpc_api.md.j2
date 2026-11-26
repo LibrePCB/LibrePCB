@@ -42,6 +42,7 @@ This reference documents the commands (data types, error types, classes with the
 
 > Note: This reference is about controlling a *running* LibrePCB application. For the *online* REST API used to fetch libraries, see @ref doc_server_api.
 
+{% if spec.ext_types %}
 # Extension Types {{ "{" }}#doc_rpc_api_ext_types}
 
 MessagePack extension types: Tagged raw bytes which are opaque to the transport layer (only the ext code and the raw payload cross the wire). Their interpretation is up to the client/server.
@@ -54,6 +55,7 @@ MessagePack extension types: Tagged raw bytes which are opaque to the transport 
 
 ---
 
+{% endif %}
 # Error Types {{ "{" }}#doc_rpc_api_errors}
 
 A failed command responds with the error code as the response status; the

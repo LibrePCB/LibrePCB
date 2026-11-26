@@ -20,6 +20,16 @@ lz-str = "0.2.1"  # Keep in sync with interactive-html-bom
 rmp = "0.8"
 rmpv = "1"
 
+# Only used for signature *verification* in the RPC server, thus compiled
+# without the default features (no key generation, no PEM, no X25519) to
+# keep its dependency footprint at zero. Its verification rejects
+# non-canonical encodings and small-order points, i.e. it is "strict"
+# like ed25519-dalek's verify_strict().
+[dependencies.ed25519-compact]
+version = "2.6"
+default-features = false
+features = ["std"]
+
 [dependencies.regex]
 version = "1.11"
 default-features = false

@@ -1,6 +1,8 @@
 """Controls for the WorkspaceDb class."""
 
-from client import ext_uuid, fmt_details
+import uuid as uuidlib
+
+from client import fmt_details
 
 
 class WorkspaceDbPage:
@@ -22,10 +24,12 @@ class WorkspaceDbPage:
         if not value:
             return
         params = {"type": self.app.db_get_type}
-        ext = ext_uuid(value)
-        if ext is not None:
-            params["uuid"] = ext
-        else:
+        try:
+            # UUIDs are plain strings now: If the input is a valid UUID,
+            # it is sent in the 'uuid' argument instead of 'path'.
+            uuidlib.UUID(value)
+            params["uuid"] = value
+        except ValueError:
             params["path"] = value
         self.app.call("WorkspaceDb/get", params, self._on_result)
 

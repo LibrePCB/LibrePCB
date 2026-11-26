@@ -62,11 +62,25 @@ public:
   // General Methods
 
   /**
-   * @brief Handshake and authentication. The first message of a connection
-   *        must be this request (see the transport protocol documentation).
+   * @brief Handshake and version negotiation. The first message of a
+   *        connection must be this request, and its structure never changes
+   *        (see the transport protocol documentation). It does not
+   *        authenticate the connection — call `authenticate` afterwards.
    */
   static void initialize(GuiApplication& app, RpcObjectRegistry& registry,
                          RpcRequest& request);
+
+  /**
+   * @brief Authenticate the connection. Must be called after `initialize`,
+   *        before any other request. Two mechanisms are supported: External
+   *        clients prove possession of an Ed25519 private key whose public
+   *        key the user has confirmed in the application (unknown keys are
+   *        confirmed interactively, known keys are accepted silently), and
+   *        processes spawned by the application itself simply pass the token
+   *        they received out-of-band (e.g. by an environment variable).
+   */
+  static void authenticate(GuiApplication& app, RpcObjectRegistry& registry,
+                           RpcRequest& request);
 
   /**
    * @brief A request which is answered with a nil result by the server

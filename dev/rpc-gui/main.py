@@ -5,12 +5,15 @@ RPC classes (generated list, see api.py), the page of the selected class
 and a log. The logic per class lives in pages/*.py, one module per page.
 """
 
+import json
 import os
 import queue
 import time
 from datetime import timedelta
 
 import slint
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 import api
 from client import RpcClient, fmt_value, fmt_uuid
@@ -22,6 +25,40 @@ from pages.undo_stack import UndoStackPage
 from pages.remote_library import RemoteLibraryPage
 from pages.workspace import WorkspacePage
 from pages.workspace_db import WorkspaceDbPage
+
+
+def load_or_create_keypair():
+    """The persistent Ed25519 keypair identifying this client, generated on
+    first use and stored in the user's config directory (see the RPC
+    server documentation). If the key cannot be persisted, an ephemeral
+    key is used (requiring a confirmation on every start)."""
+    path = os.path.join(
+        os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config")),
+        "librepcb-rpc-gui", "client_key.json")
+    try:
+        with open(path, "r") as f:
+            data = json.load(f)
+        key = Ed25519PrivateKey.from_private_bytes(
+            bytes.fromhex(data["private_key"]))
+    except (OSError, ValueError, KeyError):
+        key = Ed25519PrivateKey.generate()
+        try:
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, "w") as f:
+                json.dump({"private_key": key.private_bytes(
+                    serialization.Encoding.Raw,
+                    serialization.PrivateFormat.Raw,
+                    serialization.NoEncryption()).hex()}, f)
+            print(f"Generated new client key: {path}")
+        except OSError as e:
+            print(f"Warning: Could not persist the client key ({e}), "
+                  "using an ephemeral key.")
+    pub = key.public_key().public_bytes(
+        serialization.Encoding.Raw, serialization.PublicFormat.Raw)
+    return key, pub.hex()
+
+
+KEYPAIR = load_or_create_keypair()
 
 # A project to pre-fill the project path edit with (developer comfort).
 DEFAULT_PROJECT_PATH = os.path.normpath(os.path.join(
@@ -114,7 +151,7 @@ class Gui(ns.AppWindow):
         except OSError:
             return  # The application is not running (yet).
         self.connected = True
-        self._log("  Connected. Now initialize to authenticate.")
+        self._log("  Connected. Now authenticate.")
 
     @slint.callback
     def connect_clicked(self):
@@ -132,12 +169,14 @@ class Gui(ns.AppWindow):
         try:
             self.client = RpcClient()
             self.connected = True
-            self._log("  Connected. Now initialize to authenticate.")
+            self._log("  Connected. Now authenticate.")
         except OSError as e:
             self._log(f"  Connection failed: {e}")
 
     @slint.callback
     def init_clicked(self):
+        """The Authenticate button: Handshake (initialize) followed by
+        authentication (authenticate)."""
         if self.client.pending_msgid is not None:
             try:
                 self.client.cancel(self.client.pending_msgid)
@@ -145,12 +184,22 @@ class Gui(ns.AppWindow):
                 pass
             self._log(f"⊗ cancel: {self.client.pending_msgid}")
             return
-        params = {"name": "librepcb-rpc-gui"}
-        token = self.token.strip()
-        if token:
-            params["token"] = token
         try:
-            self.client.pending_msgid = self.call("initialize", params)
+            self.call("initialize", {"format": "1.0"}, self._on_initialize)
+        except OSError as e:
+            self._log(f"  Send failed: {e}")
+
+    def _on_initialize(self, status, payload):
+        """The initialize response: Sign the nonce and authenticate."""
+        if status != 0:
+            return
+        key, pubkey_hex = KEYPAIR
+        proof = key.sign(str(payload["nonce"]).encode()).hex()
+        try:
+            self.client.pending_msgid = self.call(
+                "authenticate",
+                {"name": "librepcb-rpc-gui", "pubkey": pubkey_hex,
+                 "proof": proof})
             self.pending = True
         except OSError as e:
             self._log(f"  Send failed: {e}")
@@ -354,12 +403,11 @@ class Gui(ns.AppWindow):
             msgid, (None, None, 0.0)
         )
         if msgid == self.client.pending_msgid:
-            # The initialize reply (status 0 or error code) (un-)authenticates.
+            # The authenticate reply (status 0 or error code)
+            # (un-)authenticates.
             self.client.pending_msgid = None
             self.pending = False
             self.authenticated = status == 0
-            if status == 0 and "token" in payload:
-                self.token = str(payload["token"])
         duration = f" ({int((received_at - sent_at) * 1000)} ms)"
         if status == 0:
             self._log(f"✔ {method}: {fmt_value(payload)}{duration}")

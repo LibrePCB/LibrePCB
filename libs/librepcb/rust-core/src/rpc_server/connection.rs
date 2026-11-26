@@ -13,7 +13,8 @@ use rmpv::Value;
 
 use super::codec::{self, read_message};
 use super::protocol::{
-  build_response, classify_message, ParsedMessage, RpcError, METHOD_INITIALIZE,
+  build_response, classify_message, ParsedMessage, RpcError,
+  METHOD_AUTHENTICATE, METHOD_INITIALIZE,
 };
 use super::{lock, Connection, Inner, RpcErrorCode};
 
@@ -85,7 +86,7 @@ fn handle_connection(inner: Arc<Inner>, stream: TcpStream, conn_id: u32) {
   // our own clone below) closes the writer thread's channel.
   let (tx, rx) = mpsc::channel::<Vec<u8>>();
   let pending = Arc::new(Mutex::new(std::collections::HashSet::new()));
-  let pending_initializes =
+  let pending_authentications =
     Arc::new(Mutex::new(std::collections::HashSet::new()));
   let authenticated = Arc::new(AtomicBool::new(false));
   lock(&inner.clients).insert(
@@ -94,7 +95,7 @@ fn handle_connection(inner: Arc<Inner>, stream: TcpStream, conn_id: u32) {
       tx: tx.clone(),
       stream,
       pending: Arc::clone(&pending),
-      pending_initializes: Arc::clone(&pending_initializes),
+      pending_authentications: Arc::clone(&pending_authentications),
       authenticated: Arc::clone(&authenticated),
     },
   );
@@ -127,7 +128,7 @@ fn handle_connection(inner: Arc<Inner>, stream: TcpStream, conn_id: u32) {
           &inner,
           conn_id,
           &pending,
-          &pending_initializes,
+          &pending_authentications,
           &authenticated,
           &message,
         ) {
@@ -164,7 +165,7 @@ fn process_message(
   inner: &Inner,
   conn_id: u32,
   pending: &Arc<Mutex<std::collections::HashSet<u32>>>,
-  pending_initializes: &Arc<Mutex<std::collections::HashSet<u32>>>,
+  pending_authentications: &Arc<Mutex<std::collections::HashSet<u32>>>,
   authenticated: &Arc<AtomicBool>,
   message: &Value,
 ) -> Option<Value> {
@@ -174,12 +175,13 @@ fn process_message(
       method,
       params,
     } => {
-      // The `initialize` request is always dispatched (that's how a
-      // connection gets authenticated — the token validation and the
-      // reply live on the C++ side, which authenticates the connection
-      // implicitly by its reply). All other requests are only dispatched
-      // while the connection is authenticated.
+      // The `initialize` and `authenticate` requests are always dispatched
+      // (the version negotiation, the key/token validation and the replies
+      // live on the C++ side, which authenticates the connection implicitly
+      // by the reply to `authenticate`). All other requests are only
+      // dispatched while the connection is authenticated.
       if (method != METHOD_INITIALIZE)
+        && (method != METHOD_AUTHENTICATE)
         && (!authenticated.load(Ordering::SeqCst))
       {
         let error = RpcError::canonical(RpcErrorCode::Unauthenticated);
@@ -193,7 +195,7 @@ fn process_message(
         inner,
         conn_id,
         pending,
-        pending_initializes,
+        pending_authentications,
         msgid,
         method,
         params,
@@ -239,7 +241,7 @@ fn dispatch_request(
   inner: &Inner,
   conn_id: u32,
   pending: &Arc<Mutex<std::collections::HashSet<u32>>>,
-  pending_initializes: &Arc<Mutex<std::collections::HashSet<u32>>>,
+  pending_authentications: &Arc<Mutex<std::collections::HashSet<u32>>>,
   msgid: u32,
   method: String,
   params: Value,
@@ -256,16 +258,16 @@ fn dispatch_request(
       &error.to_payload(),
     ));
   }
-  // The reply to an `initialize` request authenticates the connection
+  // The reply to an `authenticate` request authenticates the connection
   // (see the reply path in the server), so the msgid must be known there.
-  if method == METHOD_INITIALIZE {
-    lock(pending_initializes).insert(msgid);
+  if method == METHOD_AUTHENTICATE {
+    lock(pending_authentications).insert(msgid);
   }
   match (inner.dispatch)(conn_id, msgid, &method, &params) {
     Ok(()) => None,
     Err(error) => {
       lock(pending).remove(&msgid);
-      lock(pending_initializes).remove(&msgid);
+      lock(pending_authentications).remove(&msgid);
       Some(build_response(
         msgid,
         error.code() as i64,

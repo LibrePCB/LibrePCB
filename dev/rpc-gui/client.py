@@ -9,7 +9,6 @@ import queue
 import socket
 import threading
 import time
-import uuid
 
 import umsgpack
 
@@ -45,39 +44,15 @@ def _fmt(value):
     return str(value)
 
 
-def ext_uuid(value):
-    """Encode a string as the protocol's uuid extension value. Returns None
-    if the string is not a valid UUID."""
-    try:
-        return umsgpack.Ext(2, uuid.UUID(value).bytes)
-    except (ValueError, TypeError):
-        return None
-
-
 def fmt_uuid(value):
-    """Format a uuid ext value into its canonical string form (e.g. for
+    """Format a UUID value into its canonical string form (e.g. for
     displaying it in the UI)."""
-    if (
-        isinstance(value, umsgpack.Ext)
-        and value.type == 2
-        and len(value.data) == 16
-    ):
-        hexstr = value.data.hex()
-        return "%s-%s-%s-%s-%s" % (
-            hexstr[0:8], hexstr[8:12], hexstr[12:16], hexstr[16:20],
-            hexstr[20:32],
-        )
     return str(value)
 
 
 def _fmt_ext(ext):
-    # The UUID ext type (see the API specification), rendered as string.
-    if ext.type == 2 and len(ext.data) == 16:
-        hexstr = ext.data.hex()
-        return "%s-%s-%s-%s-%s" % (
-            hexstr[0:8], hexstr[8:12], hexstr[12:16], hexstr[16:20],
-            hexstr[20:32],
-        )
+    # The protocol does not use msgpack extension types anymore, but they
+    # could still show up when connecting to an older server.
     return f"ext {ext.type} <{ext.data.hex()}>"
 
 

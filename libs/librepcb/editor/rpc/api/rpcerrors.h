@@ -97,9 +97,8 @@ public:
 };
 
 /**
- * @brief A request other than `initialize` was sent on a connection which
- *        is not authenticated yet. The first message of a connection must
- *        be an `initialize` request.
+ * @brief A request other than `initialize` or `authenticate` was sent on a
+ *        connection which is not authenticated yet.
  */
 class RpcUnauthenticated final : public RpcError {
 public:
@@ -121,10 +120,9 @@ public:
 };
 
 /**
- * @brief The provided access token doesn't have the permissions to execute
- *        the command. If this error is returned by the 'initialize' method,
- *        it means that either the provided token is invalid or has expired,
- *        or an interactive connection request was denied by the user.
+ * @brief The authentication failed, e.g. because the provided proof or
+ *        token was invalid, or an interactive connection request was denied
+ *        by the user.
  */
 class RpcAccessDenied final : public RpcError {
 public:

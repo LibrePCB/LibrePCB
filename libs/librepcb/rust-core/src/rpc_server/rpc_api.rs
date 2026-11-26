@@ -21,18 +21,15 @@ pub enum RpcErrorCode {
   MessageTooLarge = 11,
   /// The request doesn't conform to the message envelope.
   InvalidRequest = 20,
-  /// A request other than `initialize` was sent on a connection which is not
-  /// authenticated yet. The first message of a connection must be an `initialize`
-  /// request.
+  /// A request other than `initialize` or `authenticate` was sent on a connection
+  /// which is not authenticated yet.
   Unauthenticated = 30,
   /// The method was not found, e.g. because it was added in a newer application
   /// version than the running one, or the method has been removed from the
   /// application and is no longer available.
   MethodNotFound = 31,
-  /// The provided access token doesn't have the permissions to execute the
-  /// command. If this error is returned by the 'initialize' method, it means that
-  /// either the provided token is invalid or has expired, or an interactive
-  /// connection request was denied by the user.
+  /// The authentication failed, e.g. because the provided proof or token was
+  /// invalid, or an interactive connection request was denied by the user.
   AccessDenied = 33,
   /// An unexpected internal error occurred, e.g. a command handler returned
   /// invalid data. This is a bug in LibrePCB, please open an issue on GitHub.

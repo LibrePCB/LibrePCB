@@ -39,46 +39,79 @@ Handshake {#doc_rpc_api_handshake}
 ---------
 
 The first message of a connection must be an
-[`initialize`](@ref doc_rpc_api_method_initialize) request. Any
-other first message is answered with an error response (without being
-dispatched) and the connection stays open, but stays unauthenticated.
-There are two ways to authenticate:
+[`initialize`](@ref doc_rpc_api_method_initialize) request, followed by an
+[`authenticate`](@ref doc_rpc_api_method_authenticate) request. Any other
+message is answered with an error response (without being dispatched) and
+the connection stays open, but stays unauthenticated.
 
-- **With a token:** The params carry a `token` string. If the token was
-  issued by this application instance (see below) and is still valid, the
-  connection is authenticated. Otherwise the request is answered with an
-  error ([code 33](@ref doc_rpc_api_errors)) and the connection stays
-  open, but stays unauthenticated.
-- **Interactively:** The params carry a `name` string identifying the
-  client. The application asks the user whether to accept the connection
-  (via a notification). If the user accepts it, the connection is
-  authenticated and a new token is issued, which the client shall store
-  for future connections. If the user denies the request, the request is
-  answered with an error ([code 33](@ref doc_rpc_api_errors)); if the
-  client cancels it, with [code 99](@ref doc_rpc_api_errors).
+**Version negotiation:** The client passes the highest format version it
+supports in the `format` argument (`"MAJOR.MINOR"`). The server replies
+with the *negotiated version*, which the whole connection then speaks:
 
-The success result is a map with some application information:
+> 1. Versions are `"MAJOR.MINOR"`. Within a major, higher versions are
+>    backwards compatible (strict supersets). Majors may drop features.
+> 2. `initialize` is the mandatory first message and its structure never
+>    changes. A missing or unparsable `format` argument is answered with
+>    [error code 40](@ref doc_rpc_api_errors).
+> 3. The negotiated version is `min(client_format, server_format)`. The
+>    server supports every version between its minimum and its
+>    `server_format`; if the client's offer is below that minimum, the
+>    server responds with its minimum. The server never rejects on version
+>    grounds — a client which cannot speak the negotiated version simply
+>    closes the connection.
+> 4. All messages on the connection conform to the negotiated version, in
+>    both directions. A higher minor version therefore means additive,
+>    backward-compatible changes *relative to the negotiated version*: A
+>    server never emits anything the client's offered version does not
+>    cover.
+
+The `initialize` response carries a `host_key` identifying the server
+installation (stable across restarts) — clients may persist it and verify it
+to detect a connection to the wrong server (trust on first use, like SSH) —
+and a fresh `nonce` for authenticating.
+
+**Authentication** is a separate request, so the handshake stays minimal
+and frozen while the authentication flow may evolve:
+
+- **External clients** pass their Ed25519 `pubkey` (64 hex characters) and
+  a `proof` — the signature (128 hex characters) over the `nonce`. If the
+  user has confirmed this key before, the connection is authenticated
+  silently. If the key is unknown, the application asks the user whether
+  to accept the client (via a notification): On acceptance the key is
+  remembered and the connection is authenticated; on denial the request is
+  answered with [error code 33](@ref doc_rpc_api_errors); if the client
+  cancels it, with [error code 99](@ref doc_rpc_api_errors). The
+  application stores only *public* keys — no secrets are stored or
+  transmitted, and a signature over a per-connection nonce cannot be
+  replayed.
+- **Spawned processes** (e.g. plugins started by the application itself)
+  simply pass the `token` they received out-of-band (e.g. by an
+  environment variable). The application issued that token itself, so no
+  user interaction is needed. The token is only valid for the lifetime of
+  the issuing application instance. This path requires no cryptography at
+  all in the client.
+
+Connections stay open on all errors; the client closes them.
+
+The `authenticate` success result is a map with application information:
 
 ~~~{.msgpack}
-[1, 1, 0, {"format": "1.0", "server": "librepcb", "session":
-"783ea436-b2bc-4a1e-95a1-d5600c4a26d6", "token":
-"0f0e7d09-457c-4924-a21f-d8d5341f8d55", "version": "2.1.2"}]
+[1, 2, 0, {"server": "librepcb", "session":
+"783ea436-b2bc-4a1e-95a1-d5600c4a26d6", "version": "2.1.2"}]
 ~~~
 
-The fields have the following meaning:
-
-- `format`: The RPC interface format version (currently `"1.0"`).
-  Clients must verify the major version and reject other major versions;
-  a higher minor version means additive, backward-compatible changes.
 - `server`: Always `"librepcb"` (so clients can verify the server).
 - `version`: The application version.
 - `session`: A UUID identifying the application *process*: It changes
   whenever the application is restarted, so clients can detect that.
-- `token`: The access token for this connection — either the one provided
-  in the request, or a freshly issued one (see above).
 
-Information about the currently opened workspace is available through the
-`Workspace/get` method instead.
+**Endpoint discovery:** At startup the server writes `{pid, port,
+host_key}` to a file with 0600 permissions in `$XDG_RUNTIME_DIR` (the
+`DISPLAY`/`SSH_AUTH_SOCK` pattern). Clients should connect to the port
+from that file — a process squatting the default port then never receives
+a connection — and may verify the `host_key` against the file, which
+detects a wrong server even on the very first connection. The file is
+removed when the server stops.
 
 Clients use `version` together with the per-method `since`
 from the specification file to determine which methods the server

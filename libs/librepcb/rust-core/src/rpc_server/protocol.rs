@@ -31,12 +31,16 @@ const MESSAGE_TYPE_CANCEL: i64 = 3;
 /// determined.
 pub const RESERVED_MSGID: u32 = 0;
 
-/// Name of the method which authenticates a connection. It is dispatched
-/// to the C++ side like any other command (the token handling lives
-/// there), but — unlike all other methods — it is dispatched even while
-/// the connection is not authenticated yet (otherwise it could never be
-/// authenticated).
+/// Name of the method which a connection must call first (handshake and
+/// version negotiation). It is dispatched to the C++ side like any other
+/// command, but — unlike all other methods except `authenticate` — it is
+/// dispatched even while the connection is not authenticated yet.
 pub const METHOD_INITIALIZE: &str = "initialize";
+
+/// Name of the method which authenticates a connection. It is dispatched
+/// to the C++ side like any other command, but — unlike all other methods
+/// — its success reply authenticates the connection (see the reply path).
+pub const METHOD_AUTHENTICATE: &str = "authenticate";
 
 /// An RPC error, as sent in a response.
 #[derive(Clone, Debug)]

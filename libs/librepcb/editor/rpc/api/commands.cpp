@@ -58,6 +58,7 @@ void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
   using RpcCommand = void (*)(GuiApplication&, RpcObjectRegistry&, RpcRequest&);
   static const QHash<QString, RpcCommand> commands = {
       {"initialize", &ProtocolRpc::initialize},
+      {"authenticate", &ProtocolRpc::authenticate},
       {"ping", &ProtocolRpc::ping},
       {"ProjectEditor/list", &ProjectEditorRpc::list},
       {"ProjectEditor/create", &ProjectEditorRpc::create},

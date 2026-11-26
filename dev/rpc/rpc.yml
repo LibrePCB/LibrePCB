@@ -11,17 +11,18 @@
 # - The documentation generator (dev/rpc/gen.py).
 # - Client authors: Read this file to know which methods exist, and compare
 #   each method's `since` with the `version` reported by the
-#   server's `initialize` method to know which ones are available on a
+#   server's `authenticate` method to know which ones are available on a
 #   given server (functions added after the revision of your spec file are
 #   unknown to you, which is fine — calling them results in error -32601).
 #
 # Schema notes:
 # - Types are from the protocol's value domain: null, bool, int (i64 or
 #   u64),
-#   float (f64), string, binary, array, map (with string keys), ext (see
-#   the extension types below). A struct is a map with the listed
-#   fields. `handle` is a special type: an *opaque* object handle (see
-#   the class descriptions). `uuid` is an extension type.
+#   float (f64), string, binary, array, map (with string keys). A struct is
+#   a map with the listed fields. `handle` is a special type: an *opaque*
+#   object handle (see the class descriptions). No msgpack extension
+#   types are used — everything is expressed with builtin types only
+#   (e.g. UUIDs are passed as 36-character strings).
 # - The params of every method are a map. The reserved key "obj" carries
 #   the receiver handle for non-static methods — it is NOT listed in the
 #   params below. Handles are opaque values: Clients obtain them from
@@ -71,9 +72,8 @@ errors:
     name: Unauthenticated
     message: Connection is not authenticated
     description: >-
-      A request other than `initialize` was sent on a connection which is
-      not authenticated yet. The first message of a connection must be an
-      `initialize` request.
+      A request other than `initialize` or `authenticate` was sent on a
+      connection which is not authenticated yet.
 
   - code: 31
     name: MethodNotFound
@@ -95,10 +95,9 @@ errors:
     name: AccessDenied
     message: Access denied
     description: >-
-      The provided access token doesn't have the permissions to execute the
-      command. If this error is returned by the 'initialize' method, it means
-      that either the provided token is invalid or has expired, or an
-      interactive connection request was denied by the user.
+      The authentication failed, e.g. because the provided proof or
+      token was invalid, or an interactive connection request was denied
+      by the user.
 
   - code: 39
     name: InternalError
@@ -180,22 +179,6 @@ enums:
           Restore the auto-save backup, if available.
 
 # ---------------------------------------------------------------------------
-# Extension Types
-# ---------------------------------------------------------------------------
-#
-# The MessagePack extension types used by this API, i.e. tagged raw bytes.
-# They are opaque to the transport layer: Only the ext code and the raw
-# payload cross the wire, their interpretation is up to the client/server.
-
-ext_types:
-  - name: uuid
-    code: "0x02"
-    description: >-
-      A UUID (RFC 4122), encoded as its 16 bytes in field order (network
-      byte order). This requires only half of the size of the 36-character
-      string representation on the wire.
-
-# ---------------------------------------------------------------------------
 # Structs
 # ---------------------------------------------------------------------------
 
@@ -252,7 +235,7 @@ structs:
     description: Details about an open project.
     fields:
       - name: uuid
-        type: uuid
+        type: string
         description: The project UUID.
       - name: name
         type: string
@@ -282,7 +265,7 @@ structs:
     description: A summary of a schematic sheet.
     fields:
       - name: uuid
-        type: uuid
+        type: string
         description: The schematic UUID.
       - name: name
         type: string
@@ -292,7 +275,7 @@ structs:
     description: A summary of a board.
     fields:
       - name: uuid
-        type: uuid
+        type: string
         description: The board UUID.
       - name: name
         type: string
@@ -302,7 +285,7 @@ structs:
     description: A summary of a remote library.
     fields:
       - name: uuid
-        type: uuid
+        type: string
         description: The remote library UUID.
       - name: name
         type: string
@@ -397,23 +380,67 @@ classes:
       - name: initialize
         static: true
         description: >-
-          Handshake and authentication. The first message of a connection
-          must be this request (see the transport protocol documentation).
+          Handshake and version negotiation. The first message of a
+          connection must be this request, and its structure never changes
+          (see the transport protocol documentation). It does not
+          authenticate the connection — call `authenticate` afterwards.
+        params:
+          - name: format
+            type: string
+            description: >-
+              The highest protocol format version supported by the client,
+              as "MAJOR.MINOR" (see the transport protocol documentation
+              for the negotiation rules).
+        result:
+          - name: format
+            type: string
+            description: The negotiated format version of this connection.
+          - name: host_key
+            type: string
+            description: >-
+              A value identifying this server installation (stable across
+              restarts). Clients may persist it and verify it to detect
+              a connection to the wrong server.
+          - name: nonce
+            type: string
+            description: >-
+              A fresh random challenge for this connection, to be signed
+              in the `proof` argument of the subsequent `authenticate`
+              request.
+
+      - name: authenticate
+        static: true
+        description: >-
+          Authenticate the connection. Must be called after `initialize`,
+          before any other request. Two mechanisms are supported: External
+          clients prove possession of an Ed25519 private key whose public
+          key the user has confirmed in the application (unknown keys are
+          confirmed interactively, known keys are accepted silently), and
+          processes spawned by the application itself simply pass the token
+          they received out-of-band (e.g. by an environment variable).
         params:
           - name: name
             type: string
             description: An arbitrary name identifying the client application.
-          - name: token
-            type: string
+          - name: pubkey
+            type: string?
             description: >-
-              A token previously received by an initialize call of this
-              application instance. If not provided (or nil), the
-              connection request has to be confirmed by the user in the
-              application.
+              The Ed25519 public key of an external client, as 64 hex
+              characters. If provided, `proof` must contain the signature
+              of the `nonce` from the `initialize` response (64 bytes,
+              hex encoded).
+          - name: proof
+            type: string?
+            description: >-
+              The Ed25519 signature (128 hex characters) over the `nonce`,
+              proving possession of the private key belonging to `pubkey`.
+          - name: token
+            type: string?
+            description: >-
+              The token received out-of-band from the application which
+              spawned this process. Only valid for the lifetime of the
+              spawning application instance.
         result:
-          - name: format
-            type: string
-            description: The handshake format version, currently always "1.0".
           - name: server
             type: string
             description: Always "librepcb", so clients can verify the server.
@@ -425,11 +452,6 @@ classes:
             description: >-
               A UUID identifying the running application process (changes
               on every application restart).
-          - name: token
-            type: string
-            description: >-
-              The token to be used for subsequent connections of this
-              client (see the transport protocol documentation).
 
       - name: ping
         static: true
@@ -772,21 +794,21 @@ classes:
               If provided, only list elements contained in this library,
               specified by its absolute file path.
           - name: category
-            type: uuid?
+            type: string?
             description: >-
               If provided, only list elements or categories within this
               category. If `null`, it means the root category, or elements
               without a valid category.
           - name: package
-            type: uuid
+            type: string
             description: >-
               If provided, only list devices or parts for this package.
           - name: component
-            type: uuid
+            type: string
             description: >-
               If provided, only list devices or parts for this component.
           - name: device
-            type: uuid
+            type: string
             description: >-
               If provided, only list parts for this device.
           - name: limit
@@ -835,7 +857,7 @@ classes:
               workspace libraries root folder. If omitted, the `uuid` argument
               must be passed instead.
           - name: uuid
-            type: uuid
+            type: string
             description: >-
               UUID of the library element. If there exist multiple library
               elements with that UUID, the one with the highest version number

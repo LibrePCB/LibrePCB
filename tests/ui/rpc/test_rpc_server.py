@@ -11,6 +11,9 @@ import socket
 import time
 
 import umsgpack
+from cryptography.hazmat.primitives.asymmetric.ed25519 import (
+    Ed25519PrivateKey,
+)
 
 # The default RPC server port (the letters "LP" interpreted as a
 # hexadecimal number: 0x4C50 = 19536). Keep in sync with DEFAULT_PORT in
@@ -19,6 +22,27 @@ PORT = 19536
 
 
 # --- A minimal RPC client ---------------------------------------------------
+
+
+def handshake(rpc, msgid):
+    """Send the initialize request and return its result."""
+    status, result = rpc.request(msgid, "initialize", {"format": "1.0"})
+    assert status == 0, f"initialize failed: {result!r}"
+    assert result["format"] == "1.0", result
+    assert isinstance(result["host_key"], str) and result["host_key"], result
+    assert isinstance(result["nonce"], str) and result["nonce"], result
+    return result
+
+
+def auth_params(key, nonce):
+    """Build the pubkey/proof arguments for an Ed25519 client key."""
+    from cryptography.hazmat.primitives import serialization
+    pubkey = key.public_key().public_bytes(
+        serialization.Encoding.Raw, serialization.PublicFormat.Raw)
+    return {
+        "pubkey": pubkey.hex(),
+        "proof": key.sign(str(nonce).encode()).hex(),
+    }
 
 
 class RpcClient:
@@ -72,39 +96,47 @@ class RpcClient:
 
 def test_rpc_server(librepcb, helpers):
     """
-    Smoke test for the RPC server: handshake (interactive authentication
-    and token issuance), protocol-level methods, commands with a real open
-    project, error handling and pipelining.
+    Smoke test for the RPC server: handshake and authentication (Ed25519
+    with interactive confirmation), protocol-level methods, commands with a
+    real open project, error handling and pipelining.
     """
     librepcb.add_project("Empty Project")
     librepcb.set_project("Empty Project/Empty Project.lpp")
     # Note: The RPC server is enabled by the demo workspace settings file
     # (tests/data/workspaces/Empty Workspace).
 
+    # A fresh client keypair for this test run: Its key is unknown to the
+    # server, so the first connection needs an interactive confirmation.
+    client_key = Ed25519PrivateKey.generate()
+
     with librepcb.open() as app:  # noqa: F841
         rpc = RpcClient(PORT)
         try:
             # --- Handshake -----------------------------------------------
-            # The first connection has no token yet, so the user has to
-            # accept the connection interactively: The response is only
-            # sent after clicking the notification button.
-            rpc.send([0, 1, "initialize", {"name": "RPC Test"}])
+            nonce = handshake(rpc, 1)["nonce"]
+
+            # The handshake does not authenticate anything yet, so any
+            # other request is rejected at this point:
+            status, payload = rpc.request(20, "ping", None)
+            assert status == 30, payload
+
+            # The client key is unknown, so the user has to accept the
+            # connection interactively: The response is only sent after
+            # clicking the notification button.
+            rpc.send([0, 2, "authenticate",
+                      {"name": "RPC Test",
+                       **auth_params(client_key, nonce)}])
             notification = helpers.wait_for_notification(
                 app, "RPC Connection Request"
             )
             notification.trigger()
             message = rpc.receive()
-            assert message[0:2] == [1, 1], message
+            assert message[0:2] == [1, 2], message
             assert message[2] == 0, message  # Status: success.
             result = message[3]
-            assert result["format"] == "1.0", result
             assert result["server"] == "librepcb", result
             assert isinstance(result["version"], str), result
-            # The workspace path is not part of initialize anymore.
-            assert "workspace" not in result, result
-            # A token was issued, to be used for future connections.
-            token = result["token"]
-            assert isinstance(token, str) and len(token) > 10, result
+            assert isinstance(result["session"], str), result
 
             # Workspace/get → details about the currently opened workspace.
             # Also verifies that we're connected to the expected application
@@ -115,40 +147,49 @@ def test_rpc_server(librepcb, helpers):
             workspace_path = librepcb.workspace_path.replace("\\", "/")
             assert result["path"] == workspace_path, result
 
-            # A second connection can authenticate with the issued token,
+            # A second connection with the now-known key is authenticated
             # without any user interaction.
             rpc2 = RpcClient(PORT)
             try:
+                nonce = handshake(rpc2, 1)["nonce"]
                 status, result = rpc2.request(
-                    2, "initialize", {"name": "RPC Test", "token": token})
-                assert status == 0, f"initialize failed: {result!r}"
-                assert result["format"] == "1.0", result
+                    2, "authenticate",
+                    {"name": "RPC Test", **auth_params(client_key, nonce)})
+                assert status == 0, f"authenticate failed: {result!r}"
                 assert result["server"] == "librepcb", result
-                assert result["token"] == token, result
             finally:
                 rpc2.close()
 
-            # A token which was not issued by this application instance is
-            # rejected, and the connection stays unauthenticated.
+            # An invalid proof is rejected, and the connection stays
+            # unauthenticated.
             rpc3 = RpcClient(PORT)
             try:
-                rpc3.expect_error(
-                    1, "initialize", {"name": "RPC Test", "token": "invalid"}, 33)
-                status, payload = rpc3.request(2, "ping", None)
+                nonce = handshake(rpc3, 1)["nonce"]
+                params = auth_params(client_key, nonce)
+                params["proof"] = "00" * 64
+                rpc3.expect_error(2, "authenticate",
+                                  {"name": "RPC Test", **params}, 33)
+                status, payload = rpc3.request(3, "ping", None)
                 assert status == 30, payload
             finally:
                 rpc3.close()
 
-            # Cancelling a pending connection request denies access.
+            # Cancelling a pending connection request denies access. This
+            # needs another unknown key: The first key was confirmed above,
+            # so it would be accepted silently.
+            unknown_key = Ed25519PrivateKey.generate()
             rpc4 = RpcClient(PORT)
             try:
-                rpc4.send([0, 1, "initialize", {"name": "RPC Test"}])
+                nonce = handshake(rpc4, 1)["nonce"]
+                rpc4.send([0, 2, "authenticate",
+                           {"name": "RPC Test",
+                            **auth_params(unknown_key, nonce)}])
                 helpers.wait_for_notification(
                     app, "RPC Connection Request"
                 )
-                rpc4.send([3, 1])
+                rpc4.send([3, 2])
                 message = rpc4.receive()
-                assert message[0:2] == [1, 1], message
+                assert message[0:2] == [1, 2], message
                 assert message[2] == 99, message  # Status: the error code.
                 assert message[3]["message"] == "Request cancelled", message
             finally:

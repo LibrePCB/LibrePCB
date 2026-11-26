@@ -28,7 +28,6 @@ export component AppWindow inherits Window {
     in property <bool> connected;
     in property <bool> authenticated;
     in property <bool> pending;
-    in-out property <string> token;
 
     // --- Navigation (sidebar) ---------------------------------------------
     in property <[string]> classes;
@@ -155,15 +154,10 @@ export component AppWindow inherits Window {
 
                     Button {
                         horizontal-stretch: 1;
-                        text: root.pending ? "Cancel" : "Initialize";
+                        text: root.pending ? "Cancel" : "Authenticate";
                         enabled: root.connected;
                         clicked => { root.init-clicked(); }
                     }
-                }
-
-                LineEdit {
-                    text <=> root.token;
-                    placeholder-text: "Access Token";
                 }
 
                 HorizontalLayout {

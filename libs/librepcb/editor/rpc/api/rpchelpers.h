@@ -94,12 +94,10 @@ inline QVariantList toVariant(const T& list, F convertItem) {
   return result;
 }
 
-/// Convert a Uuid into the protocol's "uuid" extension type (see the API
-/// specification): An ext value with the 16 raw UUID bytes in RFC 4122
-/// field order.
+/// Convert a Uuid into its canonical 36-character string form. Note that
+/// the protocol uses no msgpack extension types — UUIDs are plain strings.
 inline QVariant toVariant(const Uuid& obj) noexcept {
-  return QVariant::fromValue(
-      rs::MsgPackExt(kMsgPackExtTypeUuid, QUuid(obj.toStr()).toRfc4122()));
+  return obj.toStr();
 }
 
 inline QVariant toVariant(const std::optional<Uuid>& obj) noexcept {
@@ -188,7 +186,7 @@ inline QVariant toVariant(const Resource& obj) noexcept {
   return QVariantMap({
       {"name", *obj.getName()},
       {"media_type", obj.getMediaType()},
-      {"url", obj.getUrl().toString(QUrl::FullyDecoded)},
+      {"url", obj.getUrl().toString(QUrl::FullyEncoded)},
   });
 }
 
@@ -426,19 +424,14 @@ struct RpcArgTraits<QVariantMap> {
 //   }
 // };
 
-/// The protocol's "uuid" extension type — strictly the ext value, i.e.
-/// a 36-character string is *not* accepted (see the API specification).
+/// A UUID, passed as its canonical 36-character string form (the protocol
+/// uses no msgpack extension types).
 template <>
 struct RpcArgTraits<Uuid> {
   static constexpr const char* NAME = "UUID";
   static std::optional<Uuid> tryFromVariant(const QVariant& v) noexcept {
-    if (v.userType() == QMetaType::fromType<rs::MsgPackExt>().id()) {
-      const auto ext = v.value<rs::MsgPackExt>();
-      if ((ext.getType() == kMsgPackExtTypeUuid) &&
-          (ext.getData().size() == 16)) {
-        const QUuid uuid = QUuid::fromRfc4122(ext.getData());
-        return Uuid::tryFromString(uuid.toString(QUuid::WithoutBraces));
-      }
+    if (v.userType() == QMetaType::QString) {
+      return Uuid::tryFromString(v.toString());
     }
     return std::nullopt;
   }

@@ -152,14 +152,6 @@ struct RpcEnumTraits<BackupRestoreMode> {
 };
 
 /*******************************************************************************
- *  Extension Types
- ******************************************************************************/
-
-/// The msgpack ext code of the "uuid" extension type (see the
-/// API specification). Used to build ext values on the wire.
-constexpr qint8 kMsgPackExtTypeUuid = 0x02;
-
-/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

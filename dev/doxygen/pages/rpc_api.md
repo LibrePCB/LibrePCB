@@ -7,16 +7,6 @@ This reference documents the commands (data types, error types, classes with the
 
 > Note: This reference is about controlling a *running* LibrePCB application. For the *online* REST API used to fetch libraries, see @ref doc_server_api.
 
-# Extension Types {#doc_rpc_api_ext_types}
-
-MessagePack extension types: Tagged raw bytes which are opaque to the transport layer (only the ext code and the raw payload cross the wire). Their interpretation is up to the client/server.
-
-| ID | Name | Description |
-|----|------|-------------|
-| 2 | `uuid` | A UUID (RFC 4122), encoded as its 16 bytes in field order (network byte order). This requires only half of the size of the 36-character string representation on the wire. |
-
----
-
 # Error Types {#doc_rpc_api_errors}
 
 A failed command responds with the error code as the response status; the
@@ -33,9 +23,9 @@ to the executed command.
 | 10 | `InvalidMessage` | Message decoding failed | The received message could not be decoded (invalid MessagePack or a truncated value), so the stream framing is broken and the connection is closed without a response. |
 | 11 | `MessageTooLarge` | Message too large | The received message exceeded the maximum size of 32 MiB, so the connection is closed without a response. |
 | 20 | `InvalidRequest` | Invalid request | The request doesn't conform to the message envelope. |
-| 30 | `Unauthenticated` | Connection is not authenticated | A request other than `initialize` was sent on a connection which is not authenticated yet. The first message of a connection must be an `initialize` request. |
+| 30 | `Unauthenticated` | Connection is not authenticated | A request other than `initialize` or `authenticate` was sent on a connection which is not authenticated yet. |
 | 31 | `MethodNotFound` | Method not found | The method was not found, e.g. because it was added in a newer application version than the running one, or the method has been removed from the application and is no longer available. |
-| 33 | `AccessDenied` | Access denied | The provided access token doesn't have the permissions to execute the command. If this error is returned by the 'initialize' method, it means that either the provided token is invalid or has expired, or an interactive connection request was denied by the user. |
+| 33 | `AccessDenied` | Access denied | The authentication failed, e.g. because the provided proof or token was invalid, or an interactive connection request was denied by the user. |
 | 39 | `InternalError` | Internal error | An unexpected internal error occurred, e.g. a command handler returned invalid data. This is a bug in LibrePCB, please open an issue on GitHub. |
 | 40 | `InvalidArgs` | Invalid method arguments | The method arguments are invalid, e.g. wrong value types, missing required arguments, invalid values, or unknown enum values. |
 | 41 | `InvalidHandle` | Invalid object handle | The provided object handle is invalid or has expired (e.g. object was deleted in the mean time). For example, this error is returned when accessing a project after it has been closed. |
@@ -88,7 +78,7 @@ Details about an open project.
 
 | Name | Type | Description |
 |------|------|-------------|
-| `uuid` | [`uuid`](@ref doc_rpc_api_ext_types) | The project UUID. |
+| `uuid` | `string` | The project UUID. |
 | `name` | `string` | The project name. |
 | `author` | `string` | The project author. |
 | `version` | `string` | The project version. |
@@ -107,7 +97,7 @@ A summary of a schematic sheet.
 
 | Name | Type | Description |
 |------|------|-------------|
-| `uuid` | [`uuid`](@ref doc_rpc_api_ext_types) | The schematic UUID. |
+| `uuid` | `string` | The schematic UUID. |
 | `name` | `string` | The schematic name. |
 
 ---
@@ -120,7 +110,7 @@ A summary of a board.
 
 | Name | Type | Description |
 |------|------|-------------|
-| `uuid` | [`uuid`](@ref doc_rpc_api_ext_types) | The board UUID. |
+| `uuid` | `string` | The board UUID. |
 | `name` | `string` | The board name. |
 
 ---
@@ -133,7 +123,7 @@ A summary of a remote library.
 
 | Name | Type | Description |
 |------|------|-------------|
-| `uuid` | [`uuid`](@ref doc_rpc_api_ext_types) | The remote library UUID. |
+| `uuid` | `string` | The remote library UUID. |
 | `name` | `string` | The remote library name. |
 | `description` | `string` | The remote library description. |
 | `installed_version` | `string?` | The installed version, if the library is installed. |
@@ -224,14 +214,13 @@ Protocol-level methods, which are not assigned to any other class.
 
 ### initialize {#doc_rpc_api_method_initialize}
 
-Handshake and authentication. The first message of a connection must be this request (see the transport protocol documentation).
+Handshake and version negotiation. The first message of a connection must be this request, and its structure never changes (see the transport protocol documentation). It does not authenticate the connection — call `authenticate` afterwards.
 
 **Params:**
 
 | Name | Type | Description |
 |------|------|-------------|
-| `name` | `string` | An arbitrary name identifying the client application. |
-| `token` | `string` | A token previously received by an initialize call of this application instance. If not provided (or nil), the connection request has to be confirmed by the user in the application. |
+| `format` | `string` | The highest protocol format version supported by the client, as "MAJOR.MINOR" (see the transport protocol documentation for the negotiation rules). |
 
 **Result:**
 
@@ -239,11 +228,37 @@ Handshake and authentication. The first message of a connection must be this req
 
 | Name | Type | Description |
 |------|------|-------------|
-| `format` | `string` | The handshake format version, currently always "1.0". |
+| `format` | `string` | The negotiated format version of this connection. |
+| `host_key` | `string` | A value identifying this server installation (stable across restarts). Clients may persist it and verify it to detect a connection to the wrong server. |
+| `nonce` | `string` | A fresh random challenge for this connection, to be signed in the `proof` argument of the subsequent `authenticate` request. |
+
+
+**Since:** 2.2.0
+
+---
+
+### authenticate {#doc_rpc_api_method_authenticate}
+
+Authenticate the connection. Must be called after `initialize`, before any other request. Two mechanisms are supported: External clients prove possession of an Ed25519 private key whose public key the user has confirmed in the application (unknown keys are confirmed interactively, known keys are accepted silently), and processes spawned by the application itself simply pass the token they received out-of-band (e.g. by an environment variable).
+
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `name` | `string` | An arbitrary name identifying the client application. |
+| `pubkey` | `string?` | The Ed25519 public key of an external client, as 64 hex characters. If provided, `proof` must contain the signature of the `nonce` from the `initialize` response (64 bytes, hex encoded). |
+| `proof` | `string?` | The Ed25519 signature (128 hex characters) over the `nonce`, proving possession of the private key belonging to `pubkey`. |
+| `token` | `string?` | The token received out-of-band from the application which spawned this process. Only valid for the lifetime of the spawning application instance. |
+
+**Result:**
+
+**Fields:**
+
+| Name | Type | Description |
+|------|------|-------------|
 | `server` | `string` | Always "librepcb", so clients can verify the server. |
 | `version` | `string` | The application version. |
 | `session` | `string` | A UUID identifying the running application process (changes on every application restart). |
-| `token` | `string` | The token to be used for subsequent connections of this client (see the transport protocol documentation). |
 
 
 **Since:** 2.2.0
@@ -543,8 +558,8 @@ IMPORTANT: After calling this method, use `WorkspaceDb.wait()` to wait for the l
 
 | Name | Type | Description |
 |------|------|-------------|
-| `install` | `array` of [`uuid`](@ref doc_rpc_api_ext_types) | UUID of libraries to install. |
-| `uninstall` | `array` of [`uuid`](@ref doc_rpc_api_ext_types) | UUID of libraries to uninstall. |
+| `install` | `array` of `uuid` | UUID of libraries to install. |
+| `uninstall` | `array` of `uuid` | UUID of libraries to uninstall. |
 
 **Result:** None
 
@@ -592,10 +607,10 @@ Search library elements.
 | `type` | `LibraryElementType` | Type of library elements to find. |
 | `query` | `string` | Keyword to search for. If omitted or empty, all elements will be returned. |
 | `library` | `string` | If provided, only list elements contained in this library, specified by its absolute file path. |
-| `category` | `uuid?` | If provided, only list elements or categories within this category. If `null`, it means the root category, or elements without a valid category. |
-| `package` | [`uuid`](@ref doc_rpc_api_ext_types) | If provided, only list devices or parts for this package. |
-| `component` | [`uuid`](@ref doc_rpc_api_ext_types) | If provided, only list devices or parts for this component. |
-| `device` | [`uuid`](@ref doc_rpc_api_ext_types) | If provided, only list parts for this device. |
+| `category` | `string?` | If provided, only list elements or categories within this category. If `null`, it means the root category, or elements without a valid category. |
+| `package` | `string` | If provided, only list devices or parts for this package. |
+| `component` | `string` | If provided, only list devices or parts for this component. |
+| `device` | `string` | If provided, only list parts for this device. |
 | `limit` | `int` | Max. number of results to return. |
 
 **Result:**
@@ -644,7 +659,7 @@ Get details about a specific library element. This accesses not only the databas
 |------|------|-------------|
 | `type` | `string` | Type of library element to open ("library", "component_category", "package_category", "symbol", "package", "component", "device", "organization"). |
 | `path` | `string` | File path to the library elements directory, relative to the workspace libraries root folder. If omitted, the `uuid` argument must be passed instead. |
-| `uuid` | [`uuid`](@ref doc_rpc_api_ext_types) | UUID of the library element. If there exist multiple library elements with that UUID, the one with the highest version number will be returned. If omitted, the `path` argument must be passed instead. |
+| `uuid` | `string` | UUID of the library element. If there exist multiple library elements with that UUID, the one with the highest version number will be returned. If omitted, the `path` argument must be passed instead. |
 
 **Result:** None
 
