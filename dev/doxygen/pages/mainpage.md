@@ -11,6 +11,7 @@ LibrePCB Developers Documentation {#mainpage}
 - @ref doc_slint_style_guide
 - @ref doc_release_workflow
 - @ref doc_architecture_overview
+- @ref doc_render_cache
 - @ref doc_attributes_system
 - @ref doc_versioning
 - @ref doc_workspace

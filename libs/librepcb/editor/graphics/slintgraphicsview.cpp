@@ -37,6 +37,20 @@ namespace editor {
 
 static const qreal sScrollFactor = 0.07;
 
+// Maps scene coordinates to a view of the given width, optionally mirrored.
+static QTransform viewTransform(qreal scale, const QPointF& offset, bool mirror,
+                                int width) noexcept {
+  QTransform tf;
+  if (mirror) {
+    tf.translate(width, 0);
+    tf.scale(-scale, scale);
+  } else {
+    tf.scale(scale, scale);
+  }
+  tf.translate(-offset.x(), -offset.y());
+  return tf;
+}
+
 static qreal boundedScaleFactor(qreal scale) noexcept {
   // Limit zoom factor to avoid crashes due to numerical issues when zooming
   // extensively (e.g. possible with free running scroll wheels).
@@ -186,20 +200,13 @@ slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
       mProjection.offset =
           initialRect.center() - target.center() / mProjection.scale;
     }
-    QRectF sceneRect(0, 0, size.width() / mProjection.scale,
-                     size.height() / mProjection.scale);
-    sceneRect.translate(mProjection.offset);
 
-    // Render the scene, either mirrored or not.
-    if (mMirror) {
-      painter.save();
-      painter.translate(size.width(), 0);
-      painter.scale(-1, 1);
-    }
-    scene.render(&painter, targetRect, sceneRect);
-    if (mMirror) {
-      painter.restore();
-    }
+    // Render the background, the scene content and the foreground layer.
+    const QTransform tf = viewTransform(mProjection.scale, mProjection.offset,
+                                        mMirror, size.width());
+    scene.renderBackground(&painter, size, tf);
+    scene.renderContent(&painter, size, tf);
+    scene.renderForeground(&painter, size, tf);
 
     // If there was an OpenGL error, print it at the bottom right.
     if (!openGlError.isEmpty()) {

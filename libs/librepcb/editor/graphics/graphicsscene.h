@@ -90,6 +90,11 @@ struct GraphicsSceneCursor {
 
 /**
  * @brief The GraphicsScene class
+ *
+ * Each rendered frame consists of three layers, in order: the Background, the
+ * Content, and the Foreground. 
+ *
+ * @see @ref doc_render_cache_layers
  */
 class GraphicsScene : public QGraphicsScene {
   Q_OBJECT
@@ -147,11 +152,67 @@ public:
   QPixmap toPixmap(const QSize& size,
                    const QColor& background = Qt::transparent) noexcept;
 
+  /**
+   * @brief Render only the background layer of the scene
+   *
+   * Draws the background fill and the grid, independent of the scene
+   * content. Takes the same arguments as ::renderContent().
+   */
+  void renderBackground(QPainter* painter, const QSize& size,
+                        const QTransform& sceneToDevice) noexcept;
+
+  /**
+   * @brief Render the scene content only
+   *
+   * Draws the scene items (components, pads, etc.) without the background
+   * and foreground layers.
+   *
+   * @param painter        Painter to draw with.
+   * @param size           Size of the target area, starting at the origin.
+   * @param sceneToDevice  Maps scene coordinates to the target area. Only a
+   *                       uniform scale with an optional horizontal flip and
+   *                       a translation is supported.
+   */
+  void renderContent(QPainter* painter, const QSize& size,
+                     const QTransform& sceneToDevice) noexcept;
+
+  /**
+   * @brief Render only the foreground layer of the scene
+   *
+   * Draws the foreground layer, independent of the scene content. This
+   * includes cursors, rulers, etc. Takes the same arguments as
+   * ::renderContent().
+   */
+  void renderForeground(QPainter* painter, const QSize& size,
+                        const QTransform& sceneToDevice) noexcept;
+
 protected:
+  /**
+   * @brief Callback function to draw the background layer
+   *
+   * Called by QGraphicsScene before drawing the scene items. Also called
+   * directly by ::renderBackground(). Draws nothing when rendering with
+   * ::renderContent().
+   *
+   * @param painter  Painter with the scene-to-device transform applied.
+   * @param rect     The scene area to draw.
+   */
   void drawBackground(QPainter* painter, const QRectF& rect) noexcept override;
+
+  /**
+   * @brief Callback function to draw the foreground layer
+   *
+   * Called by QGraphicsScene after drawing the scene items. Also called
+   * directly by ::renderForeground(). Draws nothing when rendering with
+   * ::renderContent().
+   *
+   * @param painter  Painter with the scene-to-device transform applied.
+   * @param rect     The scene area to draw.
+   */
   void drawForeground(QPainter* painter, const QRectF& rect) noexcept override;
 
 private:
+  bool mContentOnly;  ///< Whether the background and foreground draw nothing.
   GridStyle mGridStyle;
   PositiveLength mGridInterval;
   QColor mBackgroundColor;
