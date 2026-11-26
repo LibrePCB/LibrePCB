@@ -2080,8 +2080,8 @@ void Board2dTab::loadDesignRules(const QString& uiKey) noexcept {
       const Uuid orgUuid = Uuid::fromString(uiKey.split(":").first());
       const Uuid druUuid = Uuid::fromString(uiKey.split(":").last());
       std::shared_ptr<const Organization> org =
-          mApp.getLibraryElementCache().getOrganization(orgUuid,
-                                                        true);  // can throw
+          mApp.getLibraryElementCache().get<Organization>(orgUuid,
+                                                          true);  // can throw
       const OrganizationPcbDesignRules* dru = org->findPcbDesignRules(druUuid);
       if (!dru) {
         // Maybe the wrong organization was loaded since the listed organization

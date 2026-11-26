@@ -143,7 +143,7 @@ void ComponentGateListModel::add() {
   }
 
   std::shared_ptr<const Symbol> sym =
-      mCache.getSymbol(*symbolUuid, true);  // can throw
+      mCache.get<Symbol>(*symbolUuid, true);  // can throw
   Q_ASSERT(sym);
 
   std::unique_ptr<UndoCommandGroup> cmdGrp(

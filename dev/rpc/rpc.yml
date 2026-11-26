@@ -689,6 +689,7 @@ classes:
 
   - name: RemoteLibrary
     description: Allows to list, install, update and uninstall remote libraries.
+    since: "2.2.0"
     methods:
       - name: list
         description: >-
@@ -738,6 +739,7 @@ classes:
       local or remote libraries (install/remove/create/edit), call `wait()`
       before accessing the database again. Otherwise, the database may not
       reflect the changes yet, i.e. returns outdated information.
+    since: "2.2.0"
     methods:
       - name: wait
         description: >-
@@ -803,5 +805,36 @@ classes:
         result:
           - name: rows
             type: array
-            items: any
+            items: map
             description: Result rows.
+
+      - name: get
+        description: >-
+          Get details about a specific library element. This accesses not
+          only the database, but also loads the library element from disk.
+          So this is a more heavy operation and may take a few milliseconds
+          up to maybe a second. The data will be cached - any further call
+          on the same library element will be responded from memory, as long
+          as no library rescan was started in the mean time (rescan invalidates
+          the cache).
+        static: true
+        params:
+          - name: type
+            type: string
+            description: >-
+              Type of library element to open ("library", "component_category",
+              "package_category", "symbol", "package", "component", "device",
+              "organization").
+          - name: path
+            type: string
+            description: >-
+              Absolute file path to the library elements directory. If omitted,
+              the `uuid` argument must be passed instead.
+          - name: uuid
+            type: uuid
+            description: >-
+              UUID of the library element. If there exist multiple library
+              elements with that UUID, the one with the highest version number
+              will be returned. If omitted, the `path` argument must be passed
+              instead.
+        result: [] # TODO - depends on requested library element type

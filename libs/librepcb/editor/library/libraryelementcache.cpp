@@ -80,6 +80,8 @@ static void clearAndCount(T& container, int& count) noexcept {
 }
 
 void LibraryElementCache::reset() noexcept {
+  mLatest.clear();
+
   int count = 0;
   clearAndCount(mCmpCat, count);
   clearAndCount(mPkgCat, count);
@@ -91,40 +93,88 @@ void LibraryElementCache::reset() noexcept {
   qDebug() << "Discarded" << count << "cached library elements.";
 }
 
-std::shared_ptr<const ComponentCategory>
-    LibraryElementCache::getComponentCategory(const Uuid& uuid,
-                                              bool throwIfNotFound) const {
+template <>
+std::shared_ptr<const ComponentCategory> LibraryElementCache::get(
+    const Uuid& uuid, bool throwIfNotFound) const {
   return getElement(mCmpCat, uuid, throwIfNotFound);
 }
 
-std::shared_ptr<const PackageCategory> LibraryElementCache::getPackageCategory(
+template <>
+std::shared_ptr<const PackageCategory> LibraryElementCache::get(
     const Uuid& uuid, bool throwIfNotFound) const {
   return getElement(mPkgCat, uuid, throwIfNotFound);
 }
 
-std::shared_ptr<const Symbol> LibraryElementCache::getSymbol(
+template <>
+std::shared_ptr<const Symbol> LibraryElementCache::get(
     const Uuid& uuid, bool throwIfNotFound) const {
   return getElement(mSym, uuid, throwIfNotFound);
 }
 
-std::shared_ptr<const Package> LibraryElementCache::getPackage(
+template <>
+std::shared_ptr<const Package> LibraryElementCache::get(
     const Uuid& uuid, bool throwIfNotFound) const {
   return getElement(mPkg, uuid, throwIfNotFound);
 }
 
-std::shared_ptr<const Component> LibraryElementCache::getComponent(
+template <>
+std::shared_ptr<const Component> LibraryElementCache::get(
     const Uuid& uuid, bool throwIfNotFound) const {
   return getElement(mCmp, uuid, throwIfNotFound);
 }
 
-std::shared_ptr<const Device> LibraryElementCache::getDevice(
+template <>
+std::shared_ptr<const Device> LibraryElementCache::get(
     const Uuid& uuid, bool throwIfNotFound) const {
   return getElement(mDev, uuid, throwIfNotFound);
 }
 
-std::shared_ptr<const Organization> LibraryElementCache::getOrganization(
+template <>
+std::shared_ptr<const Organization> LibraryElementCache::get(
     const Uuid& uuid, bool throwIfNotFound) const {
   return getElement(mOrg, uuid, throwIfNotFound);
+}
+
+template <>
+std::shared_ptr<const ComponentCategory> LibraryElementCache::get(
+    const FilePath& fp, bool throwIfNotFound) const {
+  return getElement(mCmpCat, fp, throwIfNotFound);
+}
+
+template <>
+std::shared_ptr<const PackageCategory> LibraryElementCache::get(
+    const FilePath& fp, bool throwIfNotFound) const {
+  return getElement(mPkgCat, fp, throwIfNotFound);
+}
+
+template <>
+std::shared_ptr<const Symbol> LibraryElementCache::get(
+    const FilePath& fp, bool throwIfNotFound) const {
+  return getElement(mSym, fp, throwIfNotFound);
+}
+
+template <>
+std::shared_ptr<const Package> LibraryElementCache::get(
+    const FilePath& fp, bool throwIfNotFound) const {
+  return getElement(mPkg, fp, throwIfNotFound);
+}
+
+template <>
+std::shared_ptr<const Component> LibraryElementCache::get(
+    const FilePath& fp, bool throwIfNotFound) const {
+  return getElement(mCmp, fp, throwIfNotFound);
+}
+
+template <>
+std::shared_ptr<const Device> LibraryElementCache::get(
+    const FilePath& fp, bool throwIfNotFound) const {
+  return getElement(mDev, fp, throwIfNotFound);
+}
+
+template <>
+std::shared_ptr<const Organization> LibraryElementCache::get(
+    const FilePath& fp, bool throwIfNotFound) const {
+  return getElement(mOrg, fp, throwIfNotFound);
 }
 
 /*******************************************************************************
@@ -133,34 +183,24 @@ std::shared_ptr<const Organization> LibraryElementCache::getOrganization(
 
 template <typename T>
 std::shared_ptr<const T> LibraryElementCache::getElement(
-    QHash<Uuid, std::shared_ptr<const T>>& container, const Uuid& uuid,
+    QHash<FilePath, std::shared_ptr<const T>>& container, const Uuid& uuid,
     bool throwIfNotFound) const {
-  std::shared_ptr<const T> element = container.value(uuid);
+  const FilePath fp = getLatest<T>(uuid, throwIfNotFound);
+  return fp.isValid() ? getElement<T>(container, fp, throwIfNotFound) : nullptr;
+}
+
+template <typename T>
+std::shared_ptr<const T> LibraryElementCache::getElement(
+    QHash<FilePath, std::shared_ptr<const T>>& container, const FilePath& fp,
+    bool throwIfNotFound) const {
+  std::shared_ptr<const T> element = container.value(fp);
   QString errMsg = "Unknown error, please open an bug report.";
   if ((!element) && mDb) {
-    const bool scanInProgress = mDb->isScanInProgress();
     try {
-      FilePath fp = mDb->getLatest<T>(uuid);
-      if (fp.isValid()) {
-        element.reset(T::open(std::make_unique<TransactionalDirectory>(
-                                  TransactionalFileSystem::openRO(fp)))
-                          .release());
-        container.insert(uuid, element);
-      } else {
-        errMsg = tr("Library element '%1' with UUID '%2' not found in "
-                    "workspace library.")
-                     .arg(T::getLongElementName())
-                     .arg(uuid.toStr());
-        if (scanInProgress) {
-          errMsg += " " %
-              tr("Please try again after the background library rescan has "
-                 "completed.");
-        } else {
-          errMsg += " " %
-              tr("Please make sure that all dependent libraries are "
-                 "installed.");
-        }
-      }
+      element.reset(T::open(std::make_unique<TransactionalDirectory>(
+                                TransactionalFileSystem::openRO(fp)))
+                        .release());
+      container.insert(fp, element);
     } catch (const Exception& e) {
       qWarning() << "Failed to open library element:" << e.getMsg();
       errMsg = e.getMsg();
@@ -170,6 +210,41 @@ std::shared_ptr<const T> LibraryElementCache::getElement(
     throw RuntimeError(__FILE__, __LINE__, errMsg);
   }
   return element;
+}
+
+template <typename T>
+FilePath LibraryElementCache::getLatest(const Uuid& uuid,
+                                        bool throwIfNotFound) const {
+  const QString key = T::getShortElementName() % ":" % uuid.toStr();
+  QString errMsg;
+  FilePath fp = mLatest.value(key);
+  if ((!fp.isValid()) && (!mLatest.contains(key)) && mDb) {
+    try {
+      fp = mDb->getLatest<T>(uuid);
+      mLatest.insert(key, fp);
+    } catch (const Exception& e) {
+      errMsg = e.getMsg();
+    }
+  }
+  if (throwIfNotFound && (!fp.isValid())) {
+    if (errMsg.isEmpty()) {
+      errMsg = tr("Library element '%1' with UUID '%2' not found in "
+                  "workspace library.")
+                   .arg(T::getLongElementName())
+                   .arg(uuid.toStr());
+      if (mDb && mDb->isScanInProgress()) {
+        errMsg += " " %
+            tr("Please try again after the background library rescan has "
+               "completed.");
+      } else {
+        errMsg += " " %
+            tr("Please make sure that all dependent libraries are "
+               "installed.");
+      }
+    }
+    throw RuntimeError(__FILE__, __LINE__, errMsg);
+  }
+  return fp;
 }
 
 /*******************************************************************************

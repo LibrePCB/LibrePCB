@@ -128,7 +128,7 @@ void ComponentVariantListModel::add() noexcept {
   }
 
   std::shared_ptr<const Symbol> sym =
-      mCache.getSymbol(*symbolUuid, true);  // can throw
+      mCache.get<Symbol>(*symbolUuid, true);  // can throw
   Q_ASSERT(sym);
 
   auto gate = std::make_shared<ComponentSymbolVariantItem>(

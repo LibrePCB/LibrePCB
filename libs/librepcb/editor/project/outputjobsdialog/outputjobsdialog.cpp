@@ -316,7 +316,7 @@ void OutputJobsDialog::addClicked() noexcept {
           const Uuid& jobUuid) {
         try {
           std::shared_ptr<const Organization> orf =
-              mLibCache.getOrganization(orgUuid, true);  // can throw
+              mLibCache.get<Organization>(orgUuid, true);  // can throw
           const OutputJobList* jobs = nullptr;
           if (kind == WorkspaceLibraryDb::OutputJobKind::Pcb) {
             jobs = &orf->getPcbOutputJobs();

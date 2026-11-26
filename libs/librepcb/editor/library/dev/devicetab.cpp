@@ -855,7 +855,7 @@ void DeviceTab::refreshDependentElements() noexcept {
     mComponent.reset();
 
     try {
-      mComponent = mApp.getLibraryElementCache().getComponent(
+      mComponent = mApp.getLibraryElementCache().get<Component>(
           mDevice->getComponentUuid(), true);  // can throw
       mSymbolVariant = mComponent->getSymbolVariants().value(0);
       mSignalNames->setReferences(
@@ -865,8 +865,8 @@ void DeviceTab::refreshDependentElements() noexcept {
         for (int i = 0; i < mSymbolVariant->getSymbolItems().count(); ++i) {
           const auto gate = mSymbolVariant->getSymbolItems().at(i);
           std::shared_ptr<const Symbol> symbol =
-              mApp.getLibraryElementCache().getSymbol(gate->getSymbolUuid(),
-                                                      true);  // can throw
+              mApp.getLibraryElementCache().get<Symbol>(gate->getSymbolUuid(),
+                                                        true);  // can throw
           mSymbols.append(symbol);
           auto graphicsItem = std::make_shared<SymbolGraphicsItem>(
               const_cast<Symbol&>(*symbol), mApp.getPreviewLayers(),
@@ -898,7 +898,7 @@ void DeviceTab::refreshDependentElements() noexcept {
     mPackage.reset();
 
     try {
-      mPackage = mApp.getLibraryElementCache().getPackage(
+      mPackage = mApp.getLibraryElementCache().get<Package>(
           mDevice->getPackageUuid(), true);  // can throw
       mFootprint = mPackage->getFootprints().value(0);
       mPinout->setReferences(&mDevice->getPadSignalMap(), &mPackage->getPads(),
@@ -1023,8 +1023,8 @@ void DeviceTab::selectComponent() noexcept {
     try {
       // Load component.
       std::shared_ptr<const Component> cmp =
-          mApp.getLibraryElementCache().getComponent(*cmpUuid,
-                                                     true);  // can throw
+          mApp.getLibraryElementCache().get<Component>(*cmpUuid,
+                                                       true);  // can throw
       mComponentSelected = true;
 
       // Edit device (clear the pinout).
@@ -1059,8 +1059,8 @@ void DeviceTab::selectPackage() noexcept {
     try {
       // Load package.
       std::shared_ptr<const Package> pkg =
-          mApp.getLibraryElementCache().getPackage(*pkgUuid,
-                                                   true);  // can throw
+          mApp.getLibraryElementCache().get<Package>(*pkgUuid,
+                                                     true);  // can throw
       const QSet<Uuid> pads = pkg->getPads().getUuidSet();
       mPackageSelected = true;
 

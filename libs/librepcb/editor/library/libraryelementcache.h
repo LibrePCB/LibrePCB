@@ -66,20 +66,10 @@ public:
 
   // General Methods
   void reset() noexcept;
-  std::shared_ptr<const ComponentCategory> getComponentCategory(
-      const Uuid& uuid, bool throwIfNotFound) const;
-  std::shared_ptr<const PackageCategory> getPackageCategory(
-      const Uuid& uuid, bool throwIfNotFound) const;
-  std::shared_ptr<const Symbol> getSymbol(const Uuid& uuid,
-                                          bool throwIfNotFound) const;
-  std::shared_ptr<const Package> getPackage(const Uuid& uuid,
-                                            bool throwIfNotFound) const;
-  std::shared_ptr<const Component> getComponent(const Uuid& uuid,
-                                                bool throwIfNotFound) const;
-  std::shared_ptr<const Device> getDevice(const Uuid& uuid,
-                                          bool throwIfNotFound) const;
-  std::shared_ptr<const Organization> getOrganization(
-      const Uuid& uuid, bool throwIfNotFound) const;
+  template <typename T>
+  std::shared_ptr<const T> get(const Uuid& uuid, bool throwIfNotFound) const;
+  template <typename T>
+  std::shared_ptr<const T> get(const FilePath& fp, bool throwIfNotFound) const;
 
   // Operator Overloadings
   LibraryElementCache& operator=(const LibraryElementCache& rhs) = delete;
@@ -91,18 +81,25 @@ signals:
 private:  // Methods
   template <typename T>
   std::shared_ptr<const T> getElement(
-      QHash<Uuid, std::shared_ptr<const T>>& container, const Uuid& uuid,
+      QHash<FilePath, std::shared_ptr<const T>>& container, const Uuid& uuid,
       bool throwIfNotFound) const;
+  template <typename T>
+  std::shared_ptr<const T> getElement(
+      QHash<FilePath, std::shared_ptr<const T>>& container, const FilePath& fp,
+      bool throwIfNotFound) const;
+  template <typename T>
+  FilePath getLatest(const Uuid& uuid, bool throwIfNotFound) const;
 
 private:  // Data
   QPointer<const WorkspaceLibraryDb> mDb;
-  mutable QHash<Uuid, std::shared_ptr<const ComponentCategory>> mCmpCat;
-  mutable QHash<Uuid, std::shared_ptr<const PackageCategory>> mPkgCat;
-  mutable QHash<Uuid, std::shared_ptr<const Symbol>> mSym;
-  mutable QHash<Uuid, std::shared_ptr<const Package>> mPkg;
-  mutable QHash<Uuid, std::shared_ptr<const Component>> mCmp;
-  mutable QHash<Uuid, std::shared_ptr<const Device>> mDev;
-  mutable QHash<Uuid, std::shared_ptr<const Organization>> mOrg;
+  mutable QHash<QString, FilePath> mLatest;  // Key: "{type}:{uuid}"
+  mutable QHash<FilePath, std::shared_ptr<const ComponentCategory>> mCmpCat;
+  mutable QHash<FilePath, std::shared_ptr<const PackageCategory>> mPkgCat;
+  mutable QHash<FilePath, std::shared_ptr<const Symbol>> mSym;
+  mutable QHash<FilePath, std::shared_ptr<const Package>> mPkg;
+  mutable QHash<FilePath, std::shared_ptr<const Component>> mCmp;
+  mutable QHash<FilePath, std::shared_ptr<const Device>> mDev;
+  mutable QHash<FilePath, std::shared_ptr<const Organization>> mOrg;
 };
 
 /*******************************************************************************

@@ -179,7 +179,7 @@ void ComponentVariantEditor::autoConnectPins() {
       new UndoCommandGroup(tr("Auto-Assign Component Signals")));
   for (ComponentSymbolVariantItem& item : mVariant->getSymbolItems()) {
     if (std::shared_ptr<const Symbol> symbol =
-            mCache.getSymbol(item.getSymbolUuid(), false)) {
+            mCache.get<Symbol>(item.getSymbolUuid(), false)) {
       for (const auto& mapItem : item.getPinSignalMap().values()) {
         CircuitIdentifier pinName =
             symbol->getPins().get(mapItem->getPinUuid())->getName();
