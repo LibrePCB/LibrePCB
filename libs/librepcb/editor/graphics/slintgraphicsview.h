@@ -116,6 +116,16 @@ public:
   void zoomOut() noexcept;
   void zoomToSceneRect(const QRectF& r, bool autoFitInView) noexcept;
 
+  /**
+   * @brief Apply a continuous pan and/or zoom delta
+   *
+   * @param panDelta    Pan delta in view pixels, independent of the zoom
+   *                    level.
+   * @param zoomFactor  Zoom factor around the view center (1 = no change).
+   */
+  void applyContinuousMotion(const QPointF& panDelta,
+                             qreal zoomFactor) noexcept;
+
   // Static Methods
   static QRectF defaultSymbolSceneRect() noexcept;
   static QRectF defaultFootprintSceneRect() noexcept;
@@ -134,6 +144,9 @@ signals:
 private:  // Methods
   void scroll(const QPointF& delta) noexcept;
   void zoom(QPointF center, qreal factor) noexcept;
+  static void applyZoomAroundPoint(Projection& projection,
+                                   const QPointF& center,
+                                   qreal factor) noexcept;
   void smoothTo(const Projection& projection) noexcept;
   bool applyProjection(const Projection& projection) noexcept;
   QRectF validateSceneRect(const QRectF& r) const noexcept;

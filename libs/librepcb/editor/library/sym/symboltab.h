@@ -56,6 +56,7 @@ class LibraryElementCategoriesModel;
 class SlintGraphicsView;
 class SymbolEditorFsm;
 class SymbolGraphicsItem;
+struct SpaceMouseMotionEvent;
 
 /*******************************************************************************
  *  Class SymbolTab
@@ -103,6 +104,8 @@ public:
       const slint::language::KeyEvent& e) noexcept override;
   bool processSceneKeyReleased(
       const slint::language::KeyEvent& e) noexcept override;
+  void processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
+                              qreal dtSeconds) noexcept override;
   bool requestClose() noexcept override;
 
   // IF_GraphicsViewEventHandler

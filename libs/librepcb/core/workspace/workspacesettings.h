@@ -31,6 +31,7 @@
 #include "workspacesettingsitem_genericvalue.h"
 #include "workspacesettingsitem_genericvaluelist.h"
 #include "workspacesettingsitem_keyboardshortcuts.h"
+#include "workspacesettingsitem_spacemouse.h"
 
 #include <QtCore>
 
@@ -321,6 +322,13 @@ public:
    * @see ::librepcb::WorkspaceSettingsItem_KeyboardShortcuts
    */
   WorkspaceSettingsItem_KeyboardShortcuts keyboardShortcuts;
+
+  /**
+   * @brief SpaceMouse (3D mouse) settings
+   *
+   * @see ::librepcb::WorkspaceSettingsItem_SpaceMouse
+   */
+  WorkspaceSettingsItem_SpaceMouse spaceMouse;
 
   /**
    * @brief Schematic grid style

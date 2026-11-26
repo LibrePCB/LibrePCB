@@ -216,6 +216,13 @@ void WindowSection::processScenePointerEvent(const QPointF& pos,
   }
 }
 
+void WindowSection::processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
+                                           qreal dtSeconds) noexcept {
+  if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
+    t->processSpaceMouseEvent(e, dtSeconds);
+  }
+}
+
 bool WindowSection::processSceneScrolled(
     const QPointF& pos, slint::private_api::PointerScrollEvent e,
     int scene) noexcept {
