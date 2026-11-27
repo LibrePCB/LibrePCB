@@ -54,13 +54,13 @@ QString Application::getGitRevision() noexcept {
 }
 
 QDateTime Application::getGitCommitDate() noexcept {
-  static const QDateTime value =
+  static const QDateTime sValue =
 #if defined(GIT_COMMIT_TIMESTAMP) && (GIT_COMMIT_TIMESTAMP > 0)
       QDateTime::fromSecsSinceEpoch(GIT_COMMIT_TIMESTAMP);
 #else
       QDateTime();
 #endif
-  return value;
+  return sValue;
 }
 
 QString Application::getBuildAuthor() noexcept {
@@ -68,10 +68,10 @@ QString Application::getBuildAuthor() noexcept {
 }
 
 const Version& Application::getFileFormatVersion() noexcept {
-  static const Version value =
+  static const Version sValue =
       Version::fromString(LIBREPCB_FILE_FORMAT_VERSION);
-  Q_ASSERT(getVersion().startsWith(value.toStr() % "."));
-  return value;
+  Q_ASSERT(getVersion().startsWith(sValue.toStr() % "."));
+  return sValue;
 }
 
 bool Application::isFileFormatStable() noexcept {
@@ -116,7 +116,8 @@ QString Application::buildFullVersionDetails() noexcept {
 }
 
 FilePath Application::getTempDir() noexcept {
-  auto detect = []() {
+  // Thread-safe static initialization.
+  static const FilePath sValue = []() {
     // Use different temporary directory if supplied by environment variable
     // "LIBREPCB_TEMP_DIR" (e.g. for deployment). However, this is just a
     // safety fallback which is not communicated publicly. If no problems occur
@@ -143,10 +144,8 @@ FilePath Application::getTempDir() noexcept {
       qCritical() << "Could not determine the system's temporary directory!";
     }
     return fp.getPathTo("LibrePCB");
-  };
-
-  static const FilePath value = detect();
-  return value;
+  }();
+  return sValue;
 }
 
 FilePath Application::getRandomTempPath() noexcept {
@@ -159,7 +158,8 @@ FilePath Application::getRandomTempPath() noexcept {
 }
 
 FilePath Application::getCacheDir() noexcept {
-  auto detect = []() {
+  // Thread-safe static initialization.
+  static const FilePath sValue = []() {
     // Use different configuration directory if supplied by environment
     // variable "LIBREPCB_CACHE_DIR" (useful for functional testing).
     FilePath fp(qgetenv("LIBREPCB_CACHE_DIR"));
@@ -170,14 +170,13 @@ FilePath Application::getCacheDir() noexcept {
           QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
     }
     return fp;
-  };
-
-  static const FilePath value = detect();
-  return value;
+  }();
+  return sValue;
 }
 
 const FilePath& Application::getResourcesDir(bool* valid) noexcept {
-  auto detect = []() {
+  // Thread-safe static initialization.
+  static const auto sValue = []() {
     // Use different resources directory if supplied by environment
     // variable "LIBREPCB_SHARE_DIR" (useful for functional testing).
     FilePath fp(qgetenv("LIBREPCB_SHARE_DIR"));
@@ -227,17 +226,16 @@ const FilePath& Application::getResourcesDir(bool* valid) noexcept {
 #endif
     }
     return std::make_pair(fp, valid);
-  };
-
-  static const auto value = detect();
+  }();
   if (valid) {
-    *valid = value.second;
+    *valid = sValue.second;
   }
-  return value.first;
+  return sValue.first;
 }
 
 QStringList Application::getTranslationLocales() noexcept {
-  auto detect = []() {
+  // Thread-safe static initialization.
+  static const QStringList sValue = []() {
     QStringList locales;
     QDir dir(getResourcesDir().getPathTo("i18n").toStr());
     foreach (QString filename,
@@ -247,55 +245,51 @@ QStringList Application::getTranslationLocales() noexcept {
       locales.append(filename);
     }
     return locales;
-  };
-
-  static const QStringList value = detect();
-  return value;
+  }();
+  return sValue;
 }
 
 const QFont& Application::getDefaultSansSerifFont() noexcept {
-  auto create = []() {
+  // Thread-safe static initialization.
+  static const QFont sValue = []() {
     QFont font;
     font.setStyleStrategy(QFont::StyleStrategy(QFont::PreferQuality));
     font.setStyleHint(QFont::SansSerif);
     font.setFamily("Noto Sans");
     return font;
-  };
-
-  static const QFont value = create();
-  return value;
+  }();
+  return sValue;
 }
 
 const QFont& Application::getDefaultMonospaceFont() noexcept {
-  auto create = []() {
+  // Thread-safe static initialization.
+  static const QFont sValue = []() {
     QFont font;
     font.setStyleStrategy(QFont::StyleStrategy(QFont::PreferQuality));
     font.setStyleHint(QFont::TypeWriter);
     font.setFamily("Noto Sans Mono");
     return font;
-  };
-
-  static const QFont value = create();
-  return value;
+  }();
+  return sValue;
 }
 
 const StrokeFontPool& Application::getStrokeFonts() noexcept {
-  static const TransactionalFileSystem fs(
+  static const TransactionalFileSystem sFs(
       getResourcesDir().getPathTo("fontobene"), false,
       &TransactionalFileSystem::RestoreMode::no);
-  static const StrokeFontPool pool(fs);
+  static const StrokeFontPool sPool(sFs);
 
   // Abort the application if there's no default stroke font!
-  auto checkDefaultFontExistence = [](const StrokeFontPool& p) {
+  // Thread-safe static initialization.
+  static const bool sCheck = [](const StrokeFontPool& p) {
     if (!p.exists(getDefaultStrokeFontName())) {
       qFatal("Failed to load default stroke font, terminating application!");
     }
     return true;
-  };
-  static bool check = checkDefaultFontExistence(pool);
-  Q_UNUSED(check);
+  }(sPool);
+  Q_UNUSED(sCheck);
 
-  return pool;
+  return sPool;
 }
 
 const StrokeFont& Application::getDefaultStrokeFont() noexcept {
@@ -324,26 +318,26 @@ void Application::loadBundledFonts() noexcept {
 }
 
 void Application::setTranslationLocale(const QLocale& locale) noexcept {
-  static QVector<QTranslator*> installedTranslators;
+  static QVector<QTranslator*> sInstalledTranslators;
 
   // Do nothing if locale has not changed.
-  static std::optional<QLocale> currentLocale;
-  if (currentLocale == locale) {
+  static std::optional<QLocale> sCurrentLocale;
+  if (sCurrentLocale == locale) {
     return;
   } else {
-    currentLocale = locale;
+    sCurrentLocale = locale;
   }
 
   // First, remove all currently installed translations to avoid falling back to
   // wrong languages. The fallback language must always be en_US, i.e.
   // untranslated strings. See https://github.com/LibrePCB/LibrePCB/issues/611
-  foreach (QTranslator* translator, installedTranslators) {
+  foreach (QTranslator* translator, sInstalledTranslators) {
     if (!qApp->removeTranslator(translator)) {
       qWarning() << "Failed to remove translator.";
     }
   }
-  qDeleteAll(installedTranslators);
-  installedTranslators.clear();
+  qDeleteAll(sInstalledTranslators);
+  sInstalledTranslators.clear();
 
   // Install Qt translations
   QTranslator* qtTranslator = new QTranslator(qApp);
@@ -351,7 +345,7 @@ void Application::setTranslationLocale(const QLocale& locale) noexcept {
       qtTranslator->load("qt_" % locale.name(),
                          QLibraryInfo::path(QLibraryInfo::TranslationsPath));
   qApp->installTranslator(qtTranslator);
-  installedTranslators.append(qtTranslator);
+  sInstalledTranslators.append(qtTranslator);
 
   // Install system language translations (all system languages defined in the
   // system settings, in the defined order)
@@ -359,20 +353,20 @@ void Application::setTranslationLocale(const QLocale& locale) noexcept {
   QTranslator* systemTranslator = new QTranslator(qApp);
   std::ignore = systemTranslator->load(locale, "librepcb", "_", dir);
   qApp->installTranslator(systemTranslator);
-  installedTranslators.append(systemTranslator);
+  sInstalledTranslators.append(systemTranslator);
 
   // Install language translations (like "de" for German)
   QTranslator* appTranslator1 = new QTranslator(qApp);
   std::ignore =
       appTranslator1->load("librepcb_" % locale.name().split("_").at(0), dir);
   qApp->installTranslator(appTranslator1);
-  installedTranslators.append(appTranslator1);
+  sInstalledTranslators.append(appTranslator1);
 
   // Install language/country translations (like "de_ch" for German/Switzerland)
   QTranslator* appTranslator2 = new QTranslator(qApp);
   std::ignore = appTranslator2->load("librepcb_" % locale.name(), dir);
   qApp->installTranslator(appTranslator2);
-  installedTranslators.append(appTranslator2);
+  sInstalledTranslators.append(appTranslator2);
 }
 
 void Application::cleanTemporaryDirectory() noexcept {

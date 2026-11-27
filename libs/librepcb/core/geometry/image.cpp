@@ -252,8 +252,8 @@ const QStringList& Image::getSupportedExtensions() noexcept {
   //
   // ATTENTION: This list is considered as part of the file format
   // specification! Any change will requiring bumping the file format version!
-  static const QStringList extensions = {"jpg", "png", "svg"};
-  return extensions;
+  static const QStringList sExtensions = {"jpg", "png", "svg"};
+  return sExtensions;
 }
 
 std::optional<QImage> Image::tryLoad(const QByteArray& data,

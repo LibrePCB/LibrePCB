@@ -244,8 +244,8 @@ void DirectoryLock::unlock() {
  ******************************************************************************/
 
 QSet<FilePath>& DirectoryLock::dirsLockedByThisAppInstance() noexcept {
-  static QSet<FilePath> set;
-  return set;
+  static QSet<FilePath> sDirs;
+  return sDirs;
 }
 
 /*******************************************************************************

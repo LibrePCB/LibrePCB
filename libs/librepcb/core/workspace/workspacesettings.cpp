@@ -110,10 +110,10 @@ WorkspaceSettings::WorkspaceSettings(QObject* parent)
     keyboardShortcuts(this),
     schematicGridStyle("schematic_grid_style", GridStyle::Lines, this),
     boardGridStyle("board_grid_style", GridStyle::Lines, this),
-    schematicColorSchemes(WorkspaceSettingsItem_ColorSchemes::Kind::sSchematic,
+    schematicColorSchemes(WorkspaceSettingsItem_ColorSchemes::Kind::SCHEMATIC,
                           this),
-    boardColorSchemes(WorkspaceSettingsItem_ColorSchemes::Kind::sBoard, this),
-    view3dColorSchemes(WorkspaceSettingsItem_ColorSchemes::Kind::s3d, this),
+    boardColorSchemes(WorkspaceSettingsItem_ColorSchemes::Kind::BOARD, this),
+    view3dColorSchemes(WorkspaceSettingsItem_ColorSchemes::Kind::VIEW_3D, this),
     dismissedMessages("dismissed_messages", "message", QSet<QString>(), this) {
 }
 

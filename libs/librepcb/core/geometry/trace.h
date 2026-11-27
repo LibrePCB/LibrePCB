@@ -186,7 +186,7 @@ private:  // Data
  ******************************************************************************/
 
 struct TraceListNameProvider {
-  static constexpr const char* tagname = "trace";
+  static constexpr const char* TAGNAME = "trace";
 };
 using TraceList =
     SerializableObjectList<Trace, TraceListNameProvider, Trace::Event>;

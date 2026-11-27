@@ -291,7 +291,7 @@ void SceneData3D::preprocess(bool center, bool sortDevices, Length* width,
  ******************************************************************************/
 
 bool SceneData3D::isLayerNeeded(const Layer& layer) const noexcept {
-  static const QSet<const Layer*> layers = {
+  static const QSet<const Layer*> sLayers = {
       &Layer::boardOutlines(),  //
       &Layer::boardCutouts(),  //
       &Layer::boardPlatedCutouts(),  //
@@ -303,7 +303,7 @@ bool SceneData3D::isLayerNeeded(const Layer& layer) const noexcept {
       &Layer::botSolderPaste(),  //
   };
 
-  return layers.contains(&layer) || mSilkscreenLayersTop.contains(&layer) ||
+  return sLayers.contains(&layer) || mSilkscreenLayersTop.contains(&layer) ||
       mSilkscreenLayersBot.contains(&layer);
 }
 

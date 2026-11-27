@@ -69,7 +69,7 @@ SGI_SymbolPin::SGI_SymbolPin(
   setZValue(SchematicGraphicsScene::ZValue_SymbolPins);
 
   // Setup circle.
-  const UnsignedLength circleDiameter(sGrabAreaSizeNm);
+  const UnsignedLength circleDiameter(GRAB_AREA_SIZE_NM);
   mCircleGraphicsItem->setDiameter(circleDiameter);
   mCircleGraphicsItem->setShapeMode(
       PrimitiveCircleGraphicsItem::ShapeMode::FilledOutline);
@@ -256,7 +256,7 @@ void SGI_SymbolPin::updateShape() noexcept {
   Q_ASSERT(mLineGraphicsItem);
 
   // Note: We ignore shortened pin lines (i.e., if the pin has an error)
-  const qreal grabSizePx = Length(sGrabAreaSizeNm).toPx();
+  const qreal grabSizePx = Length(GRAB_AREA_SIZE_NM).toPx();
   const qreal lengthPx = mPin.getLibPin().getLength()->toPx();
 
   // Grab area: A circle at the end of the pin plus a rectangle of the same

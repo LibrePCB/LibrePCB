@@ -31,7 +31,7 @@
 namespace librepcb {
 namespace tests {
 
-static const QString sHeader =
+static const QString HEADER =
     "C  IPC-D-356A Netlist\n"
     "C  \n"
     "C  Project Name:        My Project\n"
@@ -83,7 +83,7 @@ TEST_F(D356NetlistGeneratorTest, testSmtPad) {
              PositiveLength(20000000), PositiveLength(30000000),
              -Angle::deg180(), 5);
 
-  const QString expected = sHeader %  // clang-format off
+  const QString expected = HEADER %  // clang-format off
   "327N/C              NOREF -NPAD       A01X+000001Y-000002X0123Y0654R000 S2\n"
   "327N/C{2}           U1    -42         A01X-000011Y+000022X0235Y0765R090 S2\n"
   "327N/C{2}           U2    -1337       A05X-000011Y+000022X0235Y0765R270 S1\n"
@@ -108,7 +108,7 @@ TEST_F(D356NetlistGeneratorTest, testThtPad) {
              PositiveLength(20000000), PositiveLength(30000000),
              -Angle::deg180(), PositiveLength(20000000));
 
-  const QString expected = sHeader %  // clang-format off
+  const QString expected = HEADER %  // clang-format off
   "317N/C              NOREF -NPAD D1300PA00X+000001Y-000002X0123Y0654R000 S0\n"
   "317N/C{2}           U1    -42   D0444PA00X-000011Y+000022X0235Y0765R090 S0\n"
   "317N/C{2}           U2    -1337 D0556PA00X-000011Y+000022X0235Y0765R270 S0\n"
@@ -136,7 +136,7 @@ TEST_F(D356NetlistGeneratorTest, testVia) {
 
   // Note: Not sure if blind and buried vias are represented correctly, we
   // need specs which are more clear!
-  const QString expected = sHeader %  // clang-format off
+  const QString expected = HEADER %  // clang-format off
   "317N/C              VIA        MD1300PA00X+000001Y-000002X0123Y0654R000 S0\n"
   "307N/C{2}           VIA        MD0444PA01X-000011Y+000022               S2L01L03\n"
   "027                 VIA               A01X-000011Y+000022X0235Y0765R090\n"

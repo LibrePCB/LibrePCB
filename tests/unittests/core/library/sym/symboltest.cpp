@@ -43,11 +43,11 @@ namespace tests {
 class SymbolTest : public ::testing::Test {
 public:
   FilePath mTmpDir;
-  static constexpr const char* sUuid = "35aad2af-5cd4-42ae-8576-fe7febad0d8a";
+  static constexpr const char* UUID = "35aad2af-5cd4-42ae-8576-fe7febad0d8a";
 
   SymbolTest() {
     // the whitespaces in the path are there to make the test even stronger ;)
-    mTmpDir = Application::getRandomTempPath().getPathTo(sUuid);
+    mTmpDir = Application::getRandomTempPath().getPathTo(UUID);
   }
 
   ~SymbolTest() override {
@@ -68,7 +68,7 @@ public:
 TEST_F(SymbolTest, testUpgradeV01) {
   // Copy into temporary directory.
   const FilePath src =
-      FilePath(TEST_DATA_DIR "/libraries/v0.1.lplib/sym").getPathTo(sUuid);
+      FilePath(TEST_DATA_DIR "/libraries/v0.1.lplib/sym").getPathTo(UUID);
   FileUtils::copyDirRecursively(src, mTmpDir);
 
   // Open/upgrade/close.

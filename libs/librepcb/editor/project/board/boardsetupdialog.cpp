@@ -47,7 +47,7 @@
 namespace librepcb {
 namespace editor {
 
-const QString BoardSetupDialog::sSettingsPrefix = "board_setup_dialog";
+const QString BoardSetupDialog::SETTINGS_PREFIX = "board_setup_dialog";
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -73,7 +73,7 @@ BoardSetupDialog::BoardSetupDialog(GuiApplication& app, Board& board,
   mUi->edtPcbThickness->setToolTip(tr("Default:") % " 1.6 mm");
   mUi->edtPcbThickness->configure(mBoard.getGridUnit(),
                                   LengthEditBase::Steps::generic(),
-                                  sSettingsPrefix % "/pcb_thickness");
+                                  SETTINGS_PREFIX % "/pcb_thickness");
   mUi->cbxSolderResist->addItem(
       tr("None (fully exposed copper)"),
       QVariant::fromValue(static_cast<const PcbColor*>(nullptr)));
@@ -110,41 +110,41 @@ BoardSetupDialog::BoardSetupDialog(GuiApplication& app, Board& board,
   // Tab: Design Rules
   mUi->edtDefaultTraceWidth->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
-      sSettingsPrefix % "/default_trace_width");
+      SETTINGS_PREFIX % "/default_trace_width");
   mUi->edtDefaultViaDrill->configure(mBoard.getGridUnit(),
                                      LengthEditBase::Steps::drillDiameter(),
-                                     sSettingsPrefix % "/default_via_drill");
+                                     SETTINGS_PREFIX % "/default_via_drill");
   mUi->edtRulesStopMaskClrRatio->setSingleStep(5.0);  // [%]
   mUi->edtRulesStopMaskClrMin->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
-      sSettingsPrefix % "/stopmask_clearance_min");
+      SETTINGS_PREFIX % "/stopmask_clearance_min");
   mUi->edtRulesStopMaskClrMax->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
-      sSettingsPrefix % "/stopmask_clearance_max");
+      SETTINGS_PREFIX % "/stopmask_clearance_max");
   mUi->edtRulesSolderPasteClrRatio->setSingleStep(5.0);  // [%]
   mUi->edtRulesSolderPasteClrMin->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
-      sSettingsPrefix % "/solderpaste_clearance_min");
+      SETTINGS_PREFIX % "/solderpaste_clearance_min");
   mUi->edtRulesSolderPasteClrMax->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
-      sSettingsPrefix % "/solderpaste_clearance_max");
+      SETTINGS_PREFIX % "/solderpaste_clearance_max");
   mUi->edtRulesPadAnnularRingRatio->setSingleStep(5.0);  // [%]
   mUi->edtRulesPadAnnularRingMin->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
-      sSettingsPrefix % "/pad_annular_ring_min");
+      SETTINGS_PREFIX % "/pad_annular_ring_min");
   mUi->edtRulesPadAnnularRingMax->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
-      sSettingsPrefix % "/pad_annular_ring_max");
+      SETTINGS_PREFIX % "/pad_annular_ring_max");
   mUi->edtRulesViaAnnularRingRatio->setSingleStep(5.0);  // [%]
   mUi->edtRulesViaAnnularRingMin->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
-      sSettingsPrefix % "/via_annular_ring_min");
+      SETTINGS_PREFIX % "/via_annular_ring_min");
   mUi->edtRulesViaAnnularRingMax->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
-      sSettingsPrefix % "/via_annular_ring_max");
+      SETTINGS_PREFIX % "/via_annular_ring_max");
   mUi->edtRulesStopMaskMaxViaDia->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
-      sSettingsPrefix % "/stopmask_max_via_diameter");
+      SETTINGS_PREFIX % "/stopmask_max_via_diameter");
   for (auto rbtn :
        {mUi->rbtnRulesCmpSidePadFullShape, mUi->rbtnRulesInnerPadFullShape}) {
     rbtn->setToolTip(
@@ -197,49 +197,49 @@ BoardSetupDialog::BoardSetupDialog(GuiApplication& app, Board& board,
           });
   mUi->edtDrcClearanceCopperCopper->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
-      sSettingsPrefix % "/clearance_copper_copper");
+      SETTINGS_PREFIX % "/clearance_copper_copper");
   mUi->edtDrcClearanceCopperBoard->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
-      sSettingsPrefix % "/clearance_copper_board");
+      SETTINGS_PREFIX % "/clearance_copper_board");
   mUi->edtDrcClearanceCopperNpth->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
-      sSettingsPrefix % "/clearance_copper_npth");
+      SETTINGS_PREFIX % "/clearance_copper_npth");
   mUi->edtDrcClearanceDrillDrill->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
-      sSettingsPrefix % "/clearance_drill_drill");
+      SETTINGS_PREFIX % "/clearance_drill_drill");
   mUi->edtDrcClearanceDrillBoard->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
-      sSettingsPrefix % "/clearance_drill_board");
+      SETTINGS_PREFIX % "/clearance_drill_board");
   mUi->edtDrcClearanceSilkscreenStopmask->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
-      sSettingsPrefix % "/clearance_silkscreen_stopmask");
+      SETTINGS_PREFIX % "/clearance_silkscreen_stopmask");
   mUi->edtDrcMinCopperWidth->configure(mBoard.getGridUnit(),
                                        LengthEditBase::Steps::generic(),
-                                       sSettingsPrefix % "/min_copper_width");
+                                       SETTINGS_PREFIX % "/min_copper_width");
   mUi->edtDrcMinPthAnnularRing->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
-      sSettingsPrefix % "/min_pth_annular_ring");
+      SETTINGS_PREFIX % "/min_pth_annular_ring");
   mUi->edtDrcMinNpthDrillDiameter->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::drillDiameter(),
-      sSettingsPrefix % "/min_npth_drill_diameter");
+      SETTINGS_PREFIX % "/min_npth_drill_diameter");
   mUi->edtDrcMinNpthSlotWidth->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::drillDiameter(),
-      sSettingsPrefix % "/min_npth_slot_width");
+      SETTINGS_PREFIX % "/min_npth_slot_width");
   mUi->edtDrcMinPthDrillDiameter->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::drillDiameter(),
-      sSettingsPrefix % "/min_pth_drill_diameter");
+      SETTINGS_PREFIX % "/min_pth_drill_diameter");
   mUi->edtDrcMinPthSlotWidth->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::drillDiameter(),
-      sSettingsPrefix % "/min_pth_slot_width");
+      SETTINGS_PREFIX % "/min_pth_slot_width");
   mUi->edtDrcMinSilkscreenWidth->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
-      sSettingsPrefix % "/min_silkscreen_width");
+      SETTINGS_PREFIX % "/min_silkscreen_width");
   mUi->edtDrcMinSilkscreenTextHeight->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
-      sSettingsPrefix % "/min_silkscreen_text_height");
+      SETTINGS_PREFIX % "/min_silkscreen_text_height");
   mUi->edtDrcMinOutlineToolDiameter->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::drillDiameter(),
-      sSettingsPrefix % "/min_outline_tool_diameter");
+      SETTINGS_PREFIX % "/min_outline_tool_diameter");
   for (QComboBox* cbx :
        {mUi->cbxDrcAllowedNpthSlots, mUi->cbxDrcAllowedPthSlots}) {
     cbx->addItem(
@@ -263,7 +263,7 @@ BoardSetupDialog::BoardSetupDialog(GuiApplication& app, Board& board,
 
   // Load client settings.
   QSettings cs;
-  const QSize windowSize = cs.value(sSettingsPrefix % "/window_size").toSize();
+  const QSize windowSize = cs.value(SETTINGS_PREFIX % "/window_size").toSize();
   if (!windowSize.isEmpty()) {
     resize(windowSize);
   }
@@ -274,7 +274,7 @@ BoardSetupDialog::BoardSetupDialog(GuiApplication& app, Board& board,
 
 BoardSetupDialog::~BoardSetupDialog() {
   QSettings cs;
-  cs.setValue(sSettingsPrefix % "/window_size", size());
+  cs.setValue(SETTINGS_PREFIX % "/window_size", size());
 }
 
 /*******************************************************************************

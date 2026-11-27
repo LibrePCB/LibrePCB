@@ -102,15 +102,15 @@ private:  // Methods
 private:  // Data
   EditorCommandSet& mCommands;
 
-  static constexpr qreal sPageWidth = 270;
-  static constexpr qreal sPageHeight = 190;
-  static constexpr qreal sCategoryTextSize = 3;
-  static constexpr qreal sRowTextSize = 2.4;
-  static constexpr qreal sRowHeight = 2.9;
-  static constexpr qreal sCategorySpacing = 5;
-  static constexpr qreal sColumnSpacing = 3.5;
-  static constexpr qreal sColumnWidth = (sPageWidth - 3 * sColumnSpacing) / 4;
-  static constexpr qreal sShortcutsWidth = 28;
+  static constexpr qreal PAGE_WIDTH = 270;
+  static constexpr qreal PAGE_HEIGHT = 190;
+  static constexpr qreal CATEGORY_TEXT_SIZE = 3;
+  static constexpr qreal ROW_TEXT_SIZE = 2.4;
+  static constexpr qreal ROW_HEIGHT = 2.9;
+  static constexpr qreal CATEGORY_SPACING = 5;
+  static constexpr qreal COLUMN_SPACING = 3.5;
+  static constexpr qreal COLUMN_WIDTH = (PAGE_WIDTH - 3 * COLUMN_SPACING) / 4;
+  static constexpr qreal SHORTCUTS_WIDTH = 28;
 };
 
 }  // namespace editor

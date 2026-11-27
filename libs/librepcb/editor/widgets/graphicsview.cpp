@@ -204,7 +204,7 @@ void GraphicsView::handleMouseWheelEvent(
     }
   } else {
     // Zoom to mouse
-    qreal scaleFactor = qPow(sZoomStepFactor, event->delta() / qreal(120));
+    qreal scaleFactor = qPow(ZOOM_STEP_FACTOR, event->delta() / qreal(120));
     scale(scaleFactor, scaleFactor);
   }
   event->setAccepted(true);
@@ -216,13 +216,13 @@ void GraphicsView::handleMouseWheelEvent(
 
 void GraphicsView::zoomIn() noexcept {
   if (!mScene) return;
-  scale(sZoomStepFactor, sZoomStepFactor);
+  scale(ZOOM_STEP_FACTOR, ZOOM_STEP_FACTOR);
   mIdleTimeMs = 0;
 }
 
 void GraphicsView::zoomOut() noexcept {
   if (!mScene) return;
-  scale(1 / sZoomStepFactor, 1 / sZoomStepFactor);
+  scale(1 / ZOOM_STEP_FACTOR, 1 / ZOOM_STEP_FACTOR);
   mIdleTimeMs = 0;
 }
 

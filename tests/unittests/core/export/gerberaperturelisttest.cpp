@@ -45,8 +45,8 @@ protected:
    * @return Apertures
    */
   static const QString& generateEverything() noexcept {
-    static QString s;
-    if (s.isEmpty()) {
+    static QString sCache;
+    if (sCache.isEmpty()) {
       GerberApertureList l;
 
       QVector<GerberApertureList::Function> functions = {
@@ -101,9 +101,9 @@ protected:
                        UnsignedLength(20000), rot, function);
         }
       }
-      s = l.generateString();
+      sCache = l.generateString();
     }
-    return s;
+    return sCache;
   }
 };
 

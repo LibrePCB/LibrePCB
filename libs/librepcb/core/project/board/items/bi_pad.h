@@ -194,12 +194,12 @@ private:  // Methods
 private:  // Data
   /// The net segment this pad is part of
   ///
-  /// @attention  This is `nullptr if this is a footprint pad.
+  /// @attention  This is `nullptr` if this is a footprint pad.
   BI_NetSegment* mNetSegment;
 
   /// The device this pad is part of
   ///
-  /// @attention  This is `nullptr if this is a board pad.
+  /// @attention  This is `nullptr` if this is a board pad.
   BI_Device* mDevice;
 
   /// The footprint pad of the device

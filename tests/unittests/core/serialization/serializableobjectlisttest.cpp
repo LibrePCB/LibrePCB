@@ -38,7 +38,7 @@ namespace tests {
  ******************************************************************************/
 
 struct SerializableObjectListTagNameProvider {
-  static constexpr const char* tagname = "test";
+  static constexpr const char* TAGNAME = "test";
 };
 
 using MinimalMock = MinimalSerializableObjectMock;

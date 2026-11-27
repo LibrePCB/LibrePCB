@@ -99,7 +99,7 @@ private:  // Data
  ******************************************************************************/
 
 struct DevicePadSignalMapNameProvider {
-  static constexpr const char* tagname = "pad";
+  static constexpr const char* TAGNAME = "pad";
 };
 using DevicePadSignalMap =
     SerializableObjectList<DevicePadSignalMapItem,

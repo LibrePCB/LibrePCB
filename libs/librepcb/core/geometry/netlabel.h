@@ -107,7 +107,7 @@ private:  // Data
  ******************************************************************************/
 
 struct NetLabelListNameProvider {
-  static constexpr const char* tagname = "label";
+  static constexpr const char* TAGNAME = "label";
 };
 using NetLabelList =
     SerializableObjectList<NetLabel, NetLabelListNameProvider, NetLabel::Event>;

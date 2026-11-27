@@ -102,7 +102,7 @@ inline std::size_t qHash(const std::shared_ptr<AssemblyVariant>& key,
  ******************************************************************************/
 
 struct AssemblyVariantListNameProvider {
-  static constexpr const char* tagname = "variant";
+  static constexpr const char* TAGNAME = "variant";
 };
 using AssemblyVariantList =
     SerializableObjectList<AssemblyVariant, AssemblyVariantListNameProvider,

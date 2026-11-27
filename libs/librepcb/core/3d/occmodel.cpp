@@ -871,7 +871,8 @@ QByteArray OccModel::minifyStep(const QByteArray& content) {
 
 void OccModel::initOpenCascade() {
 #if USE_OPENCASCADE
-  auto initOnce = []() {
+  // Thread-safe static initialization.
+  static const bool sDone = []() {
     // Make console output less verbose.
     if (!sOutputVerbosityConfigured) {
       setVerboseOutput(false);
@@ -885,9 +886,8 @@ void OccModel::initOpenCascade() {
     // Thus now allowing a larger tolerance.
     BRepBuilderAPI::Precision(5.0e-6);
     return true;
-  };
-  static const bool done = initOnce();
-  Q_UNUSED(done);
+  }();
+  Q_UNUSED(sDone);
 #endif
 }
 

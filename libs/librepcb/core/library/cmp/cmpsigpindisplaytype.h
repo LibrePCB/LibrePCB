@@ -92,26 +92,26 @@ public:
 
   /// @brief None (no text)
   static const CmpSigPinDisplayType& none() noexcept {
-    static CmpSigPinDisplayType type("none", tr("None (no text)"));
-    return type;
+    static CmpSigPinDisplayType sObj("none", tr("None (no text)"));
+    return sObj;
   }
 
   /// @brief display the name of the symbol pin
   static const CmpSigPinDisplayType& pinName() noexcept {
-    static CmpSigPinDisplayType type("pin", tr("Symbol pin name"));
-    return type;
+    static CmpSigPinDisplayType sObj("pin", tr("Symbol pin name"));
+    return sObj;
   }
 
   /// @brief display the name of the component signal
   static const CmpSigPinDisplayType& componentSignal() noexcept {
-    static CmpSigPinDisplayType type("signal", tr("Component signal name"));
-    return type;
+    static CmpSigPinDisplayType sObj("signal", tr("Component signal name"));
+    return sObj;
   }
 
   /// @brief display the name of the connected net signal
   static const CmpSigPinDisplayType& netSignal() noexcept {
-    static CmpSigPinDisplayType type("net", tr("Schematic net name"));
-    return type;
+    static CmpSigPinDisplayType sObj("net", tr("Schematic net name"));
+    return sObj;
   }
 
 private:  // Methods

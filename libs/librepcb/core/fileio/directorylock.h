@@ -264,7 +264,8 @@ public:
    * @return  The current lock status (see #LockStatus). If any underlying
    *          function from ::librepcb::SystemInfo failed (as it might happen
    *          in a sandboxed environment), or an existing lock file is
-   *          corrupted, this function returns #LockStatus::LockedByUnknownApp.
+   *          corrupted, this function returns
+   *          ::librepcb::DirectoryLock::LockStatus::LockedByUnknownApp.
    *
    * @throw   Exception on fatal errors only (e.g. invalid file path).
    */

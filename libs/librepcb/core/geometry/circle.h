@@ -116,7 +116,7 @@ private:  // Data
  ******************************************************************************/
 
 struct CircleListNameProvider {
-  static constexpr const char* tagname = "circle";
+  static constexpr const char* TAGNAME = "circle";
 };
 using CircleList =
     SerializableObjectList<Circle, CircleListNameProvider, Circle::Event>;

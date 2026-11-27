@@ -100,7 +100,7 @@ protected:  // Data
  ******************************************************************************/
 
 struct PadHoleListNameProvider {
-  static constexpr const char* tagname = "hole";
+  static constexpr const char* TAGNAME = "hole";
 };
 using PadHoleList =
     SerializableObjectList<PadHole, PadHoleListNameProvider, PadHole::Event>;

@@ -396,18 +396,16 @@ QString NetworkRequestBase::formatFileSize(qint64 bytes) noexcept {
 }
 
 QString NetworkRequestBase::getUserAgent() noexcept {
-  static QString userAgent;
-  if (userAgent.isEmpty()) {
+  static QString sUserAgent = []() {
     QStringList details;
     details << QSysInfo::prettyProductName();
     details << QSysInfo::currentCpuArchitecture();
     details << QLocale::system().name();
-    userAgent =
-        QString("LibrePCB/%1 (%2) Qt/%3")
-            .arg(Application::getVersion(),
-                 details.join("; ").remove("(").remove(")"), qVersion());
-  }
-  return userAgent;
+    return QString("LibrePCB/%1 (%2) Qt/%3")
+        .arg(Application::getVersion(),
+             details.join("; ").remove("(").remove(")"), qVersion());
+  }();
+  return sUserAgent;
 }
 
 /*******************************************************************************

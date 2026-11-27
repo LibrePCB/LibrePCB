@@ -84,9 +84,9 @@ const QList<std::shared_ptr<FileFormatMigration>>
 
   // Allow partially upgrading previous unstable file format releases if the
   // LIBREPCB_UPGRADE_UNSTABLE environment variable is set to 1.
-  static const bool upgradeUnstable =
+  static const bool sUpgradeUnstable =
       (qgetenv("LIBREPCB_UPGRADE_UNSTABLE") == "1");
-  if (upgradeUnstable && (fileFormat == Application::getFileFormatVersion())) {
+  if (sUpgradeUnstable && (fileFormat == Application::getFileFormatVersion())) {
     migrations.append(std::make_shared<FileFormatMigrationUnstable>());
   }
 

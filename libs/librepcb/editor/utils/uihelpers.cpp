@@ -247,7 +247,7 @@ ui::NotificationType l2s(RuleCheckMessage::Severity v) noexcept {
 }
 
 static const std::vector<Package::AssemblyType>& getAssemblyTypes() noexcept {
-  static const std::vector<Package::AssemblyType> list = {
+  static const std::vector<Package::AssemblyType> sList = {
       // ATTENTION: Keep in sync with constants.slint!
       Package::AssemblyType::Tht,  // clang-format break
       Package::AssemblyType::Smt,  // clang-format break
@@ -256,7 +256,7 @@ static const std::vector<Package::AssemblyType>& getAssemblyTypes() noexcept {
       Package::AssemblyType::None,  // clang-format break
       Package::AssemblyType::Auto,  // clang-format break
   };
-  return list;
+  return sList;
 }
 
 int l2s(Package::AssemblyType v) noexcept {
@@ -345,7 +345,7 @@ static bool isKeySequence(const slint::private_api::KeyEvent& e,
   // Compare the modifiers. For special key characters, allow an additional
   // SHIFT modifier as this might be required on some keyboard layouts. See
   // discussion in https://github.com/LibrePCB/LibrePCB/issues/1641.
-  static QString specialChars = "+-*/.,:;_[]=@#%&()?!{}<>|";
+  static QString sSpecialChars = "+-*/.,:;_[]=@#%&()?!{}<>|";
   const slint::private_api::KeyboardModifiers seqMod =
       q2s(seq[0].keyboardModifiers());
   return (e.modifiers == seqMod) ||
@@ -354,13 +354,13 @@ static bool isKeySequence(const slint::private_api::KeyEvent& e,
        (e.modifiers.alt == seqMod.alt) &&  //
        (e.modifiers.control == seqMod.control) &&  //
        (e.modifiers.meta == seqMod.meta) &&  //
-       (specialChars.contains(s2q(e.text))));
+       (sSpecialChars.contains(s2q(e.text))));
 }
 
 bool isShortcut(const slint::private_api::KeyEvent& e,
                 const ui::EditorCommand& cmd) noexcept {
   // On the first call, build a hash table of all commands for fast lookup.
-  auto hashCmd = []() {
+  static const QHash<slint::SharedString, const EditorCommand*> sMap = []() {
     QHash<slint::SharedString, const EditorCommand*> map;
     EditorCommandSet& cmd = EditorCommandSet::instance();
     foreach (const EditorCommandCategory* category, cmd.getCategories()) {
@@ -369,11 +369,10 @@ bool isShortcut(const slint::private_api::KeyEvent& e,
       }
     }
     return map;
-  };
-  static const QHash<slint::SharedString, const EditorCommand*> map = hashCmd();
+  }();
 
   // Find the command with the corresponding keyboard shortcut.
-  if (const EditorCommand* c = map.value(cmd.id)) {
+  if (const EditorCommand* c = sMap.value(cmd.id)) {
     for (const QKeySequence& seq : c->getKeySequences()) {
       if (isKeySequence(e, seq)) {
         return true;

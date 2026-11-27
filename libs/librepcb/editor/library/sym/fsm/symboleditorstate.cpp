@@ -91,7 +91,7 @@ QWidget* SymbolEditorState::parentWidget() noexcept {
 }
 
 const QSet<const Layer*>& SymbolEditorState::getAllowedTextLayers() noexcept {
-  static const QSet<const Layer*> layers = {
+  static const QSet<const Layer*> sLayers = {
       &Layer::symbolOutlines(),
       // &Layer::symbolHiddenGrabAreas(), -> makes no sense for texts
       &Layer::symbolNames(),
@@ -101,18 +101,18 @@ const QSet<const Layer*>& SymbolEditorState::getAllowedTextLayers() noexcept {
       &Layer::schematicComments(),
       &Layer::schematicGuide(),
   };
-  return layers;
+  return sLayers;
 }
 
 const QSet<const Layer*>&
     SymbolEditorState::getAllowedCircleAndPolygonLayers() noexcept {
-  static const QSet<const Layer*> layers = {
+  static const QSet<const Layer*> sLayers = {
       &Layer::symbolOutlines(),       &Layer::symbolHiddenGrabAreas(),
       &Layer::symbolNames(),          &Layer::symbolValues(),
       &Layer::schematicSheetFrames(), &Layer::schematicDocumentation(),
       &Layer::schematicComments(),    &Layer::schematicGuide(),
   };
-  return layers;
+  return sLayers;
 }
 
 UnsignedLength SymbolEditorState::getDefaultLineWidth(

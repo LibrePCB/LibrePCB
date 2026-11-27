@@ -58,7 +58,7 @@ Layer::~Layer() noexcept {
  ******************************************************************************/
 
 const Layer& Layer::mirrored(int innerLayers) const noexcept {
-  static QHash<const Layer*, const Layer*> map = {
+  static QHash<const Layer*, const Layer*> sMap = {
       {&topNames(), &botNames()},
       {&topValues(), &botValues()},
       {&topLegend(), &botLegend()},
@@ -72,9 +72,9 @@ const Layer& Layer::mirrored(int innerLayers) const noexcept {
       {&topGlue(), &botGlue()},
       {&topCopper(), &botCopper()},
   };
-  if (map.contains(this)) {
-    return *map.value(this);
-  } else if (const Layer* layer = map.key(this)) {
+  if (sMap.contains(this)) {
+    return *sMap.value(this);
+  } else if (const Layer* layer = sMap.key(this)) {
     return *layer;
   } else if ((innerLayers >= 0) && (innerLayers <= innerCopperCount()) &&
              isInner()) {
@@ -91,278 +91,279 @@ const Layer& Layer::mirrored(int innerLayers) const noexcept {
  ******************************************************************************/
 
 const Layer& Layer::schematicSheetFrames() noexcept {
-  static Layer layer("sch_frames", tr("Sheet Frames"),
-                     ColorRole::schematicFrames(), Flag::Schematic);
-  return layer;
+  static Layer sObj("sch_frames", tr("Sheet Frames"),
+                    ColorRole::schematicFrames(), Flag::Schematic);
+  return sObj;
 }
 
 const Layer& Layer::schematicDocumentation() noexcept {
-  static Layer layer("sch_documentation", tr("Documentation"),
-                     ColorRole::schematicDocumentation(), Flag::Schematic);
-  return layer;
+  static Layer sObj("sch_documentation", tr("Documentation"),
+                    ColorRole::schematicDocumentation(), Flag::Schematic);
+  return sObj;
 }
 
 const Layer& Layer::schematicComments() noexcept {
-  static Layer layer("sch_comments", tr("Comments"),
-                     ColorRole::schematicComments(), Flag::Schematic);
-  return layer;
+  static Layer sObj("sch_comments", tr("Comments"),
+                    ColorRole::schematicComments(), Flag::Schematic);
+  return sObj;
 }
 
 const Layer& Layer::schematicGuide() noexcept {
-  static Layer layer("sch_guide", tr("Guide"), ColorRole::schematicGuide(),
-                     Flag::Schematic);
-  return layer;
+  static Layer sObj("sch_guide", tr("Guide"), ColorRole::schematicGuide(),
+                    Flag::Schematic);
+  return sObj;
 }
 
 const Layer& Layer::symbolOutlines() noexcept {
-  static Layer layer("sym_outlines", tr("Outlines"),
-                     ColorRole::schematicOutlines(), Flag::Schematic);
-  return layer;
+  static Layer sObj("sym_outlines", tr("Outlines"),
+                    ColorRole::schematicOutlines(), Flag::Schematic);
+  return sObj;
 }
 
 const Layer& Layer::symbolHiddenGrabAreas() noexcept {
-  static Layer layer("sym_hidden_grab_areas", tr("Hidden Grab Areas"),
-                     ColorRole::schematicHiddenGrabAreas(), Flag::Schematic);
-  return layer;
+  static Layer sObj("sym_hidden_grab_areas", tr("Hidden Grab Areas"),
+                    ColorRole::schematicHiddenGrabAreas(), Flag::Schematic);
+  return sObj;
 }
 
 const Layer& Layer::symbolNames() noexcept {
-  static Layer layer("sym_names", tr("Names"), ColorRole::schematicNames(),
-                     Flag::Schematic);
-  return layer;
+  static Layer sObj("sym_names", tr("Names"), ColorRole::schematicNames(),
+                    Flag::Schematic);
+  return sObj;
 }
 
 const Layer& Layer::symbolValues() noexcept {
-  static Layer layer("sym_values", tr("Values"), ColorRole::schematicValues(),
-                     Flag::Schematic);
-  return layer;
+  static Layer sObj("sym_values", tr("Values"), ColorRole::schematicValues(),
+                    Flag::Schematic);
+  return sObj;
 }
 
 const Layer& Layer::symbolPinNames() noexcept {
-  static Layer layer("sym_pin_names", tr("Pin Names"),
-                     ColorRole::schematicPinNames(), Flag::Schematic);
-  return layer;
+  static Layer sObj("sym_pin_names", tr("Pin Names"),
+                    ColorRole::schematicPinNames(), Flag::Schematic);
+  return sObj;
 }
 
 const Layer& Layer::boardSheetFrames() noexcept {
-  static Layer layer("brd_frames", tr("Sheet Frames"), ColorRole::boardFrames(),
-                     Flag::Board);
-  return layer;
+  static Layer sObj("brd_frames", tr("Sheet Frames"), ColorRole::boardFrames(),
+                    Flag::Board);
+  return sObj;
 }
 
 const Layer& Layer::boardOutlines() noexcept {
-  static Layer layer("brd_outlines", tr("Board Outlines"),
-                     ColorRole::boardOutlines(), Flag::Board | Flag::BoardEdge);
-  return layer;
+  static Layer sObj("brd_outlines", tr("Board Outlines"),
+                    ColorRole::boardOutlines(), Flag::Board | Flag::BoardEdge);
+  return sObj;
 }
 
 const Layer& Layer::boardCutouts() noexcept {
-  static Layer layer("brd_cutouts", tr("Board Cutouts"),
-                     ColorRole::boardOutlines(),  // No dedicated color ID.
-                     Flag::Board | Flag::BoardEdge);
-  return layer;
+  static Layer sObj("brd_cutouts", tr("Board Cutouts"),
+                    ColorRole::boardOutlines(),  // No dedicated color ID.
+                    Flag::Board | Flag::BoardEdge);
+  return sObj;
 }
 
 const Layer& Layer::boardPlatedCutouts() noexcept {
-  static Layer layer("brd_plated_cutouts", tr("Plated Board Cutouts"),
-                     ColorRole::boardPlatedCutouts(),
-                     Flag::Board | Flag::BoardEdge);
-  return layer;
+  static Layer sObj("brd_plated_cutouts", tr("Plated Board Cutouts"),
+                    ColorRole::boardPlatedCutouts(),
+                    Flag::Board | Flag::BoardEdge);
+  return sObj;
 }
 
 const Layer& Layer::boardMeasures() noexcept {
-  static Layer layer("brd_measures", tr("Measures"), ColorRole::boardMeasures(),
-                     Flag::Board);
-  return layer;
+  static Layer sObj("brd_measures", tr("Measures"), ColorRole::boardMeasures(),
+                    Flag::Board);
+  return sObj;
 }
 
 const Layer& Layer::boardAlignment() noexcept {
-  static Layer layer("brd_alignment", tr("Alignment"),
-                     ColorRole::boardAlignment(), Flag::Board);
-  return layer;
+  static Layer sObj("brd_alignment", tr("Alignment"),
+                    ColorRole::boardAlignment(), Flag::Board);
+  return sObj;
 }
 
 const Layer& Layer::boardDocumentation() noexcept {
-  static Layer layer("brd_documentation", tr("Documentation"),
-                     ColorRole::boardDocumentation(), Flag::Board);
-  return layer;
+  static Layer sObj("brd_documentation", tr("Documentation"),
+                    ColorRole::boardDocumentation(), Flag::Board);
+  return sObj;
 }
 
 const Layer& Layer::boardComments() noexcept {
-  static Layer layer("brd_comments", tr("Comments"), ColorRole::boardComments(),
-                     Flag::Board);
-  return layer;
+  static Layer sObj("brd_comments", tr("Comments"), ColorRole::boardComments(),
+                    Flag::Board);
+  return sObj;
 }
 
 const Layer& Layer::boardGuide() noexcept {
-  static Layer layer("brd_guide", tr("Guide"), ColorRole::boardGuide(),
-                     Flag::Board);
-  return layer;
+  static Layer sObj("brd_guide", tr("Guide"), ColorRole::boardGuide(),
+                    Flag::Board);
+  return sObj;
 }
 
 const Layer& Layer::topNames() noexcept {
-  static Layer layer("top_names", tr("Top Names"), ColorRole::boardNamesTop(),
-                     Flag::Board | Flag::Top);
-  return layer;
+  static Layer sObj("top_names", tr("Top Names"), ColorRole::boardNamesTop(),
+                    Flag::Board | Flag::Top);
+  return sObj;
 }
 
 const Layer& Layer::botNames() noexcept {
-  static Layer layer("bot_names", tr("Bottom Names"),
-                     ColorRole::boardNamesBot(), Flag::Board | Flag::Bottom);
-  return layer;
+  static Layer sObj("bot_names", tr("Bottom Names"), ColorRole::boardNamesBot(),
+                    Flag::Board | Flag::Bottom);
+  return sObj;
 }
 
 const Layer& Layer::topValues() noexcept {
-  static Layer layer("top_values", tr("Top Values"),
-                     ColorRole::boardValuesTop(), Flag::Board | Flag::Top);
-  return layer;
+  static Layer sObj("top_values", tr("Top Values"), ColorRole::boardValuesTop(),
+                    Flag::Board | Flag::Top);
+  return sObj;
 }
 
 const Layer& Layer::botValues() noexcept {
-  static Layer layer("bot_values", tr("Bottom Values"),
-                     ColorRole::boardValuesBot(), Flag::Board | Flag::Bottom);
-  return layer;
+  static Layer sObj("bot_values", tr("Bottom Values"),
+                    ColorRole::boardValuesBot(), Flag::Board | Flag::Bottom);
+  return sObj;
 }
 
 const Layer& Layer::topLegend() noexcept {
-  static Layer layer("top_legend", tr("Top Legend"),
-                     ColorRole::boardLegendTop(), Flag::Board | Flag::Top);
-  return layer;
+  static Layer sObj("top_legend", tr("Top Legend"), ColorRole::boardLegendTop(),
+                    Flag::Board | Flag::Top);
+  return sObj;
 }
 
 const Layer& Layer::botLegend() noexcept {
-  static Layer layer("bot_legend", tr("Bottom Legend"),
-                     ColorRole::boardLegendBot(), Flag::Board | Flag::Bottom);
-  return layer;
+  static Layer sObj("bot_legend", tr("Bottom Legend"),
+                    ColorRole::boardLegendBot(), Flag::Board | Flag::Bottom);
+  return sObj;
 }
 
 const Layer& Layer::topDocumentation() noexcept {
-  static Layer layer("top_documentation", tr("Top Documentation"),
-                     ColorRole::boardDocumentationTop(),
-                     Flag::Board | Flag::Top);
-  return layer;
+  static Layer sObj("top_documentation", tr("Top Documentation"),
+                    ColorRole::boardDocumentationTop(),
+                    Flag::Board | Flag::Top);
+  return sObj;
 }
 
 const Layer& Layer::botDocumentation() noexcept {
-  static Layer layer("bot_documentation", tr("Bottom Documentation"),
-                     ColorRole::boardDocumentationBot(),
-                     Flag::Board | Flag::Bottom);
-  return layer;
+  static Layer sObj("bot_documentation", tr("Bottom Documentation"),
+                    ColorRole::boardDocumentationBot(),
+                    Flag::Board | Flag::Bottom);
+  return sObj;
 }
 
 const Layer& Layer::topPackageOutlines() noexcept {
-  static Layer layer("top_package_outlines", tr("Top Package Outlines"),
-                     ColorRole::boardPackageOutlinesTop(),
-                     Flag::Board | Flag::Top | Flag::PackageOutline |
-                         Flag::PolygonsRepresentAreas);
-  return layer;
+  static Layer sObj("top_package_outlines", tr("Top Package Outlines"),
+                    ColorRole::boardPackageOutlinesTop(),
+                    Flag::Board | Flag::Top | Flag::PackageOutline |
+                        Flag::PolygonsRepresentAreas);
+  return sObj;
 }
 
 const Layer& Layer::botPackageOutlines() noexcept {
-  static Layer layer("bot_package_outlines", tr("Bottom Package Outlines"),
-                     ColorRole::boardPackageOutlinesBot(),
-                     Flag::Board | Flag::Bottom | Flag::PackageOutline |
-                         Flag::PolygonsRepresentAreas);
-  return layer;
+  static Layer sObj("bot_package_outlines", tr("Bottom Package Outlines"),
+                    ColorRole::boardPackageOutlinesBot(),
+                    Flag::Board | Flag::Bottom | Flag::PackageOutline |
+                        Flag::PolygonsRepresentAreas);
+  return sObj;
 }
 
 const Layer& Layer::topCourtyard() noexcept {
-  static Layer layer("top_courtyard", tr("Top Courtyard"),
-                     ColorRole::boardCourtyardTop(),
-                     Flag::Board | Flag::Top | Flag::PackageCourtyard |
-                         Flag::PolygonsRepresentAreas);
-  return layer;
+  static Layer sObj("top_courtyard", tr("Top Courtyard"),
+                    ColorRole::boardCourtyardTop(),
+                    Flag::Board | Flag::Top | Flag::PackageCourtyard |
+                        Flag::PolygonsRepresentAreas);
+  return sObj;
 }
 
 const Layer& Layer::botCourtyard() noexcept {
-  static Layer layer("bot_courtyard", tr("Bottom Courtyard"),
-                     ColorRole::boardCourtyardBot(),
-                     Flag::Board | Flag::Bottom | Flag::PackageCourtyard |
-                         Flag::PolygonsRepresentAreas);
-  return layer;
+  static Layer sObj("bot_courtyard", tr("Bottom Courtyard"),
+                    ColorRole::boardCourtyardBot(),
+                    Flag::Board | Flag::Bottom | Flag::PackageCourtyard |
+                        Flag::PolygonsRepresentAreas);
+  return sObj;
 }
 
 const Layer& Layer::topHiddenGrabAreas() noexcept {
-  static Layer layer("top_hidden_grab_areas", tr("Top Hidden Grab Areas"),
-                     ColorRole::boardHiddenGrabAreasTop(),
-                     Flag::Board | Flag::Top);
-  return layer;
+  static Layer sObj("top_hidden_grab_areas", tr("Top Hidden Grab Areas"),
+                    ColorRole::boardHiddenGrabAreasTop(),
+                    Flag::Board | Flag::Top);
+  return sObj;
 }
 
 const Layer& Layer::botHiddenGrabAreas() noexcept {
-  static Layer layer("bot_hidden_grab_areas", tr("Bottom Hidden Grab Areas"),
-                     ColorRole::boardHiddenGrabAreasBot(),
-                     Flag::Board | Flag::Bottom);
-  return layer;
+  static Layer sObj("bot_hidden_grab_areas", tr("Bottom Hidden Grab Areas"),
+                    ColorRole::boardHiddenGrabAreasBot(),
+                    Flag::Board | Flag::Bottom);
+  return sObj;
 }
 
 const Layer& Layer::topStopMask() noexcept {
-  static Layer layer("top_stop_mask", tr("Top Stop Mask"),
-                     ColorRole::boardStopMaskTop(),
-                     Flag::Board | Flag::Top | Flag::StopMask);
-  return layer;
+  static Layer sObj("top_stop_mask", tr("Top Stop Mask"),
+                    ColorRole::boardStopMaskTop(),
+                    Flag::Board | Flag::Top | Flag::StopMask);
+  return sObj;
 }
 
 const Layer& Layer::botStopMask() noexcept {
-  static Layer layer("bot_stop_mask", tr("Bottom Stop Mask"),
-                     ColorRole::boardStopMaskBot(),
-                     Flag::Board | Flag::Bottom | Flag::StopMask);
-  return layer;
+  static Layer sObj("bot_stop_mask", tr("Bottom Stop Mask"),
+                    ColorRole::boardStopMaskBot(),
+                    Flag::Board | Flag::Bottom | Flag::StopMask);
+  return sObj;
 }
 
 const Layer& Layer::topSolderPaste() noexcept {
-  static Layer layer("top_solder_paste", tr("Top Solder Paste"),
-                     ColorRole::boardSolderPasteTop(),
-                     Flag::Board | Flag::Top | Flag::SolderPaste);
-  return layer;
+  static Layer sObj("top_solder_paste", tr("Top Solder Paste"),
+                    ColorRole::boardSolderPasteTop(),
+                    Flag::Board | Flag::Top | Flag::SolderPaste);
+  return sObj;
 }
 
 const Layer& Layer::botSolderPaste() noexcept {
-  static Layer layer("bot_solder_paste", tr("Bottom Solder Paste"),
-                     ColorRole::boardSolderPasteBot(),
-                     Flag::Board | Flag::Bottom | Flag::SolderPaste);
-  return layer;
+  static Layer sObj("bot_solder_paste", tr("Bottom Solder Paste"),
+                    ColorRole::boardSolderPasteBot(),
+                    Flag::Board | Flag::Bottom | Flag::SolderPaste);
+  return sObj;
 }
 
 const Layer& Layer::topFinish() noexcept {
-  static Layer layer("top_finish", tr("Top Finish"),
-                     ColorRole::boardFinishTop(), Flag::Board | Flag::Top);
-  return layer;
+  static Layer sObj("top_finish", tr("Top Finish"), ColorRole::boardFinishTop(),
+                    Flag::Board | Flag::Top);
+  return sObj;
 }
 
 const Layer& Layer::botFinish() noexcept {
-  static Layer layer("bot_finish", tr("Bottom Finish"),
-                     ColorRole::boardFinishBot(), Flag::Board | Flag::Bottom);
-  return layer;
+  static Layer sObj("bot_finish", tr("Bottom Finish"),
+                    ColorRole::boardFinishBot(), Flag::Board | Flag::Bottom);
+  return sObj;
 }
 
 const Layer& Layer::topGlue() noexcept {
-  static Layer layer("top_glue", tr("Top Glue"), ColorRole::boardGlueTop(),
-                     Flag::Board | Flag::Top);
-  return layer;
+  static Layer sObj("top_glue", tr("Top Glue"), ColorRole::boardGlueTop(),
+                    Flag::Board | Flag::Top);
+  return sObj;
 }
 
 const Layer& Layer::botGlue() noexcept {
-  static Layer layer("bot_glue", tr("Bottom Glue"), ColorRole::boardGlueBot(),
-                     Flag::Board | Flag::Bottom);
-  return layer;
+  static Layer sObj("bot_glue", tr("Bottom Glue"), ColorRole::boardGlueBot(),
+                    Flag::Board | Flag::Bottom);
+  return sObj;
 }
 
 const Layer& Layer::topCopper() noexcept {
-  static Layer layer("top_cu", tr("Top Copper"), ColorRole::boardCopperTop(),
-                     Flag::Board | Flag::Top | Flag::Copper);
-  return layer;
+  static Layer sObj("top_cu", tr("Top Copper"), ColorRole::boardCopperTop(),
+                    Flag::Board | Flag::Top | Flag::Copper);
+  return sObj;
 }
 
 const Layer& Layer::botCopper() noexcept {
-  static Layer layer("bot_cu", tr("Bottom Copper"), ColorRole::boardCopperBot(),
-                     Flag::Board | Flag::Bottom | Flag::Copper |
-                         static_cast<Flag>(innerCopperCount() + 1));  // NOLINT
-  return layer;
+  static Layer sObj("bot_cu", tr("Bottom Copper"), ColorRole::boardCopperBot(),
+                    Flag::Board | Flag::Bottom | Flag::Copper |
+                        static_cast<Flag>(innerCopperCount() + 1));  // NOLINT
+  return sObj;
 }
 
 const QVector<const Layer*>& Layer::innerCopper() noexcept {
-  auto createThreadSafe = []() {
+  // Thread-safe static initialization.
+  static QVector<const Layer*> sLayers = []() {
     QVector<const Layer*> list;
     for (int i = 1; i <= innerCopperCount(); ++i) {
       const ColorRole* role = ColorRole::boardCopperInner(i);
@@ -373,9 +374,8 @@ const QVector<const Layer*>& Layer::innerCopper() noexcept {
                                 static_cast<Flag>(i)));  // NOLINT
     }
     return list;
-  };
-  static QVector<const Layer*> layers = createThreadSafe();
-  return layers;
+  }();
+  return sLayers;
 }
 
 const Layer* Layer::innerCopper(int number) noexcept {
@@ -397,7 +397,7 @@ const Layer* Layer::copper(int number) noexcept {
 }
 
 const QVector<const Layer*>& Layer::all() noexcept {
-  static QVector<const Layer*> list =
+  static QVector<const Layer*> sList =
       QVector<const Layer*>{
           &schematicSheetFrames(),  //
           &schematicDocumentation(),  //
@@ -445,7 +445,7 @@ const QVector<const Layer*>& Layer::all() noexcept {
           &botFinish(),  //
           &botGlue(),  //
       };
-  return list;
+  return sList;
 }
 
 const Layer& Layer::get(QStringView id) {

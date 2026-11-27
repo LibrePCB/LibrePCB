@@ -157,7 +157,7 @@ private:  // Data
  ******************************************************************************/
 
 struct StrokeTextListNameProvider {
-  static constexpr const char* tagname = "stroke_text";
+  static constexpr const char* TAGNAME = "stroke_text";
 };
 using StrokeTextList =
     SerializableObjectList<StrokeText, StrokeTextListNameProvider,

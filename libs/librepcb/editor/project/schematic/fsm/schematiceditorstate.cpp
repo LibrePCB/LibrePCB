@@ -100,7 +100,7 @@ const LengthUnit& SchematicEditorState::getLengthUnit() const noexcept {
 
 const QSet<const Layer*>&
     SchematicEditorState::getAllowedGeometryLayers() noexcept {
-  static QSet<const Layer*> layers = {
+  static QSet<const Layer*> sLayers = {
       &Layer::symbolOutlines(),
       // &Layer::symbolHiddenGrabAreas(), -> makes no sense in schematics
       &Layer::symbolNames(),
@@ -110,7 +110,7 @@ const QSet<const Layer*>&
       &Layer::schematicComments(),
       &Layer::schematicGuide(),
   };
-  return layers;
+  return sLayers;
 }
 
 void SchematicEditorState::abortBlockingToolsInOtherEditors() noexcept {

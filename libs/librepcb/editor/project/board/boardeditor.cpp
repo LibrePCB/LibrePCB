@@ -181,7 +181,7 @@ ui::BoardData BoardEditor::getUiData() const noexcept {
 }
 
 void BoardEditor::setUiData(const ui::BoardData& data) noexcept {
-  static QHash<ui::SolderTechnology, QVector<Tag>> solderTechnologyTags = {
+  static QHash<ui::SolderTechnology, QVector<Tag>> sSolderTechnologyTags = {
       {ui::SolderTechnology::HandLarge,
        {
            Tag("hand-soldering"),
@@ -193,7 +193,7 @@ void BoardEditor::setUiData(const ui::BoardData& data) noexcept {
       {ui::SolderTechnology::Reflow, {Tag("reflow-soldering")}},
       {ui::SolderTechnology::Wave, {Tag("wave-soldering")}},
   };
-  static QHash<ui::IpcDensityLevel, QVector<Tag>> ipcDensityLevelTags = {
+  static QHash<ui::IpcDensityLevel, QVector<Tag>> sIpcDensityLevelTags = {
       {ui::IpcDensityLevel::A,
        {
            Tag("ipc-density-level-a"),
@@ -241,8 +241,8 @@ void BoardEditor::setUiData(const ui::BoardData& data) noexcept {
       editPreferredFootprintTags(
           {&tags.thtTop, &tags.thtBot},
           // NOLINTNEXTLINE
-          solderTechnologyTags.values() + ipcDensityLevelTags.values(),
-          solderTechnologyTags.value(data.tht_soldering), QVector<Tag>{});
+          sSolderTechnologyTags.values() + sIpcDensityLevelTags.values(),
+          sSolderTechnologyTags.value(data.tht_soldering), QVector<Tag>{});
     });
   }
   if (data.smt_soldering != mSmtSolderTechnology) {
@@ -250,15 +250,15 @@ void BoardEditor::setUiData(const ui::BoardData& data) noexcept {
       editPreferredFootprintTags(
           {&tags.smtTop, &tags.smtBot},
           // NOLINTNEXTLINE
-          solderTechnologyTags.values() + ipcDensityLevelTags.values(),
-          solderTechnologyTags.value(data.smt_soldering), QVector<Tag>{});
+          sSolderTechnologyTags.values() + sIpcDensityLevelTags.values(),
+          sSolderTechnologyTags.value(data.smt_soldering), QVector<Tag>{});
     });
   }
   if (data.ipc_density_level != mIpcDensityLevel) {
     setPreferredFootprintTags([&](Board::PreferredFootprintTags& tags) {
       editPreferredFootprintTags(
-          {&tags.common}, ipcDensityLevelTags.values(), QVector<Tag>{},
-          ipcDensityLevelTags.value(data.ipc_density_level));
+          {&tags.common}, sIpcDensityLevelTags.values(), QVector<Tag>{},
+          sIpcDensityLevelTags.value(data.ipc_density_level));
     });
   }
 }

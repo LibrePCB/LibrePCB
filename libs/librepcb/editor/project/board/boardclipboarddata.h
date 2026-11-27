@@ -66,7 +66,7 @@ class BoardClipboardData final {
 public:
   // Types
   struct Device {
-    static constexpr const char* tagname = "device";
+    static constexpr const char* TAGNAME = "device";
 
     Uuid componentUuid;
     Uuid libDeviceUuid;
@@ -147,7 +147,7 @@ public:
   };
 
   struct NetSegment {
-    static constexpr const char* tagname = "netsegment";
+    static constexpr const char* TAGNAME = "netsegment";
 
     std::optional<CircuitIdentifier> netName;
     BoardPadDataList pads;
@@ -195,7 +195,7 @@ public:
   };
 
   struct Plane {
-    static constexpr const char* tagname = "plane";
+    static constexpr const char* TAGNAME = "plane";
 
     Uuid uuid;
     const Layer* layer;

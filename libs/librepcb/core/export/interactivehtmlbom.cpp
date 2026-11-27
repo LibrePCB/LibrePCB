@@ -124,13 +124,13 @@ InteractiveHtmlBom::InteractiveHtmlBom(
 void InteractiveHtmlBom::setViewConfig(ViewMode mode,
                                        HighlightPin1Mode highlightPin1,
                                        bool dark) noexcept {
-  static const QHash<ViewMode, rs::InteractiveHtmlBomViewMode> modeMap = {
+  static const QHash<ViewMode, rs::InteractiveHtmlBomViewMode> sModeMap = {
       {ViewMode::BomOnly, rs::InteractiveHtmlBomViewMode::BomOnly},
       {ViewMode::LeftRight, rs::InteractiveHtmlBomViewMode::LeftRight},
       {ViewMode::TopBottom, rs::InteractiveHtmlBomViewMode::TopBottom},
   };
   static const QHash<HighlightPin1Mode, rs::InteractiveHtmlBomHighlightPin1Mode>
-      pin1Map = {
+      sPin1Map = {
           {HighlightPin1Mode::None,
            rs::InteractiveHtmlBomHighlightPin1Mode::None},
           {HighlightPin1Mode::Selected,
@@ -138,8 +138,8 @@ void InteractiveHtmlBom::setViewConfig(ViewMode mode,
           {HighlightPin1Mode::All,
            rs::InteractiveHtmlBomHighlightPin1Mode::All},
       };
-  rs::ffi_ibom_set_view_config(*mHandle, modeMap[mode], pin1Map[highlightPin1],
-                               dark);
+  rs::ffi_ibom_set_view_config(*mHandle, sModeMap[mode],
+                               sPin1Map[highlightPin1], dark);
 }
 
 void InteractiveHtmlBom::setBoardRotation(const Angle& angle,
@@ -171,14 +171,16 @@ void InteractiveHtmlBom::addDrawing(DrawingKind kind, DrawingLayer layer,
                                     const Path& path,
                                     const UnsignedLength& width,
                                     bool filled) noexcept {
-  static const QHash<DrawingKind, rs::InteractiveHtmlBomDrawingKind> kindMap = {
-      {DrawingKind::Polygon, rs::InteractiveHtmlBomDrawingKind::Polygon},
-      {DrawingKind::ReferenceText,
-       rs::InteractiveHtmlBomDrawingKind::ReferenceText},
-      {DrawingKind::ValueText, rs::InteractiveHtmlBomDrawingKind::ValueText},
-  };
+  static const QHash<DrawingKind, rs::InteractiveHtmlBomDrawingKind> sKindMap =
+      {
+          {DrawingKind::Polygon, rs::InteractiveHtmlBomDrawingKind::Polygon},
+          {DrawingKind::ReferenceText,
+           rs::InteractiveHtmlBomDrawingKind::ReferenceText},
+          {DrawingKind::ValueText,
+           rs::InteractiveHtmlBomDrawingKind::ValueText},
+      };
   static const QHash<DrawingLayer, rs::InteractiveHtmlBomDrawingLayer>
-      layerMap = {
+      sLayerMap = {
           {DrawingLayer::Edge, rs::InteractiveHtmlBomDrawingLayer::Edge},
           {DrawingLayer::SilkscreenFront,
            rs::InteractiveHtmlBomDrawingLayer::SilkscreenFront},
@@ -191,7 +193,7 @@ void InteractiveHtmlBom::addDrawing(DrawingKind kind, DrawingLayer layer,
       };
 
   const QString svg = path.toSvgPathMm();
-  rs::ffi_ibom_add_drawing(*mHandle, kindMap[kind], layerMap[layer], &svg,
+  rs::ffi_ibom_add_drawing(*mHandle, sKindMap[kind], sLayerMap[layer], &svg,
                            width->toMm(), filled);
 }
 
@@ -199,11 +201,11 @@ void InteractiveHtmlBom::addTrack(
     Layer layer, const Point& start, const Point& end,
     const PositiveLength& width,
     const std::optional<QString>& netName) noexcept {
-  static const QHash<Layer, rs::InteractiveHtmlBomLayer> map = {
+  static const QHash<Layer, rs::InteractiveHtmlBomLayer> sMap = {
       {Layer::Top, rs::InteractiveHtmlBomLayer::Front},
       {Layer::Bottom, rs::InteractiveHtmlBomLayer::Back},
   };
-  rs::ffi_ibom_add_track(*mHandle, map[layer], start.getX().toMm(),
+  rs::ffi_ibom_add_track(*mHandle, sMap[layer], start.getX().toMm(),
                          -start.getY().toMm(), end.getX().toMm(),
                          -end.getY().toMm(), width->toMm(),
                          netName ? &(*netName) : nullptr);
@@ -213,14 +215,14 @@ void InteractiveHtmlBom::addVia(
     QSet<Layer> layers, const Point& pos, const PositiveLength& diameter,
     const PositiveLength& drillDiameter,
     const std::optional<QString>& netName) noexcept {
-  static const QHash<Layer, rs::InteractiveHtmlBomLayer> map = {
+  static const QHash<Layer, rs::InteractiveHtmlBomLayer> sMap = {
       {Layer::Top, rs::InteractiveHtmlBomLayer::Front},
       {Layer::Bottom, rs::InteractiveHtmlBomLayer::Back},
   };
 
   std::vector<rs::InteractiveHtmlBomLayer> layersVec;
   for (auto layer : layers) {
-    layersVec.push_back(map[layer]);
+    layersVec.push_back(sMap[layer]);
   }
   const float drill = drillDiameter->toMm();
   rs::ffi_ibom_add_via(*mHandle, layersVec.data(), layersVec.size(),
@@ -231,12 +233,12 @@ void InteractiveHtmlBom::addVia(
 void InteractiveHtmlBom::addPlaneFragment(
     Layer layer, const Path& outline,
     const std::optional<QString>& netName) noexcept {
-  static const QHash<Layer, rs::InteractiveHtmlBomLayer> map = {
+  static const QHash<Layer, rs::InteractiveHtmlBomLayer> sMap = {
       {Layer::Top, rs::InteractiveHtmlBomLayer::Front},
       {Layer::Bottom, rs::InteractiveHtmlBomLayer::Back},
   };
   const QString svg = outline.toClosedPath().toSvgPathMm();
-  rs::ffi_ibom_add_zone(*mHandle, map[layer], &svg,
+  rs::ffi_ibom_add_zone(*mHandle, sMap[layer], &svg,
                         netName ? &(*netName) : nullptr);
 }
 
@@ -244,7 +246,7 @@ std::size_t InteractiveHtmlBom::addFootprint(
     Layer layer, const Point& pos, const Angle& rot, const Point& topLeft,
     const Point& bottomRight, bool mount, const QStringList& fields,
     const QList<Pad>& pads) noexcept {
-  static const QHash<Layer, rs::InteractiveHtmlBomLayer> map = {
+  static const QHash<Layer, rs::InteractiveHtmlBomLayer> sMap = {
       {Layer::Top, rs::InteractiveHtmlBomLayer::Front},
       {Layer::Bottom, rs::InteractiveHtmlBomLayer::Back},
   };
@@ -319,7 +321,7 @@ std::size_t InteractiveHtmlBom::addFootprint(
     origin -= Point(bottomRight.getX() + topLeft.getX(), 0).rotated(rot);
   }
   return rs::ffi_ibom_add_footprint(
-      *mHandle, map[layer], origin.getX().toMm(), -origin.getY().toMm(),
+      *mHandle, sMap[layer], origin.getX().toMm(), -origin.getY().toMm(),
       rot.toDeg(), topLeft.getX().toMm(), -bottomRight.getY().toMm(),
       bottomRight.getX().toMm(), -topLeft.getY().toMm(), mount, &fields,
       padsVec.data(), padsVec.size());
@@ -328,7 +330,7 @@ std::size_t InteractiveHtmlBom::addFootprint(
 void InteractiveHtmlBom::addBomRow(
     Sides sides,
     const QList<std::pair<QString, std::size_t> >& parts) noexcept {
-  static const QHash<Sides, rs::InteractiveHtmlBomSides> map = {
+  static const QHash<Sides, rs::InteractiveHtmlBomSides> sMap = {
       {Sides::Top, rs::InteractiveHtmlBomSides::Front},
       {Sides::Bottom, rs::InteractiveHtmlBomSides::Back},
       {Sides::Both, rs::InteractiveHtmlBomSides::Both},
@@ -338,7 +340,7 @@ void InteractiveHtmlBom::addBomRow(
   for (const auto& part : parts) {
     list.push_back(rs::InteractiveHtmlBomRefMap{&part.first, part.second});
   }
-  rs::ffi_ibom_add_bom_line(*mHandle, map[sides], list.data(), list.size());
+  rs::ffi_ibom_add_bom_line(*mHandle, sMap[sides], list.data(), list.size());
 }
 
 QString InteractiveHtmlBom::generateHtml() const {

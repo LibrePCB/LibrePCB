@@ -142,7 +142,7 @@ private:  // Data
  ******************************************************************************/
 
 struct FootprintPadListNameProvider {
-  static constexpr const char* tagname = "pad";
+  static constexpr const char* TAGNAME = "pad";
 };
 using FootprintPadList =
     SerializableObjectList<FootprintPad, FootprintPadListNameProvider,

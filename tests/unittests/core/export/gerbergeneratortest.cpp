@@ -48,8 +48,8 @@ protected:
    * @return Gerber content
    */
   static const QString& generateEverything(bool componentPins = true) noexcept {
-    static QHash<bool, QString> cache;
-    if (!cache.contains(componentPins)) {
+    static QHash<bool, QString> sCache;
+    if (!sCache.contains(componentPins)) {
       GerberGenerator gen(
           QDateTime(QDate(2000, 2, 1), QTime(1, 2, 3, 4), Qt::OffsetFromUTC,
                     3600),
@@ -190,9 +190,9 @@ protected:
         }
       }
       gen.generate();
-      cache[componentPins] = gen.toStr();
+      sCache[componentPins] = gen.toStr();
     }
-    return cache[componentPins];
+    return sCache[componentPins];
   }
 };
 

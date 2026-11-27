@@ -81,12 +81,12 @@ QString RuleCheckMessage::getSeverityTr(Severity severity) noexcept {
 }
 
 const QIcon& RuleCheckMessage::getSeverityIcon(Severity severity) noexcept {
-  static QMap<Severity, QIcon> icon = {
+  static QMap<Severity, QIcon> sIcon = {
       {Severity::Hint, QIcon(":/img/status/info.png")},
       {Severity::Warning, QIcon(":/img/status/dialog_warning.png")},
       {Severity::Error, QIcon(":/img/status/dialog_error.png")},
   };
-  return icon[severity];
+  return sIcon[severity];
 }
 
 QSet<SExpression> RuleCheckMessage::getAllApprovals(

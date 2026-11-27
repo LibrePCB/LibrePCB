@@ -149,7 +149,7 @@ private:  // Data
  ******************************************************************************/
 
 struct ViaListNameProvider {
-  static constexpr const char* tagname = "via";
+  static constexpr const char* TAGNAME = "via";
 };
 using ViaList = SerializableObjectList<Via, ViaListNameProvider, Via::Event>;
 

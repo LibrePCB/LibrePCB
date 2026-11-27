@@ -30,13 +30,13 @@
 namespace librepcb {
 namespace editor {
 
-static constexpr std::array sZoneRuleKeys = {
+static constexpr std::array ZONE_RULE_KEYS = {
     std::pair{Zone::Rule::NoCopper, "no_copper"},
     std::pair{Zone::Rule::NoPlanes, "no_planes"},
     std::pair{Zone::Rule::NoExposure, "no_exposure"},
     std::pair{Zone::Rule::NoDevices, "no_devices"},
 };
-static_assert(static_cast<int>(sZoneRuleKeys.size()) ==
+static_assert(static_cast<int>(ZONE_RULE_KEYS.size()) ==
               std::popcount(static_cast<uint>(Zone::Rule::All)));
 
 /*******************************************************************************
@@ -62,7 +62,7 @@ ClientSettings::~ClientSettings() noexcept {
  ******************************************************************************/
 
 void ClientSettings::set(QAnyStringView key, Zone::Rules value) noexcept {
-  for (const auto& [rule, ruleKey] : sZoneRuleKeys) {
+  for (const auto& [rule, ruleKey] : ZONE_RULE_KEYS) {
     set(key.toString() % "/" % ruleKey, value.testFlag(rule));
   }
 }
@@ -93,7 +93,7 @@ std::optional<Zone::Rules> ClientSettings::get(
     QAnyStringView key, Zone::Rules defaultFlags) const noexcept {
   Zone::Rules r;
   bool loaded = false;
-  for (const auto& [rule, ruleKey] : sZoneRuleKeys) {
+  for (const auto& [rule, ruleKey] : ZONE_RULE_KEYS) {
     if (auto v = get<bool>(key.toString() % "/" % ruleKey)) {
       r.setFlag(rule, *v);
       loaded = true;

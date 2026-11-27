@@ -75,7 +75,7 @@ PartInformationToolTip::PartInformationToolTip(
                         " padding: 0px;"
                         " margin: 0px;"
                         "};")
-                    .arg(sWindowArrowSize + 1));
+                    .arg(WINDOW_ARROW_SIZE + 1));
 
   // Set up expand/collapse animation.
   mExpandAnimation->setStartValue(0);
@@ -217,7 +217,7 @@ void PartInformationToolTip::showPart(
   }
 
   mArrowPositionY = height() / 2;
-  move(pos - QPoint(sWindowArrowSize, mArrowPositionY));
+  move(pos - QPoint(WINDOW_ARROW_SIZE, mArrowPositionY));
   setSourceDetailsExpanded(false, false);
 
   if (isVisible()) {
@@ -232,7 +232,7 @@ void PartInformationToolTip::showPart(
 void PartInformationToolTip::hideAndReset(bool resetTimer) noexcept {
   mPopUpDelayTimer->stop();
   if (resetTimer) {
-    mPopUpDelayTimer->setInterval(sPopupDelayMs);
+    mPopUpDelayTimer->setInterval(POPUP_DELAY_MS);
   }
   QFrame::hide();
 }
@@ -348,12 +348,12 @@ void PartInformationToolTip::updateShape() noexcept {
   const int h = height();
   setMask(QRegion(QPolygon({
       QPoint(0, mArrowPositionY),
-      QPoint(sWindowArrowSize, mArrowPositionY - sWindowArrowSize),
-      QPoint(sWindowArrowSize, 0),
+      QPoint(WINDOW_ARROW_SIZE, mArrowPositionY - WINDOW_ARROW_SIZE),
+      QPoint(WINDOW_ARROW_SIZE, 0),
       QPoint(w, 0),
       QPoint(w, h),
-      QPoint(sWindowArrowSize, h),
-      QPoint(sWindowArrowSize, mArrowPositionY + sWindowArrowSize),
+      QPoint(WINDOW_ARROW_SIZE, h),
+      QPoint(WINDOW_ARROW_SIZE, mArrowPositionY + WINDOW_ARROW_SIZE),
       QPoint(0, mArrowPositionY),
   })));
 }

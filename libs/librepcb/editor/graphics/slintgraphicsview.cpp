@@ -35,7 +35,7 @@
 namespace librepcb {
 namespace editor {
 
-static const qreal sScrollFactor = 0.07;
+static const qreal SCROLL_FACTOR = 0.07;
 
 static qreal boundedScaleFactor(qreal scale) noexcept {
   // Limit zoom factor to avoid crashes due to numerical issues when zooming
@@ -351,19 +351,19 @@ bool SlintGraphicsView::keyReleased(
 }
 
 void SlintGraphicsView::scrollLeft() noexcept {
-  scroll(QPointF(-mViewSize.width() * sScrollFactor / mProjection.scale, 0));
+  scroll(QPointF(-mViewSize.width() * SCROLL_FACTOR / mProjection.scale, 0));
 }
 
 void SlintGraphicsView::scrollRight() noexcept {
-  scroll(QPointF(mViewSize.width() * sScrollFactor / mProjection.scale, 0));
+  scroll(QPointF(mViewSize.width() * SCROLL_FACTOR / mProjection.scale, 0));
 }
 
 void SlintGraphicsView::scrollUp() noexcept {
-  scroll(QPointF(0, -mViewSize.height() * sScrollFactor / mProjection.scale));
+  scroll(QPointF(0, -mViewSize.height() * SCROLL_FACTOR / mProjection.scale));
 }
 
 void SlintGraphicsView::scrollDown() noexcept {
-  scroll(QPointF(0, mViewSize.height() * sScrollFactor / mProjection.scale));
+  scroll(QPointF(0, mViewSize.height() * SCROLL_FACTOR / mProjection.scale));
 }
 
 void SlintGraphicsView::zoomIn() noexcept {

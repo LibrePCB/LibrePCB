@@ -45,8 +45,8 @@ namespace librepcb {
 
 struct NormDependentPrefixMapPolicy {
   typedef ComponentPrefix ValueType;
-  static constexpr const char* tagname = "prefix";
-  static constexpr const char* keyname = "norm";
+  static constexpr const char* TAGNAME = "prefix";
+  static constexpr const char* KEYNAME = "norm";
 };
 using NormDependentPrefixMap =
     SerializableKeyValueMap<NormDependentPrefixMapPolicy>;

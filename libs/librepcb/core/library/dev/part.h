@@ -110,7 +110,7 @@ private:  // Data
  ******************************************************************************/
 
 struct PartListNameProvider {
-  static constexpr const char* tagname = "part";
+  static constexpr const char* TAGNAME = "part";
 };
 using PartList =
     SerializableObjectList<Part, PartListNameProvider, Part::Event>;

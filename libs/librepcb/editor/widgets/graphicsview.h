@@ -128,7 +128,7 @@ private:
   qint64 mIdleTimeMs;
 
   // Static Variables
-  static constexpr qreal sZoomStepFactor = 1.3;
+  static constexpr qreal ZOOM_STEP_FACTOR = 1.3;
 };
 
 /*******************************************************************************

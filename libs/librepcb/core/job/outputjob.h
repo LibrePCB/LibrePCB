@@ -180,7 +180,7 @@ protected:  // Data
  ******************************************************************************/
 
 struct OutputJobListNameProvider {
-  static constexpr const char* tagname = "job";
+  static constexpr const char* TAGNAME = "job";
 };
 using OutputJobList =
     SerializableObjectList<OutputJob, OutputJobListNameProvider,

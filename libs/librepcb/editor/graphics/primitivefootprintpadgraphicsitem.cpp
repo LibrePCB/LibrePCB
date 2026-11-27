@@ -149,7 +149,7 @@ void PrimitiveFootprintPadGraphicsItem::setState(
 void PrimitiveFootprintPadGraphicsItem::setGeometries(
     const QHash<const Layer*, QList<PadGeometry> >& geometries,
     const Length& clearance) noexcept {
-  static const QHash<const ColorRole*, float> zValues = {
+  static const QHash<const ColorRole*, float> sZValues = {
       {&ColorRole::boardSolderPasteBot(), -300},
       {&ColorRole::boardStopMaskBot(), -200},
       {&ColorRole::boardCopperBot(), -100},
@@ -184,8 +184,8 @@ void PrimitiveFootprintPadGraphicsItem::setGeometries(
       item->setShapeMode(
           isCopperLayer ? PrimitivePathGraphicsItem::ShapeMode::FilledOutline
                         : PrimitivePathGraphicsItem::ShapeMode::None);
-      if (zValues.contains(&layer->getRole())) {
-        item->setZValue(zValues.value(&layer->getRole()));
+      if (sZValues.contains(&layer->getRole())) {
+        item->setZValue(sZValues.value(&layer->getRole()));
       } else {
         item->setZValue(static_cast<qreal>(it.key()->getCopperNumber()));
       }

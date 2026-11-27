@@ -49,7 +49,7 @@ namespace librepcb {
 namespace editor {
 
 // Not sure what is a good light direction...
-const QVector3D SlintOpenGlView::sLightDir =
+const QVector3D SlintOpenGlView::LIGHT_DIR =
     QVector3D(0.0f, 0.2f, 0.75f).normalized();
 
 static qreal calcAspectRatio(qreal width, qreal height) noexcept {
@@ -186,15 +186,15 @@ slint::Image SlintOpenGlView::render(float width, float height) noexcept {
   QMatrix4x4 modelView;
   modelView.setToIdentity();
   modelView.translate(mProjection.center.x(), mProjection.center.y(),
-                      -sCameraPosZ);
+                      -CAMERA_POS_Z);
   modelView = modelView * mProjection.transform;
   QMatrix4x4 projection;
   projection.setToIdentity();
   projection.perspective(mProjection.fov, calcAspectRatio(width, height),
-                         sNearZ, sFarZ);
+                         NEAR_Z, FAR_Z);
   mProgram->setUniformValue("mv_matrix", modelView);
   mProgram->setUniformValue("mvp_matrix", projection * modelView);
-  mProgram->setUniformValue("light_dir", sLightDir);
+  mProgram->setUniformValue("light_dir", LIGHT_DIR);
 
   // Limit alpha of silkscreen.
   auto alpha = mAlpha;
@@ -394,7 +394,7 @@ QPointF SlintOpenGlView::toNormalizedPos(const QPointF& pos) const noexcept {
 }
 
 QPointF SlintOpenGlView::toModelPos(const QPointF& pos) const noexcept {
-  const qreal wy = 2 * sCameraPosZ * std::tan(mProjection.fov * M_PI / 360);
+  const qreal wy = 2 * CAMERA_POS_Z * std::tan(mProjection.fov * M_PI / 360);
   const qreal wx = wy * calcAspectRatio(mViewSize.width(), mViewSize.height());
   return QPointF(pos.x() * wx, pos.y() * wy);
 }

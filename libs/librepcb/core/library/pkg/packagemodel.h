@@ -93,7 +93,7 @@ private:  // Data
  ******************************************************************************/
 
 struct PackageModelListNameProvider {
-  static constexpr const char* tagname = "3d_model";
+  static constexpr const char* TAGNAME = "3d_model";
 };
 using PackageModelList =
     SerializableObjectList<PackageModel, PackageModelListNameProvider,

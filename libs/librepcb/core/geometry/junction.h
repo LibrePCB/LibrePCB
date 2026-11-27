@@ -98,7 +98,7 @@ private:  // Data
  ******************************************************************************/
 
 struct JunctionListNameProvider {
-  static constexpr const char* tagname = "junction";
+  static constexpr const char* TAGNAME = "junction";
 };
 using JunctionList =
     SerializableObjectList<Junction, JunctionListNameProvider, Junction::Event>;

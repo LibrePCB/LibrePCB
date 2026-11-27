@@ -162,7 +162,7 @@ private:  // Data
  ******************************************************************************/
 
 struct ImageListNameProvider {
-  static constexpr const char* tagname = "image";
+  static constexpr const char* TAGNAME = "image";
 };
 using ImageList =
     SerializableObjectList<Image, ImageListNameProvider, Image::Event>;

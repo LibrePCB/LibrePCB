@@ -108,7 +108,7 @@ private:  // Data
  ******************************************************************************/
 
 struct HoleListNameProvider {
-  static constexpr const char* tagname = "hole";
+  static constexpr const char* TAGNAME = "hole";
 };
 using HoleList =
     SerializableObjectList<Hole, HoleListNameProvider, Hole::Event>;

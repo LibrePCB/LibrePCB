@@ -122,7 +122,7 @@ private:  // Data
  ******************************************************************************/
 
 struct TextListNameProvider {
-  static constexpr const char* tagname = "text";
+  static constexpr const char* TAGNAME = "text";
 };
 using TextList =
     SerializableObjectList<Text, TextListNameProvider, Text::Event>;

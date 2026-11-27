@@ -141,7 +141,7 @@ public:
    *
    * @warning Be careful with this method, as it can decrease the precision!
    */
-  qreal toInch() const noexcept { return (qreal)mNanometers / sNmPerInch; }
+  qreal toInch() const noexcept { return (qreal)mNanometers / NM_PER_INCH; }
 
   /**
    * @brief Get the length in mils (1/1000 inches)
@@ -150,7 +150,7 @@ public:
    *
    * @warning Be careful with this method, as it can decrease the precision!
    */
-  qreal toMil() const noexcept { return (qreal)mNanometers / sNmPerMil; }
+  qreal toMil() const noexcept { return (qreal)mNanometers / NM_PER_MIL; }
 
   /**
    * @brief Get the length in pixels (for QGraphics* objects)
@@ -162,7 +162,7 @@ public:
    *
    * @warning Be careful with this method, as it can decrease the precision!
    */
-  qreal toPx() const noexcept { return mNanometers * sPixelsPerNm; }
+  qreal toPx() const noexcept { return mNanometers * PIXELS_PER_NM; }
 
   // General Methods
 
@@ -449,12 +449,11 @@ private:
   int64_t mNanometers;  ///< the length in nanometers
 
   // Static Length Converting Constants
-  static constexpr int64_t sNmPerInch = 25400000;  ///< 1 inch = 25.4mm
-  static constexpr int64_t sNmPerMil = 25400;  ///< 1 inch = 25.4mm
-  static constexpr int64_t sPixelsPerInch =
-      72;  ///< 72 dpi for the QGraphics* objects
-  static constexpr qreal sNmPerPixel = (qreal)sNmPerInch / sPixelsPerInch;
-  static constexpr qreal sPixelsPerNm = (qreal)sPixelsPerInch / sNmPerInch;
+  static constexpr int64_t NM_PER_INCH = 25400000;  ///< 1 inch = 25.4mm
+  static constexpr int64_t NM_PER_MIL = 25400;  ///< 1 inch = 25.4mm
+  static constexpr int64_t PIXELS_PER_INCH = 72;  ///< 72 dpi for graphics scene
+  static constexpr qreal NM_PER_PIXEL = (qreal)NM_PER_INCH / PIXELS_PER_INCH;
+  static constexpr qreal PIXELS_PER_NM = (qreal)PIXELS_PER_INCH / NM_PER_INCH;
 };
 
 /*******************************************************************************

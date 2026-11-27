@@ -161,10 +161,10 @@ private:  // Data
   QVector<std::shared_ptr<OpenGlObject>> mObjects;
 
   // Static Variables
-  static constexpr qreal sNearZ = 0.1;
-  static constexpr qreal sFarZ = 100.0;
-  static constexpr qreal sCameraPosZ = 5.0;
-  static const QVector3D sLightDir;
+  static constexpr qreal NEAR_Z = 0.1;
+  static constexpr qreal FAR_Z = 100.0;
+  static constexpr qreal CAMERA_POS_Z = 5.0;
+  static const QVector3D LIGHT_DIR;
 };
 
 /*******************************************************************************

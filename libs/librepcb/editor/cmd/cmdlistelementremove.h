@@ -50,7 +50,7 @@ public:
   CmdListElementRemove(const CmdListElementRemove& other) = delete;
   CmdListElementRemove(SerializableObjectList<T, P, OnEditedArgs...>& list,
                        const T* element) noexcept
-    : UndoCommand(tr("Remove %1").arg(P::tagname)),
+    : UndoCommand(tr("Remove %1").arg(P::TAGNAME)),
       mList(list),
       mElement(element),
       mIndex(-1) {}

@@ -117,7 +117,7 @@ private:  // Data
  ******************************************************************************/
 
 struct ComponentAssemblyOptionListNameProvider {
-  static constexpr const char* tagname = "device";
+  static constexpr const char* TAGNAME = "device";
 };
 using ComponentAssemblyOptionList =
     SerializableObjectList<ComponentAssemblyOption,

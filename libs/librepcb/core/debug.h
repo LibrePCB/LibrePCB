@@ -151,8 +151,8 @@ public:
    * @return A pointer to the singleton object
    */
   static Debug* instance() {
-    static Debug dbg;
-    return &dbg;
+    static Debug sObj;
+    return &sObj;
   }
 
   // Operator Overloadings

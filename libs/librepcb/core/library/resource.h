@@ -100,7 +100,7 @@ private:  // Data
  ******************************************************************************/
 
 struct ResourceListNameProvider {
-  static constexpr const char* tagname = "resource";
+  static constexpr const char* TAGNAME = "resource";
 };
 using ResourceList =
     SerializableObjectList<Resource, ResourceListNameProvider, Resource::Event>;

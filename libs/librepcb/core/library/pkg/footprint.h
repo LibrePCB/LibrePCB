@@ -191,7 +191,7 @@ private:  // Data
  ******************************************************************************/
 
 struct FootprintListNameProvider {
-  static constexpr const char* tagname = "footprint";
+  static constexpr const char* TAGNAME = "footprint";
 };
 using FootprintList =
     SerializableObjectList<Footprint, FootprintListNameProvider,

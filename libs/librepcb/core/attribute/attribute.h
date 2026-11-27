@@ -109,7 +109,7 @@ private:  // Data
  ******************************************************************************/
 
 struct AttributeListNameProvider {
-  static constexpr const char* tagname = "attribute";
+  static constexpr const char* TAGNAME = "attribute";
 };
 using AttributeList =
     SerializableObjectList<Attribute, AttributeListNameProvider,

@@ -117,7 +117,7 @@ private:  // Data
  ******************************************************************************/
 
 struct ComponentSignalListNameProvider {
-  static constexpr const char* tagname = "signal";
+  static constexpr const char* TAGNAME = "signal";
 };
 using ComponentSignalList =
     SerializableObjectList<ComponentSignal, ComponentSignalListNameProvider,

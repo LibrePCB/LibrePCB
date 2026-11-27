@@ -48,9 +48,9 @@ class WorkspaceSettingsItem_ColorSchemes final : public WorkspaceSettingsItem {
 
 public:
   struct Kind {
-    static constexpr const char* sSchematic = "schematic_color_schemes";
-    static constexpr const char* sBoard = "board_color_schemes";
-    static constexpr const char* s3d = "3d_color_schemes";
+    static constexpr const char* SCHEMATIC = "schematic_color_schemes";
+    static constexpr const char* BOARD = "board_color_schemes";
+    static constexpr const char* VIEW_3D = "3d_color_schemes";
   };
 
   // Constructors / Destructor

@@ -135,7 +135,7 @@ private:  // Data
  ******************************************************************************/
 
 struct BoardPadDataListNameProvider {
-  static constexpr const char* tagname = "pad";
+  static constexpr const char* TAGNAME = "pad";
 };
 using BoardPadDataList =
     SerializableObjectList<BoardPadData, BoardPadDataListNameProvider,

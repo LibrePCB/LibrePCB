@@ -86,12 +86,12 @@ namespace editor {
 
 // Detect window size enforced by environment variable (required for testing).
 static std::optional<QSize> getOverrideWindowSize() noexcept {
-  static const QString value =
+  static const QString sValue =
       qgetenv("LIBREPCB_WINDOW_SIZE").trimmed().toLower();
-  if (value.isEmpty()) {
+  if (sValue.isEmpty()) {
     return std::nullopt;  // Environment variable not set.
   }
-  const QStringList numbers = value.split("x");
+  const QStringList numbers = sValue.split("x");
   const int width = numbers.value(0).toInt();
   const int height = numbers.value(1).toInt();
   return QSize(width, height);

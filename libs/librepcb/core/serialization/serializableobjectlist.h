@@ -77,7 +77,7 @@ namespace librepcb {
  *              - Optional: A method `QString getName() const noexcept`
  * @tparam P  A class which provides the S-Expression node tag name of the list
  *            items. Example:
- *   `struct MyNameProvider {static constexpr const char* tagname = "item";};`
+ *   `struct MyNameProvider {static constexpr const char* TAGNAME = "item";};`
  *
  * @note    Instead of directly storing elements of type `T`, elements are
  * always wrapped into a `std::shared_ptr<T>` before adding them to the list.
@@ -317,7 +317,7 @@ public:
   // General Methods
   int loadFromSExpression(const SExpression& node) {
     clear();
-    foreach (const SExpression* child, node.getChildren(P::tagname)) {
+    foreach (const SExpression* child, node.getChildren(P::TAGNAME)) {
       append(std::make_shared<T>(*child));  // can throw
     }
     return count();
@@ -380,7 +380,7 @@ public:
   void serialize(SExpression& root) const {
     for (const std::shared_ptr<T>& ptr : mObjects) {
       root.ensureLineBreak();
-      ptr->serialize(root.appendList(P::tagname));  // can throw
+      ptr->serialize(root.appendList(P::TAGNAME));  // can throw
     }
     root.ensureLineBreak();
   }
@@ -481,7 +481,7 @@ protected:  // Methods
         QString(
             tr("There is "
                "no element of type \"%1\" with the UUID \"%2\" in the list."))
-            .arg(P::tagname)
+            .arg(P::TAGNAME)
             .arg(key.toStr()));
   }
   void throwNameNotFoundException(const QString& name) const {
@@ -490,7 +490,7 @@ protected:  // Methods
         QString(
             tr("There is "
                "no element of type \"%1\" with the name \"%2\" in the list."))
-            .arg(P::tagname)
+            .arg(P::TAGNAME)
             .arg(name));
   }
 

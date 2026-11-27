@@ -122,7 +122,8 @@ public:
  ******************************************************************************/
 
 bool EditorToolbox::isSystemThemeDark() noexcept {
-  auto detect = []() {
+  // Thread-safe static initialization.
+  static const bool sValue = []() {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
     switch (qApp->styleHints()->colorScheme()) {
       case Qt::ColorScheme::Dark:
@@ -146,9 +147,8 @@ bool EditorToolbox::isSystemThemeDark() noexcept {
         << " theme based on window background color " << bgColor.name() << ".";
     return dark;
 #endif
-  };
-  static bool value = detect();
-  return value;
+  }();
+  return sValue;
 }
 
 QString EditorToolbox::modifierKeyText(Qt::KeyboardModifier modifier) noexcept {

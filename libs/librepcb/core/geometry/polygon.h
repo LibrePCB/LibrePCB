@@ -111,7 +111,7 @@ private:  // Data
  ******************************************************************************/
 
 struct PolygonListNameProvider {
-  static constexpr const char* tagname = "polygon";
+  static constexpr const char* TAGNAME = "polygon";
 };
 using PolygonList =
     SerializableObjectList<Polygon, PolygonListNameProvider, Polygon::Event>;

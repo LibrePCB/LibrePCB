@@ -85,11 +85,11 @@ public:
   FilePath toAbs(const QString& fp) { return mWsDir.getPathTo(fp); }
 
   Uuid uuid(int index = -1) {
-    static QHash<int, Uuid> cache;
+    static QHash<int, Uuid> sCache;
     if (index >= 0) {
-      auto it = cache.find(index);
-      if (it == cache.end()) {
-        it = cache.insert(index, uuid());
+      auto it = sCache.find(index);
+      if (it == sCache.end()) {
+        it = sCache.insert(index, uuid());
       }
       return *it;
     } else {

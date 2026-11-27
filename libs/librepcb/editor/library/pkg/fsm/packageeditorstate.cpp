@@ -69,7 +69,7 @@ QWidget* PackageEditorState::parentWidget() noexcept {
 }
 
 const QSet<const Layer*>& PackageEditorState::getAllowedTextLayers() noexcept {
-  static const QSet<const Layer*> layers = {
+  static const QSet<const Layer*> sLayers = {
       &Layer::boardSheetFrames(),
       &Layer::boardOutlines(),
       &Layer::boardCutouts(),
@@ -100,12 +100,12 @@ const QSet<const Layer*>& PackageEditorState::getAllowedTextLayers() noexcept {
       &Layer::botSolderPaste(),
       &Layer::botStopMask(),
   };
-  return layers;
+  return sLayers;
 }
 
 const QSet<const Layer*>&
     PackageEditorState::getAllowedCircleAndPolygonLayers() noexcept {
-  static const QSet<const Layer*> layers = {
+  static const QSet<const Layer*> sLayers = {
       &Layer::boardSheetFrames(),
       &Layer::boardOutlines(),
       &Layer::boardCutouts(),
@@ -138,19 +138,19 @@ const QSet<const Layer*>&
       &Layer::botSolderPaste(),
       &Layer::botStopMask(),
   };
-  return layers;
+  return sLayers;
 }
 
 UnsignedLength PackageEditorState::getDefaultLineWidth(
     const Layer& layer) noexcept {
   // Typical properties according library conventions.
-  static const QSet<const Layer*> zeroWidthLayers = {
+  static const QSet<const Layer*> sZeroWidthLayers = {
       &Layer::boardOutlines(),      &Layer::boardCutouts(),
       &Layer::boardPlatedCutouts(), &Layer::boardAlignment(),
       &Layer::topPackageOutlines(), &Layer::botPackageOutlines(),
       &Layer::topCourtyard(),       &Layer::botCourtyard(),
   };
-  return UnsignedLength(zeroWidthLayers.contains(&layer) ? 0 : 200000);
+  return UnsignedLength(sZeroWidthLayers.contains(&layer) ? 0 : 200000);
 }
 
 std::tuple<UnsignedLength, bool, bool>
@@ -160,7 +160,7 @@ std::tuple<UnsignedLength, bool, bool>
   }
 
   // Typical properties according library conventions.
-  static const QSet<const Layer*> zeroWidthLayers = {
+  static const QSet<const Layer*> sZeroWidthLayers = {
       &Layer::boardOutlines(),
       &Layer::boardCutouts(),
       &Layer::boardPlatedCutouts(),
@@ -178,7 +178,7 @@ std::tuple<UnsignedLength, bool, bool>
       &Layer::topGlue(),
       &Layer::botGlue(),
   };
-  static const QSet<const Layer*> filledLayers = {
+  static const QSet<const Layer*> sFilledLayers = {
       &Layer::topHiddenGrabAreas(),
       &Layer::botHiddenGrabAreas(),
       &Layer::topStopMask(),
@@ -188,13 +188,13 @@ std::tuple<UnsignedLength, bool, bool>
       &Layer::topGlue(),
       &Layer::botGlue(),
   };
-  static const QSet<const Layer*> grabAreaLayers = {
+  static const QSet<const Layer*> sGrabAreaLayers = {
       &Layer::topHiddenGrabAreas(),
       &Layer::botHiddenGrabAreas(),
   };
   return std::make_tuple(
-      UnsignedLength(zeroWidthLayers.contains(&layer) ? 0 : 200000),
-      filledLayers.contains(&layer), grabAreaLayers.contains(&layer));
+      UnsignedLength(sZeroWidthLayers.contains(&layer) ? 0 : 200000),
+      sFilledLayers.contains(&layer), sGrabAreaLayers.contains(&layer));
 }
 
 /*******************************************************************************

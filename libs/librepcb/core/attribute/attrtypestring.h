@@ -50,8 +50,8 @@ public:
       const QString& value,
       const AttributeUnit* unit = nullptr) const noexcept override;
   static const AttrTypeString& instance() noexcept {
-    static AttrTypeString x;
-    return x;
+    static AttrTypeString sObj;
+    return sObj;
   }
 
   // Operator Overloadings

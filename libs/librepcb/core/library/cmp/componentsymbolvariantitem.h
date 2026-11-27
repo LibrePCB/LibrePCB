@@ -142,7 +142,7 @@ private:  // Data
  ******************************************************************************/
 
 struct ComponentSymbolVariantItemListNameProvider {
-  static constexpr const char* tagname = "gate";
+  static constexpr const char* TAGNAME = "gate";
 };
 using ComponentSymbolVariantItemList =
     SerializableObjectList<ComponentSymbolVariantItem,

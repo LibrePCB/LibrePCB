@@ -104,8 +104,8 @@ private:  // Data
   QScopedPointer<QTimer> mPictureDelayTimer;
 
   // Constants
-  static const constexpr int sPopupDelayMs = 300;
-  static const constexpr int sWindowArrowSize = 8;
+  static const constexpr int POPUP_DELAY_MS = 300;
+  static const constexpr int WINDOW_ARROW_SIZE = 8;
 };
 
 /*******************************************************************************

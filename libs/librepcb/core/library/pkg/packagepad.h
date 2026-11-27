@@ -96,7 +96,7 @@ private:  // Data
  ******************************************************************************/
 
 struct PackagePadListNameProvider {
-  static constexpr const char* tagname = "pad";
+  static constexpr const char* TAGNAME = "pad";
 };
 using PackagePadList =
     SerializableObjectList<PackagePad, PackagePadListNameProvider,

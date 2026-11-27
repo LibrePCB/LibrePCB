@@ -312,24 +312,21 @@ SExpression& SExpression::operator=(const SExpression& rhs) noexcept {
  ******************************************************************************/
 
 QString SExpression::escapeString(const QString& string) noexcept {
-  static QHash<QChar, QString> replacements;
-  if (replacements.isEmpty()) {
-    replacements = {
-        {'"', "\\\""},  // Double quote *must* be escaped
-        {'\\', "\\\\"},  // Backslash *must* be escaped
-        {'\b', "\\b"},  // Escape backspace to increase readability
-        {'\f', "\\f"},  // Escape form feed to increase readability
-        {'\n', "\\n"},  // Escape line feed to increase readability
-        {'\r', "\\r"},  // Escape carriage return to increase readability
-        {'\t', "\\t"},  // Escape horizontal tab to increase readability
-        {'\v', "\\v"},  // Escape vertical tab to increase readability
-    };
-  }
+  static QHash<QChar, QString> sReplacements = {
+      {'"', "\\\""},  // Double quote *must* be escaped
+      {'\\', "\\\\"},  // Backslash *must* be escaped
+      {'\b', "\\b"},  // Escape backspace to increase readability
+      {'\f', "\\f"},  // Escape form feed to increase readability
+      {'\n', "\\n"},  // Escape line feed to increase readability
+      {'\r', "\\r"},  // Escape carriage return to increase readability
+      {'\t', "\\t"},  // Escape horizontal tab to increase readability
+      {'\v', "\\v"},  // Escape vertical tab to increase readability
+  };
 
   QString escaped;
   escaped.reserve(string.length() + (string.length() / 10));
   foreach (const QChar& c, string) {
-    escaped += replacements.value(c, c);
+    escaped += sReplacements.value(c, c);
   }
   return escaped;
 }
@@ -347,9 +344,9 @@ bool SExpression::isValidToken(const QString& token, Mode mode) noexcept {
 }
 
 bool SExpression::isValidTokenChar(const QChar& c, Mode mode) noexcept {
-  static QSet<QChar> allowedSpecialChars = {'\\', '.', ':', '_', '-'};
+  static QSet<QChar> sAllowedSpecialChars = {'\\', '.', ':', '_', '-'};
   return ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z')) ||
-      ((c >= '0') && (c <= '9')) || allowedSpecialChars.contains(c) ||
+      ((c >= '0') && (c <= '9')) || sAllowedSpecialChars.contains(c) ||
       ((mode == Mode::Permissive) && (c != '(') && (c != ')') &&
        (!c.isSpace()));
 }
@@ -538,7 +535,7 @@ QString SExpression::parseString(const QString& content, int& index,
   // strings. This library escaped more characters than we do now. To still
   // support reading the file format 0.1, we have to keep support for the
   // old escaping behavior.
-  static QHash<QChar, QChar> escapedChars = {
+  static QHash<QChar, QChar> sEscapedChars = {
       {'\'', '\''},  // Single quote
       {'"', '"'},  // Double quote
       {'?', '\?'},  // Question mark
@@ -561,8 +558,8 @@ QString SExpression::parseString(const QString& content, int& index,
     }
     const QChar& c = content.at(index);
     if (escaped) {
-      if (escapedChars.contains(c)) {
-        string += escapedChars[c];
+      if (sEscapedChars.contains(c)) {
+        string += sEscapedChars[c];
         ++index;
         escaped = false;
       } else {
@@ -586,7 +583,7 @@ QString SExpression::parseString(const QString& content, int& index,
 
 void SExpression::skipWhitespaceAndComments(const QString& content, int& index,
                                             bool skipNewline) {
-  static QSet<QChar> spaces = {' ', '\f', '\r', '\t', '\v'};
+  static QSet<QChar> sSpaces = {' ', '\f', '\r', '\t', '\v'};
 
   bool isComment = false;
   while (index < content.length()) {
@@ -596,7 +593,7 @@ void SExpression::skipWhitespaceAndComments(const QString& content, int& index,
     } else if (c == '\n') {
       isComment = false;
     }
-    if (isComment || ((skipNewline) && (c == '\n')) || spaces.contains(c)) {
+    if (isComment || ((skipNewline) && (c == '\n')) || sSpaces.contains(c)) {
       ++index;
     } else {
       break;

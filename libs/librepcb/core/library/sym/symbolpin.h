@@ -152,7 +152,7 @@ private:  // Data
  ******************************************************************************/
 
 struct SymbolPinListNameProvider {
-  static constexpr const char* tagname = "pin";
+  static constexpr const char* TAGNAME = "pin";
 };
 using SymbolPinList =
     SerializableObjectList<SymbolPin, SymbolPinListNameProvider,

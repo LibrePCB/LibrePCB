@@ -74,29 +74,25 @@ namespace librepcb {
  ******************************************************************************/
 
 const QString& SystemInfo::getUsername() noexcept {
-  auto get = []() {
-    // this line should work for most UNIX, Linux, Mac and Windows systems
-    QString s =
-        QString(qgetenv("USERNAME")).remove('\n').remove('\r').trimmed();
-
-    // if the environment variable "USERNAME" is not set, we will try "USER"
+  // Thread-safe static initialization.
+  static const QString sValue = []() {
+    // This line should work for most UNIX, Linux, Mac and Windows systems.
+    auto s = QString(qgetenv("USERNAME")).remove('\n').remove('\r').trimmed();
+    // If the environment variable "USERNAME" is not set, we will try "USER".
     if (s.isEmpty()) {
       s = QString(qgetenv("USER")).remove('\n').remove('\r').trimmed();
     }
-
     if (s.isEmpty()) {
       qWarning() << "Could not determine the system's username!";
     }
-
     return s;
-  };
-
-  static const QString value = get();  // Thread-safe initialization.
-  return value;
+  }();
+  return sValue;
 }
 
 const QString& SystemInfo::getFullUsername() noexcept {
-  auto get = []() {
+  // Thread-safe static initialization.
+  static const QString sValue = []() {
     QString s;
 #if defined(Q_OS_MACOS)  // macOS
     QString command(
@@ -152,54 +148,47 @@ const QString& SystemInfo::getFullUsername() noexcept {
 #else
 #error "Unknown operating system!"
 #endif
-
     if (s.isEmpty()) {
       qWarning()
           << "The system's full username is empty or could not be determined!";
       s = getUsername();  // fall back to username
     }
-
     return s;
-  };
-
-  static const QString value = get();  // Thread-safe initialization.
-  return value;
+  }();
+  return sValue;
 }
 
 const QString& SystemInfo::getHostname() noexcept {
-  auto get = []() {
+  // Thread-safe static initialization.
+  static const QString sValue = []() {
     QString s = QHostInfo::localHostName().remove('\n').remove('\r').trimmed();
-
     if (s.isEmpty()) {
       qWarning() << "Could not determine the system's hostname!";
     }
-
     return s;
-  };
-
-  static const QString value = get();  // Thread-safe initialization.
-  return value;
+  }();
+  return sValue;
 }
 
 QString SystemInfo::detectRuntime() noexcept {
   // Manually specified runtime has priority.
-  static QString envRuntime = qgetenv("LIBREPCB_RUNTIME").trimmed();
-  if (!envRuntime.isEmpty()) {
-    return envRuntime;
+  static QString sEnvRuntime = qgetenv("LIBREPCB_RUNTIME").trimmed();
+  if (!sEnvRuntime.isEmpty()) {
+    return sEnvRuntime;
   }
 
   // Combine any other autodetected runtime, just in case multiple are set.
   QStringList runtimes;
-  static QString envSnap = qgetenv("SNAP").trimmed();
-  if (!envSnap.isEmpty()) {
+  static QString sEnvSnap = qgetenv("SNAP").trimmed();
+  if (!sEnvSnap.isEmpty()) {
     runtimes << "Snap";
   }
-  static QString envFlatpak = qgetenv("FLATPAK_ID").trimmed();
-  if (!envFlatpak.isEmpty()) {
+  static QString sEnvFlatpak = qgetenv("FLATPAK_ID").trimmed();
+  if (!sEnvFlatpak.isEmpty()) {
     runtimes << "Flatpak";
   }
-  static QString envAppimage = qgetenv("APPIMAGE").trimmed();
-  if (!envAppimage.isEmpty()) {
+  static QString sEnvAppimage = qgetenv("APPIMAGE").trimmed();
+  if (!sEnvAppimage.isEmpty()) {
     runtimes << "AppImage";
   }
   return runtimes.join(", ");

@@ -100,7 +100,7 @@ const LengthUnit& BoardEditorState::getLengthUnit() const noexcept {
 }
 
 QSet<const Layer*> BoardEditorState::getAllowedGeometryLayers() noexcept {
-  static const QSet<const Layer*> commonLayers = {
+  static const QSet<const Layer*> sCommonLayers = {
       &Layer::boardSheetFrames(),
       &Layer::boardOutlines(),
       &Layer::boardCutouts(),
@@ -133,7 +133,7 @@ QSet<const Layer*> BoardEditorState::getAllowedGeometryLayers() noexcept {
       &Layer::botSolderPaste(),
       &Layer::botStopMask(),
   };
-  return commonLayers | mContext.board.getCopperLayers();
+  return sCommonLayers | mContext.board.getCopperLayers();
 }
 
 void BoardEditorState::makeLayerVisible(const ColorRole& role) noexcept {

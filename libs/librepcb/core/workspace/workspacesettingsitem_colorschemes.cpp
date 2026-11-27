@@ -40,13 +40,13 @@ WorkspaceSettingsItem_ColorSchemes::WorkspaceSettingsItem_ColorSchemes(
   : WorkspaceSettingsItem(kind, parent),
     mActiveUuid(Uuid::createRandom()),
     mActiveScheme(nullptr) {
-  if (kind == Kind::sSchematic) {
+  if (kind == Kind::SCHEMATIC) {
     mBaseSchemes.append(&BaseColorScheme::schematicLibrePcbLight());  // Default
     mBaseSchemes.append(&BaseColorScheme::schematicLibrePcbDark());
     mBaseSchemes.append(&BaseColorScheme::schematicSolarizedDark());
-  } else if (kind == Kind::sBoard) {
+  } else if (kind == Kind::BOARD) {
     mBaseSchemes.append(&BaseColorScheme::boardLibrePcbDark());  // Default
-  } else if (kind == Kind::s3d) {
+  } else if (kind == Kind::VIEW_3D) {
     mBaseSchemes.append(&BaseColorScheme::view3dLibrePcbLight());  // Default
     mBaseSchemes.append(&BaseColorScheme::view3dLibrePcbDark());
     mBaseSchemes.append(&BaseColorScheme::view3dSolarizedDark());

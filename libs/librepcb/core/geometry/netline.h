@@ -188,7 +188,7 @@ private:  // Data
  ******************************************************************************/
 
 struct NetLineListNameProvider {
-  static constexpr const char* tagname = "line";
+  static constexpr const char* TAGNAME = "line";
 };
 using NetLineList =
     SerializableObjectList<NetLine, NetLineListNameProvider, NetLine::Event>;

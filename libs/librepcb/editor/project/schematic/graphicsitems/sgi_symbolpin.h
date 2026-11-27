@@ -55,7 +55,7 @@ class SGI_SymbolPin final : public QGraphicsItemGroup {
 
 public:
   /// Width/diameter of the pin grab area in nanometers
-  static constexpr int64_t sGrabAreaSizeNm = 1200000;
+  static constexpr int64_t GRAB_AREA_SIZE_NM = 1200000;
 
   // Constructors / Destructor
   SGI_SymbolPin() = delete;

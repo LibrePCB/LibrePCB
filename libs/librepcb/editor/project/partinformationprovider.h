@@ -136,8 +136,8 @@ public:
 
   // Static Methods
   static PartInformationProvider& instance() noexcept {
-    static PartInformationProvider obj;
-    return obj;
+    static PartInformationProvider sObj;
+    return sObj;
   }
 
   // Operator Overloadings

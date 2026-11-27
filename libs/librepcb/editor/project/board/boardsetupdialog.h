@@ -90,7 +90,7 @@ private:  // Date
 
   BoardDesignRuleCheckSettings::SourceSet mDrcSources;
 
-  static const QString sSettingsPrefix;
+  static const QString SETTINGS_PREFIX;
 };
 
 /*******************************************************************************

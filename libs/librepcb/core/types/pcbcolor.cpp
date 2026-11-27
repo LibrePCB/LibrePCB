@@ -79,77 +79,79 @@ const QColor& PcbColor::toSilkscreenColor() const noexcept {
  ******************************************************************************/
 
 const PcbColor& PcbColor::black() noexcept {
-  static PcbColor obj("black", tr("Black"),
-                      Flag::SolderResist | Flag::Silkscreen,
-                      QColor(0, 0, 0, 210), QColor(40, 40, 40));
-  return obj;
+  static PcbColor sObj("black", tr("Black"),
+                       Flag::SolderResist | Flag::Silkscreen,
+                       QColor(0, 0, 0, 210), QColor(40, 40, 40));
+  return sObj;
 }
 
 const PcbColor& PcbColor::blackMatte() noexcept {
-  static PcbColor obj("black_matte", tr("Black Matte"), Flag::SolderResist,
-                      QColor(0, 0, 0, 210), Qt::black);
-  return obj;
+  static PcbColor sObj("black_matte", tr("Black Matte"), Flag::SolderResist,
+                       QColor(0, 0, 0, 210), Qt::black);
+  return sObj;
 }
 
 const PcbColor& PcbColor::blue() noexcept {
-  static PcbColor obj("blue", tr("Blue"), Flag::SolderResist | Flag::Silkscreen,
-                      QColor(0, 20, 100, 220), QColor(0, 0, 110));
-  return obj;
+  static PcbColor sObj("blue", tr("Blue"),
+                       Flag::SolderResist | Flag::Silkscreen,
+                       QColor(0, 20, 100, 220), QColor(0, 0, 110));
+  return sObj;
 }
 
 const PcbColor& PcbColor::clear() noexcept {
-  static PcbColor obj("clear", tr("Clear"), Flags(/* not available (yet) */),
-                      QColor(50, 50, 50, 50), Qt::white);
-  return obj;
+  static PcbColor sObj("clear", tr("Clear"), Flags(/* not available (yet) */),
+                       QColor(50, 50, 50, 50), Qt::white);
+  return sObj;
 }
 
 const PcbColor& PcbColor::green() noexcept {
-  static PcbColor obj("green", tr("Green"), Flag::SolderResist,
-                      QColor(0, 50, 0, 180), Qt::green);
-  return obj;
+  static PcbColor sObj("green", tr("Green"), Flag::SolderResist,
+                       QColor(0, 50, 0, 180), Qt::green);
+  return sObj;
 }
 
 const PcbColor& PcbColor::greenMatte() noexcept {
-  static PcbColor obj("green_matte", tr("Green Matte"), Flag::SolderResist,
-                      QColor(0, 50, 0, 180), Qt::green);
-  return obj;
+  static PcbColor sObj("green_matte", tr("Green Matte"), Flag::SolderResist,
+                       QColor(0, 50, 0, 180), Qt::green);
+  return sObj;
 }
 
 const PcbColor& PcbColor::purple() noexcept {
-  static PcbColor obj("purple", tr("Purple"), Flag::SolderResist,
-                      QColor(80, 0, 130, 180), QColor(100, 0, 160));
-  return obj;
+  static PcbColor sObj("purple", tr("Purple"), Flag::SolderResist,
+                       QColor(80, 0, 130, 180), QColor(100, 0, 160));
+  return sObj;
 }
 
 const PcbColor& PcbColor::red() noexcept {
-  static PcbColor obj("red", tr("Red"), Flag::SolderResist | Flag::Silkscreen,
-                      QColor(160, 0, 0, 180), QColor(140, 0, 0));
-  return obj;
+  static PcbColor sObj("red", tr("Red"), Flag::SolderResist | Flag::Silkscreen,
+                       QColor(160, 0, 0, 180), QColor(140, 0, 0));
+  return sObj;
 }
 
 const PcbColor& PcbColor::white() noexcept {
-  static PcbColor obj("white", tr("White"),
-                      Flag::SolderResist | Flag::Silkscreen,
-                      QColor(220, 220, 220, 210), Qt::white);
-  return obj;
+  static PcbColor sObj("white", tr("White"),
+                       Flag::SolderResist | Flag::Silkscreen,
+                       QColor(220, 220, 220, 210), Qt::white);
+  return sObj;
 }
 
 const PcbColor& PcbColor::yellow() noexcept {
-  static PcbColor obj("yellow", tr("Yellow"),
-                      Flag::SolderResist | Flag::Silkscreen,
-                      QColor(220, 220, 0, 160), QColor(210, 210, 0));
-  return obj;
+  static PcbColor sObj("yellow", tr("Yellow"),
+                       Flag::SolderResist | Flag::Silkscreen,
+                       QColor(220, 220, 0, 160), QColor(210, 210, 0));
+  return sObj;
 }
 
 const PcbColor& PcbColor::other() noexcept {
-  static PcbColor obj("other", tr("Other"),
-                      Flag::SolderResist | Flag::Silkscreen, QColor(),
-                      QColor());
-  return obj;
+  static PcbColor sObj("other", tr("Other"),
+                       Flag::SolderResist | Flag::Silkscreen, QColor(),
+                       QColor());
+  return sObj;
 }
 
 const QVector<const PcbColor*>& PcbColor::all() noexcept {
-  auto init = []() {
+  // Thread-safe static initialization.
+  static QVector<const PcbColor*> sList = []() {
     // Sort the list by function and name.
     QVector<const PcbColor*> l{
         &black(),  //
@@ -168,9 +170,8 @@ const QVector<const PcbColor*>& PcbColor::all() noexcept {
     });
     l.append(&other());
     return l;
-  };
-  static QVector<const PcbColor*> list = init();  // Thread-safe initialization.
-  return list;
+  }();
+  return sList;
 }
 
 const PcbColor& PcbColor::get(const QString& id) {

@@ -87,13 +87,13 @@ const CmpSigPinDisplayType& CmpSigPinDisplayType::fromString(
 
 const QList<CmpSigPinDisplayType>&
     CmpSigPinDisplayType::getAllTypes() noexcept {
-  static QList<CmpSigPinDisplayType> list{
+  static QList<CmpSigPinDisplayType> sList{
       none(),
       pinName(),
       componentSignal(),
       netSignal(),
   };
-  return list;
+  return sList;
 }
 
 /*******************************************************************************

@@ -58,8 +58,8 @@ private:
 public:
   // General Methods
   static EditorCommandSet& instance() noexcept {
-    static EditorCommandSet obj;
-    return obj;
+    static EditorCommandSet sObj;
+    return sObj;
   }
   void updateTranslations() noexcept {
     // Required to be called when the application's locale has changed.

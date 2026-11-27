@@ -59,7 +59,7 @@ BoardPickPlaceGenerator::~BoardPickPlaceGenerator() noexcept {
 
 std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
   // Assembly type map.
-  static QMap<Package::AssemblyType, PickPlaceDataItem::Type> types = {
+  static QMap<Package::AssemblyType, PickPlaceDataItem::Type> sTypes = {
       {Package::AssemblyType::Tht, PickPlaceDataItem::Type::Tht},
       {Package::AssemblyType::Smt, PickPlaceDataItem::Type::Smt},
       {Package::AssemblyType::Mixed, PickPlaceDataItem::Type::Mixed},
@@ -119,8 +119,8 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
         ? PickPlaceDataItem::BoardSide::Bottom
         : PickPlaceDataItem::BoardSide::Top;
     const PickPlaceDataItem::Type assemblyType =
-        types.value(device->getLibPackage().getAssemblyType(true),
-                    PickPlaceDataItem::Type::Other);
+        sTypes.value(device->getLibPackage().getAssemblyType(true),
+                     PickPlaceDataItem::Type::Other);
     items.append(PickPlaceDataItem(designator, value, devName, pkgName,
                                    position, rotation, boardSide, assemblyType,
                                    part ? true : false));

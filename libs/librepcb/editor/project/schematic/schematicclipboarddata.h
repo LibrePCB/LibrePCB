@@ -59,7 +59,7 @@ class SchematicClipboardData final {
 public:
   // Types
   struct ComponentInstance {
-    static constexpr const char* tagname = "component";
+    static constexpr const char* TAGNAME = "component";
 
     Uuid uuid;
     Uuid libComponentUuid;
@@ -129,7 +129,7 @@ public:
   };
 
   struct SymbolInstance {
-    static constexpr const char* tagname = "symbol";
+    static constexpr const char* TAGNAME = "symbol";
 
     Uuid uuid;
     Uuid componentInstanceUuid;
@@ -188,7 +188,7 @@ public:
   };
 
   struct Bus {
-    static constexpr const char* tagname = "bus";
+    static constexpr const char* TAGNAME = "bus";
 
     Uuid uuid;
     BusName name;
@@ -232,7 +232,7 @@ public:
   };
 
   struct BusSegment {
-    static constexpr const char* tagname = "bussegment";
+    static constexpr const char* TAGNAME = "bussegment";
 
     Uuid uuid;  ///< Required for references from net lines
     Uuid busUuid;
@@ -278,7 +278,7 @@ public:
   };
 
   struct NetSegment {
-    static constexpr const char* tagname = "netsegment";
+    static constexpr const char* TAGNAME = "netsegment";
 
     CircuitIdentifier netName;
     JunctionList junctions;

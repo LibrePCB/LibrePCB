@@ -60,16 +60,16 @@ PickPlaceCsvWriter::~PickPlaceCsvWriter() noexcept {
 
 std::shared_ptr<CsvFile> PickPlaceCsvWriter::generateCsv() const {
   // Names for all mount types.
-  static QVector<PickPlaceDataItem::Type> types = {
+  static QVector<PickPlaceDataItem::Type> sTypes = {
       PickPlaceDataItem::Type::Tht,   PickPlaceDataItem::Type::Smt,
       PickPlaceDataItem::Type::Mixed, PickPlaceDataItem::Type::Fiducial,
       PickPlaceDataItem::Type::Other,
   };
-  static QStringList typeNames = {
+  static QStringList sTypeNames = {
       "THT", "SMT", "THT+SMT", "Fiducial", "Other",
   };
   auto getTypeName = [](PickPlaceDataItem::Type type) {
-    return typeNames.value(types.indexOf(type), "Other");
+    return sTypeNames.value(sTypes.indexOf(type), "Other");
   };
 
   std::shared_ptr<CsvFile> file(new CsvFile());
@@ -77,7 +77,7 @@ std::shared_ptr<CsvFile> PickPlaceCsvWriter::generateCsv() const {
   // Optionally add some metadata to to the CSV as a help for readers.
   if (mIncludeMetadataComment) {
     QStringList enabledTypeNames;
-    foreach (auto type, types) {
+    foreach (auto type, sTypes) {
       if (mTypeFilter.contains(type)) {
         enabledTypeNames.append(getTypeName(type));
       }

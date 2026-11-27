@@ -113,7 +113,7 @@ private:  // Data
  ******************************************************************************/
 
 struct ComponentPinSignalMapNameProvider {
-  static constexpr const char* tagname = "pin";
+  static constexpr const char* TAGNAME = "pin";
 };
 using ComponentPinSignalMap =
     SerializableObjectList<ComponentPinSignalMapItem,

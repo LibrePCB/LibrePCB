@@ -136,15 +136,15 @@ std::optional<Length> Length::tryFromMm(QStringView millimeters) {
 }
 
 Length Length::fromInch(qreal inches) {
-  return fromNm(inches * sNmPerInch);
+  return fromNm(inches * NM_PER_INCH);
 }
 
 Length Length::fromMil(qreal mils) {
-  return fromNm(mils * sNmPerMil);
+  return fromNm(mils * NM_PER_MIL);
 }
 
 Length Length::fromPx(qreal pixels) {
-  return fromNm(pixels * sNmPerPixel);
+  return fromNm(pixels * NM_PER_PIXEL);
 }
 
 Length Length::min() noexcept {

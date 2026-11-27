@@ -74,9 +74,9 @@ QString FileDialog::getExistingDirectory(QWidget* parent,
  ******************************************************************************/
 
 void FileDialog::patchOptions(QFileDialog::Options& options) noexcept {
-  static const bool noNativeDialogs =
+  static const bool sNoNativeDialogs =
       qgetenv("LIBREPCB_DISABLE_NATIVE_DIALOGS") == "1";
-  if (noNativeDialogs) {
+  if (sNoNativeDialogs) {
     options |= QFileDialog::DontUseNativeDialog;
   }
 }

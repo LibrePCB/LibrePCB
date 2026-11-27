@@ -43,11 +43,11 @@ namespace tests {
 class ComponentTest : public ::testing::Test {
 public:
   FilePath mTmpDir;
-  static constexpr const char* sUuid = "45022bef-9310-4aa2-92ef-acec1b95aa4e";
+  static constexpr const char* UUID = "45022bef-9310-4aa2-92ef-acec1b95aa4e";
 
   ComponentTest() {
     // the whitespaces in the path are there to make the test even stronger ;)
-    mTmpDir = Application::getRandomTempPath().getPathTo(sUuid);
+    mTmpDir = Application::getRandomTempPath().getPathTo(UUID);
   }
 
   ~ComponentTest() override {
@@ -68,7 +68,7 @@ public:
 TEST_F(ComponentTest, testUpgradeV01) {
   // Copy into temporary directory.
   const FilePath src =
-      FilePath(TEST_DATA_DIR "/libraries/v0.1.lplib/cmp/").getPathTo(sUuid);
+      FilePath(TEST_DATA_DIR "/libraries/v0.1.lplib/cmp/").getPathTo(UUID);
   FileUtils::copyDirRecursively(src, mTmpDir);
 
   // Open/upgrade/close.

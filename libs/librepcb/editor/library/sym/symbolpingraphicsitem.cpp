@@ -71,7 +71,7 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(
 
   // circle
   mCircleGraphicsItem->setDiameter(
-      UnsignedLength(SGI_SymbolPin::sGrabAreaSizeNm));
+      UnsignedLength(SGI_SymbolPin::GRAB_AREA_SIZE_NM));
   mCircleGraphicsItem->setLineLayer(
       layers.get(ColorRole::schematicOptionalPins()));
   mCircleGraphicsItem->setShapeMode(
@@ -241,7 +241,7 @@ void SymbolPinGraphicsItem::setLength(const UnsignedLength& length) noexcept {
 void SymbolPinGraphicsItem::updateShape() noexcept {
   // Grab area: A circle at the end of the pin plus a rectangle of the same
   // width along the pin line.
-  const qreal grabSizePx = Length(SGI_SymbolPin::sGrabAreaSizeNm).toPx();
+  const qreal grabSizePx = Length(SGI_SymbolPin::GRAB_AREA_SIZE_NM).toPx();
   const qreal lengthPx = mPin->getLength()->toPx();
   mShape = QPainterPath();
   mShape.setFillRule(Qt::WindingFill);

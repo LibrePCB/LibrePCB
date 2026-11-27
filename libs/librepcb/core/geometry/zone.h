@@ -116,7 +116,7 @@ private:  // Data
  ******************************************************************************/
 
 struct ZoneListNameProvider {
-  static constexpr const char* tagname = "zone";
+  static constexpr const char* TAGNAME = "zone";
 };
 using ZoneList =
     SerializableObjectList<Zone, ZoneListNameProvider, Zone::Event>;

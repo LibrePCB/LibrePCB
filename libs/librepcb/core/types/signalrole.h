@@ -84,38 +84,38 @@ public:
 
   /// @brief Passive Pins (R, C, L)
   static const SignalRole& passive() noexcept {
-    static SignalRole role("passive", tr("Passive"));
-    return role;
+    static SignalRole sObj("passive", tr("Passive"));
+    return sObj;
   }
 
   /// @brief Power Pins (GND, VCC, VSS,... of Devices)
   static const SignalRole& power() noexcept {
-    static SignalRole role("power", tr("Power"));
-    return role;
+    static SignalRole sObj("power", tr("Power"));
+    return sObj;
   }
 
   /// @brief Input Pins
   static const SignalRole& input() noexcept {
-    static SignalRole role("input", tr("Input"));
-    return role;
+    static SignalRole sObj("input", tr("Input"));
+    return sObj;
   }
 
   /// @brief Output Pins
   static const SignalRole& output() noexcept {
-    static SignalRole role("output", tr("Output"));
-    return role;
+    static SignalRole sObj("output", tr("Output"));
+    return sObj;
   }
 
   /// @brief Input/Output Pins
   static const SignalRole& inout() noexcept {
-    static SignalRole role("inout", tr("I/O"));
-    return role;
+    static SignalRole sObj("inout", tr("I/O"));
+    return sObj;
   }
 
   /// @brief Open Collector / Open Drain Pins
   static const SignalRole& opendrain() noexcept {
-    static SignalRole role("opendrain", tr("Open Drain"));
-    return role;
+    static SignalRole sObj("opendrain", tr("Open Drain"));
+    return sObj;
   }
 
 private:  // Methods

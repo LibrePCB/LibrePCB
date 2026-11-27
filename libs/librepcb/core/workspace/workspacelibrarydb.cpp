@@ -61,7 +61,7 @@ WorkspaceLibraryDb::WorkspaceLibraryDb(const FilePath& librariesPath)
   : QObject(nullptr),
     mLibrariesPath(librariesPath),
     mFilePath(mLibrariesPath.getPathTo(
-        QString("cache_v%1.sqlite").arg(sCurrentDbVersion))) {
+        QString("cache_v%1.sqlite").arg(CURRENT_DB_VERSION))) {
   qDebug("Load workspace library database...");
 
   // open SQLite database
@@ -71,7 +71,7 @@ WorkspaceLibraryDb::WorkspaceLibraryDb(const FilePath& librariesPath)
   // filename, but if not (e.g. due to a mistake by us) we just remove the whole
   // database and create a new one.
   int dbVersion = getDbVersion();
-  if (dbVersion != sCurrentDbVersion) {
+  if (dbVersion != CURRENT_DB_VERSION) {
     qWarning() << "Library database version" << dbVersion
                << "is outdated or not supported, reinitializing...";
     reset();  // can throw
@@ -430,7 +430,7 @@ void WorkspaceLibraryDb::reset() {
   mDb.reset(new SQLiteDatabase(mFilePath));  // can throw
   WorkspaceLibraryDbWriter writer(mLibrariesPath, *mDb);
   writer.createAllTables();  // can throw
-  writer.addInternalData("version", sCurrentDbVersion);  // can throw
+  writer.addInternalData("version", CURRENT_DB_VERSION);  // can throw
 }
 
 QMultiMap<Version, FilePath> WorkspaceLibraryDb::getAll(

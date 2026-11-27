@@ -368,7 +368,7 @@ UnsignedLength BoardEditorState_DrawPolygon::getDefaultLineWidth(
     return UnsignedLength(0);
   }
 
-  static const QHash<const Layer*, int64_t> lookup = {
+  static const QHash<const Layer*, int64_t> sLookup = {
       {&Layer::boardOutlines(), 0},
       {&Layer::boardCutouts(), 0},
       {&Layer::boardPlatedCutouts(), 0},
@@ -381,9 +381,9 @@ UnsignedLength BoardEditorState_DrawPolygon::getDefaultLineWidth(
       {&Layer::botSolderPaste(), 0},
       {&Layer::botStopMask(), 0},
   };
-  Q_ASSERT(std::all_of(lookup.begin(), lookup.end(),
+  Q_ASSERT(std::all_of(sLookup.begin(), sLookup.end(),
                        [](int64_t v) { return v >= 0; }));
-  return UnsignedLength(lookup.value(&layer, 200000));
+  return UnsignedLength(sLookup.value(&layer, 200000));
 }
 
 bool BoardEditorState_DrawPolygon::getDefaultFilled(
@@ -392,12 +392,12 @@ bool BoardEditorState_DrawPolygon::getDefaultFilled(
     return true;
   }
 
-  static const QHash<const Layer*, bool> lookup = {
+  static const QHash<const Layer*, bool> sLookup = {
       {&Layer::topGlue(), true},        {&Layer::botGlue(), true},
       {&Layer::topSolderPaste(), true}, {&Layer::botSolderPaste(), true},
       {&Layer::topStopMask(), true},    {&Layer::botStopMask(), true},
   };
-  return lookup.value(&layer, false);
+  return sLookup.value(&layer, false);
 }
 
 /*******************************************************************************

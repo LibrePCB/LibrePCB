@@ -76,11 +76,11 @@ public:
     mValues.insert("", defaultValue);
   }
   explicit SerializableKeyValueMap(const SExpression& node) : onEdited(*this) {
-    foreach (const SExpression* child, node.getChildren(T::tagname)) {
+    foreach (const SExpression* child, node.getChildren(T::TAGNAME)) {
       QString key;
       SExpression value;
       if (child->getChild("@0").isList()) {
-        key = child->getChild(QString(T::keyname) % "/@0").getValue();
+        key = child->getChild(QString(T::KEYNAME) % "/@0").getValue();
         value = child->getChild("@1");
       } else {
         key = QString("");
@@ -95,7 +95,7 @@ public:
     }
     if (!mValues.contains(QString(""))) {
       throw RuntimeError(__FILE__, __LINE__,
-                         tr("No default %1 defined.").arg(T::tagname));
+                         tr("No default %1 defined.").arg(T::TAGNAME));
     }
   }
   ~SerializableKeyValueMap() noexcept {}
@@ -160,9 +160,9 @@ public:
   void serialize(SExpression& root) const {
     for (auto i = mValues.constBegin(); i != mValues.constEnd(); ++i) {
       root.ensureLineBreak();
-      SExpression& child = root.appendList(T::tagname);
+      SExpression& child = root.appendList(T::TAGNAME);
       if (!i.key().isEmpty()) {
-        child.appendChild(T::keyname, i.key());
+        child.appendChild(T::KEYNAME, i.key());
       }
       child.appendChild(i.value());
     }
@@ -201,8 +201,8 @@ private:  // Data
 
 struct LocalizedNameMapPolicy {
   typedef ElementName ValueType;
-  static constexpr const char* tagname = "name";
-  static constexpr const char* keyname = "locale";
+  static constexpr const char* TAGNAME = "name";
+  static constexpr const char* KEYNAME = "locale";
 };
 using LocalizedNameMap = SerializableKeyValueMap<LocalizedNameMapPolicy>;
 
@@ -212,8 +212,8 @@ using LocalizedNameMap = SerializableKeyValueMap<LocalizedNameMapPolicy>;
 
 struct LocalizedDescriptionMapPolicy {
   typedef QString ValueType;
-  static constexpr const char* tagname = "description";
-  static constexpr const char* keyname = "locale";
+  static constexpr const char* TAGNAME = "description";
+  static constexpr const char* KEYNAME = "locale";
 };
 using LocalizedDescriptionMap =
     SerializableKeyValueMap<LocalizedDescriptionMapPolicy>;
@@ -224,8 +224,8 @@ using LocalizedDescriptionMap =
 
 struct LocalizedKeywordsMapPolicy {
   typedef QString ValueType;
-  static constexpr const char* tagname = "keywords";
-  static constexpr const char* keyname = "locale";
+  static constexpr const char* TAGNAME = "keywords";
+  static constexpr const char* KEYNAME = "locale";
 };
 using LocalizedKeywordsMap =
     SerializableKeyValueMap<LocalizedKeywordsMapPolicy>;
