@@ -58,7 +58,7 @@ class ProjectEditor;
  *
  * - It starts and stops the (Rust implemented) server, which listens on
  *   127.0.0.1 for msgpack-encoded RPC commands (see the specification
- *   in `dev/plans/rpc-server.md` and `dev/rpc/rpc.yml`).
+ *   in `dev/plans/rpc-server.md` and `rpc/api.yml`).
  * - It provides the command dispatcher which marshals incoming commands to
  *   the GUI thread (via `Qt::QueuedConnection`, asynchronously!) and
  *   dispatches them to the generated command classes (see `commands.cpp`).

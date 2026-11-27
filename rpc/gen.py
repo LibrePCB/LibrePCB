@@ -4,8 +4,8 @@
 """Generate code and documentation for the LibrePCB RPC API.
 
 This script generates two files from the RPC API specification
-`dev/rpc/rpc.yml` (the single source of truth), using the Jinja2
-templates from `dev/rpc/templates/`:
+`rpc/api.yml` (the single source of truth), using the Jinja2
+templates from `rpc/templates/`:
 
 - `dev/doxygen/pages/rpc_api.md` — the Doxygen API reference.
   The transport protocol is described by hand in
@@ -30,7 +30,7 @@ Python. Later, this script will also validate the specification file.
 Usage:
 
     uv run gen.py        # From this directory
-    uv run --directory dev/rpc gen.py
+    uv run --directory rpc gen.py
 
 Attention: Do not modify the generated files manually, modify the
            specification file (or the templates) instead and re-run this
@@ -45,8 +45,8 @@ import yaml
 from jinja2 import Environment, FileSystemLoader
 
 DIR = Path(__file__).resolve().parent
-REPO_DIR = DIR.parent.parent
-SPEC_FILE = DIR / "rpc.yml"
+REPO_DIR = DIR.parent
+SPEC_FILE = DIR / "api.yml"
 TEMPLATES_DIR = DIR / "templates"
 DOCS_FILE = REPO_DIR / "dev" / "doxygen" / "pages" / "rpc_api.md"
 RUST_FILE = REPO_DIR / "libs" / "librepcb" / "rust-core" / "src" / "rpc_server" / "rpc_api.rs"

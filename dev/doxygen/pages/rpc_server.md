@@ -11,7 +11,7 @@ describes the transport protocol of the server; the available commands
 interface (payload conventions, object handle handling, ...) are
 described in \subpage doc_rpc_guidelines.
 
-The reference is generated from `dev/rpc/rpc.yml`, the single
+The reference is generated from `rpc/api.yml`, the single
 source of truth of the API.
 
 > Note: This page is about controlling a *running* LibrePCB application.

@@ -14,10 +14,10 @@ Adding a Command
 
 New commands are added in four steps:
 
-1. **Declare the method in the specification** (`dev/rpc/rpc.yml`): add
+1. **Declare the method in the specification** (`rpc/api.yml`): add
    it to its class, with description, params, result and `since`. Results
    are always a map (declared as field list or struct name) or nil.
-2. **Run the generator** (`uv run gen.py` in `dev/rpc/`): it regenerates
+2. **Run the generator** (`uv run gen.py` in `rpc/`): it regenerates
    the C++ command headers (`rpc/api/{classname}rpc.h`), the dispatcher
    (`rpc/api/commands.cpp`), the error classes (`rpc/api/rpcerrors.h`) and
    this documentation. Commit the regenerated files.

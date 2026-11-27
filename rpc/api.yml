@@ -10,13 +10,13 @@
 # Top-level keys:
 # - `format`: The format of this yml file itself, as "MAJOR.MINOR" (only
 #   bumped when the file structure changes in a way which requires
-#   consumers like dev/rpc/gen.py to be adapted).
+#   consumers like rpc/gen.py to be adapted).
 # - `protocol`: The version of the wire protocol which this file describes,
 #   as a monotonic integer (see the negotiation rules in
 #   dev/doxygen/pages/rpc_server.md).
 #
 # Consumers:
-# - The documentation generator (dev/rpc/gen.py).
+# - The documentation generator (rpc/gen.py).
 # - Client authors: Read this file to know which methods exist, and compare
 #   each method's `since` with the `version` reported by the
 #   server's `authenticate` method to know which ones are available on a
