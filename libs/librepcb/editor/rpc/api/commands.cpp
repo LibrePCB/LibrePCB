@@ -78,7 +78,6 @@ void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
       {"RemoteLibrary/apply", &RemoteLibraryRpc::apply},
       {"RemoteLibrary/get", &RemoteLibraryRpc::get},
       {"WorkspaceDb/wait", &WorkspaceDbRpc::wait},
-      {"WorkspaceDb/search", &WorkspaceDbRpc::search},
       {"WorkspaceDb/query_sql", &WorkspaceDbRpc::query_sql},
       {"WorkspaceDb/get", &WorkspaceDbRpc::get},
   };

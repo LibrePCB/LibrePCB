@@ -338,14 +338,6 @@ void WorkspaceDbRpc::wait(GuiApplication& app, RpcObjectRegistry& registry,
                    [&request]() { request.send(RpcCancelled()); });
 }
 
-void WorkspaceDbRpc::search(GuiApplication& app, RpcObjectRegistry& registry,
-                            RpcRequest& request) {
-  Q_UNUSED(app);
-  Q_UNUSED(registry);
-  Q_UNUSED(request);
-  throw RpcCommandFailed();
-}
-
 void WorkspaceDbRpc::query_sql(GuiApplication& app, RpcObjectRegistry& registry,
                                RpcRequest& request) {
   Q_UNUSED(registry);

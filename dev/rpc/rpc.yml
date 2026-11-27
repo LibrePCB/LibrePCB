@@ -781,52 +781,61 @@ classes:
         params: []
         result: WorkspaceDbDetails
 
-      - name: search
-        description: Search library elements.
-        static: true
-        params:
-          - name: type
-            type: LibraryElementType
-            description: Type of library elements to find.
-          - name: query
-            type: string
-            description: >-
-              Keyword to search for. If omitted or empty, all elements will
-              be returned.
-          - name: library
-            type: string
-            description: >-
-              If provided, only list elements contained in this library,
-              specified by its absolute file path.
-          - name: category
-            type: string?
-            description: >-
-              If provided, only list elements or categories within this
-              category. If `null`, it means the root category, or elements
-              without a valid category.
-          - name: package
-            type: string
-            description: >-
-              If provided, only list devices or parts for this package.
-          - name: component
-            type: string
-            description: >-
-              If provided, only list devices or parts for this component.
-          - name: device
-            type: string
-            description: >-
-              If provided, only list parts for this device.
-          - name: limit
-            type: int
-            description: Max. number of results to return.
-        result:
-          - name: matches
-            type: array
-            items: WorkspaceDbSearchResult
-            description: Search results.
+      # not ready yet
+      #- name: search
+      #  description: Search library elements.
+      #  static: true
+      #  params:
+      #    - name: type
+      #      type: LibraryElementType
+      #      description: Type of library elements to find.
+      #    - name: query
+      #      type: string
+      #      description: >-
+      #        Keyword to search for. If omitted or empty, all elements will
+      #        be returned.
+      #    - name: library
+      #      type: string
+      #      description: >-
+      #        If provided, only list elements contained in this library,
+      #        specified by its absolute file path.
+      #    - name: category
+      #      type: string?
+      #      description: >-
+      #        If provided, only list elements or categories within this
+      #        category. If `null`, it means the root category, or elements
+      #        without a valid category.
+      #    - name: package
+      #      type: string
+      #      description: >-
+      #        If provided, only list devices or parts for this package.
+      #    - name: component
+      #      type: string
+      #      description: >-
+      #        If provided, only list devices or parts for this component.
+      #    - name: device
+      #      type: string
+      #      description: >-
+      #        If provided, only list parts for this device.
+      #    - name: limit
+      #      type: int
+      #      description: Max. number of results to return.
+      #  result:
+      #    - name: matches
+      #      type: array
+      #      items: WorkspaceDbSearchResult
+      #      description: Search results.
 
       - name: query_sql
-        description: Query the SQLite database directly (read-only).
+        description: >-
+          Query the SQLite database directly (read-only). To inspect the
+          database scheme, you may use this query:
+
+              SELECT sql FROM sqlite_schema WHERE sql IS NOT NULL
+
+          ATTENTION: This is a low-level, unstable method! The SQLite database
+          scheme may change between LibrePCB releases without notice. This
+          method may be removed in future.
         static: true
         params:
           - name: query

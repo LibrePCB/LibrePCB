@@ -76,13 +76,12 @@ public:
                    RpcRequest& request);
 
   /**
-   * @brief Search library elements.
-   */
-  static void search(GuiApplication& app, RpcObjectRegistry& registry,
-                     RpcRequest& request);
-
-  /**
-   * @brief Query the SQLite database directly (read-only).
+   * @brief Query the SQLite database directly (read-only). To inspect the
+   *        database scheme, you may use this query: SELECT sql FROM
+   *        sqlite_schema WHERE sql IS NOT NULL ATTENTION: This is a
+   *        low-level, unstable method! The SQLite database scheme may change
+   *        between LibrePCB releases without notice. This method may be
+   *        removed in future.
    */
   static void query_sql(GuiApplication& app, RpcObjectRegistry& registry,
                         RpcRequest& request);

@@ -595,39 +595,13 @@ Wait for the library rescan to complete. If the database is already up-to-date, 
 
 ---
 
-### WorkspaceDb/search {#doc_rpc_api_method_WorkspaceDb_search}
-
-Search library elements.
-
-**Params:**
-
-| Name | Type | Description |
-|------|------|-------------|
-| `type` | `LibraryElementType` | Type of library elements to find. |
-| `query` | `string` | Keyword to search for. If omitted or empty, all elements will be returned. |
-| `library` | `string` | If provided, only list elements contained in this library, specified by its absolute file path. |
-| `category` | `string?` | If provided, only list elements or categories within this category. If `null`, it means the root category, or elements without a valid category. |
-| `package` | `string` | If provided, only list devices or parts for this package. |
-| `component` | `string` | If provided, only list devices or parts for this component. |
-| `device` | `string` | If provided, only list parts for this device. |
-| `limit` | `int` | Max. number of results to return. |
-
-**Result:**
-
-**Fields:**
-
-| Name | Type | Description |
-|------|------|-------------|
-| `matches` | `array` of `WorkspaceDbSearchResult` | Search results. |
-
-
-**Since:** 2.2.0
-
----
-
 ### WorkspaceDb/query_sql {#doc_rpc_api_method_WorkspaceDb_query_sql}
 
-Query the SQLite database directly (read-only).
+Query the SQLite database directly (read-only). To inspect the database scheme, you may use this query:
+
+    SELECT sql FROM sqlite_schema WHERE sql IS NOT NULL
+
+ATTENTION: This is a low-level, unstable method! The SQLite database scheme may change between LibrePCB releases without notice. This method may be removed in future.
 
 **Params:**
 
