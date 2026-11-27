@@ -32,13 +32,16 @@ done
 REPO_ROOT=$(git rev-parse --show-toplevel)
 BUILD_DIR="$REPO_ROOT/build/clang-tidy"
 
-# If Docker is available, run the script inside a container
+# If Docker is available, run the script inside a container.
+# Note: Mount $REPO_ROOT 1:1 (i.e. same path inside the container) to keep the
+# compilation database and caches valid accross runs of this script with
+# '--docker' and without it - i.e. allow mixed usage of '--docker'.
 if command -v docker &> /dev/null; then
   echo "[Running inside Docker container $DOCKER_IMAGE]"
   docker run --rm -i -u "$(id -u):$(id -g)" \
-    -v "$REPO_ROOT:/work" -w "/work" \
-    -e "CARGO_HOME=/work/build/clang-tidy/.cargo-home" \
-    -e "CTCACHE_DIR=/work/build/clang-tidy/.ctcache" $DOCKER_IMAGE \
+    -v "$REPO_ROOT:$REPO_ROOT" -w "$REPO_ROOT" \
+    -e "CARGO_HOME=$REPO_ROOT/build/clang-tidy/.cargo-home" \
+    -e "CTCACHE_DIR=$REPO_ROOT/build/clang-tidy/.ctcache" $DOCKER_IMAGE \
     dev/clang_tidy.sh --executable "ctcache" $DOCKER_WRAPPED_ARGS
   exit $?
 fi
