@@ -139,7 +139,9 @@ following message types:
   methods, its description and — for classes whose methods operate on an
   object instance — its **handle type** (see 2.4).
 - Static methods (no receiver) and member methods (receiver required) are
-  both declared under their class; the spec marks which is which.
+  both declared under their class; a member method declares its receiver
+  handle explicitly as the first parameter, under the reserved name
+  `obj`.
 - The C++ command surface is generated per spec class (see 4.2a),
   dispatched by the full `"ClassName/method_name"`
   string.
@@ -153,9 +155,14 @@ following message types:
 
 A request's `params` is a **string-keyed msgpack map**:
 
-- **Reserved key `"obj"`:** the receiver handle for member methods (the
-  "this" pointer). For static methods it is absent. An argument may never
-  be named `obj`.
+- **Reserved parameter name `"obj"`:** Methods which operate on an object
+  instance declare their receiver handle (the "this" pointer)
+  *explicitly* as their first parameter, under the reserved name `obj`
+  (without type/description — the docs generator renders it as a handle).
+  There is no `static:` flag in the specification: A method is
+  non-static iff it declares `obj`. Methods which do not declare `obj`
+  are static, and an argument may never be named `obj` in a
+  non-receiver position.
 - **Handles are opaque:** The handle is an arbitrary value from the
   protocol's value domain. Clients obtain handles from responses
   (embedded under the reserved key `"obj"` in maps which represent
@@ -168,10 +175,9 @@ A request's `params` is a **string-keyed msgpack map**:
 - **`"obj"` is a *documented convention only*** — there is no code for it
   on the Rust side. The whole params map crosses the FFI as one `QVariant`
   (Rust never parses command content at all, not even `obj`); the C++
-  dispatch layer extracts `"obj"` and passes a clean `(handle, args)` pair
-  to the handlers, where `handle` is an empty string for static methods.
-- `obj` present but not a string → payload-level error (detected on the
-  C++ side, answered with an RPC error like any other invalid params).
+  command handlers read `"obj"` from the request arguments themselves.
+- A handle which is unknown, expired or of the wrong type → payload-level
+  error (`InvalidHandle`, answered like any other invalid params).
 - Non-string map keys anywhere in a payload are payload-level errors too
   (answered, not disconnects) — msgpack allows them, but our boundary
   (`QVariantMap`) and spec are string-keyed, and there is no use case.
@@ -612,8 +618,7 @@ classes:
   - name: ProjectEditor
     description: An open project
     methods:
-      - name: list             # static → no obj
-        static: true
+      - name: list             # no obj → static
         description: List all open projects
         params: []
         result:
@@ -624,7 +629,8 @@ classes:
         since: "2.2.0"
       - name: get              # member → obj = the project handle
         description: Get project details
-        params: []
+        params:
+          - name: obj
         result: ProjectEditorDetails
         since: "2.2.0"
 

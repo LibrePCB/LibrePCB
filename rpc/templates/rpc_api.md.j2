@@ -16,7 +16,11 @@
 | Name | Type | Description |
 |------|------|-------------|
 {% for field in fields %}
+{% if field.name == "obj" and not field.get("type") %}
+| `obj` | `handle` | The opaque receiver handle of this method. |
+{% else %}
 | `{{ field.name }}` | {{ type_link(field.type) }}{% if field.get("items") %} of {{ type_link(field.get("items")) }}{% endif %}{% if field.get("default") %} (default: `{{ field["default"] }}`){% endif %} | {{ field.description or "" }} |
+{% endif %}
 {% endfor %}
 {% endif %}
 {%- endmacro -%}
@@ -106,7 +110,7 @@ to the executed command.
 
 # Commands {{ "{" }}#doc_rpc_api_commands}
 
-All commands below are dispatched to the application and executed on its GUI thread. Method names are `ClassName/method_name` (the protocol-level methods are named without a class prefix). Non-static methods receive their receiver handle in the reserved `obj` key of the params.
+All commands below are dispatched to the application and executed on its GUI thread. Method names are `ClassName/method_name` (the protocol-level methods are named without a class prefix). Methods which operate on an object instance declare the receiver handle explicitly as their first parameter `obj` (an opaque handle, see @ref doc_rpc_api_handles).
 
 {% for cls in spec.classes %}
 {% if cls.name %}

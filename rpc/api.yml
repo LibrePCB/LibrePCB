@@ -31,13 +31,14 @@
 #   object handle (see the class descriptions). No msgpack extension
 #   types are used — everything is expressed with builtin types only
 #   (e.g. UUIDs are passed as 36-character strings).
-# - The params of every method are a map. The reserved key "obj" carries
-#   the receiver handle for non-static methods — it is NOT listed in the
-#   params below. Handles are opaque values: Clients obtain them from
-#   responses (embedded under the reserved "obj" key) and must pass them
-#   back unchanged, without making any assumptions about their type or
-#   value. The representation may change from command to command and from
-#   app version to app version.
+# - The params of every method are a map. Methods which operate on an
+#   object instance declare their receiver handle explicitly as the first
+#   parameter, under the reserved name "obj" (without type/description).
+#   Handles are opaque values: Clients obtain them from responses
+#   (embedded under the reserved "obj" key) and must pass them back
+#   unchanged, without making any assumptions about their type or value.
+#   The representation may change from command to command and from app
+#   version to app version.
 # - Numeric conventions: Lengths are in nanometers (i64), angles in
 #   microdegrees (i64), if not stated otherwise.
 
@@ -453,7 +454,6 @@ classes:
     since: "2.2.0"
     methods:
       - name: initialize
-        static: true
         description: >-
           Handshake and version negotiation. The first message of a
           connection must be this request, and its structure never changes
@@ -478,7 +478,6 @@ classes:
               request.
 
       - name: authenticate
-        static: true
         description: >-
           Authenticate the connection. Must be called after `initialize`,
           before any other request. Two mechanisms are planned: External
@@ -526,7 +525,6 @@ classes:
               on every application restart).
 
       - name: ping
-        static: true
         description: >-
           A request which is answered with a nil result by the server
           itself, without any further processing. Useful to test a
@@ -539,7 +537,6 @@ classes:
     methods:
       - name: list
         description: List all open projects.
-        static: true
         params: []
         result:
           - name: projects
@@ -549,7 +546,6 @@ classes:
 
       - name: create
         description: Create a new project and open it.
-        static: true
         params:
           - name: path
             type: string
@@ -574,7 +570,6 @@ classes:
           Open a project by file path. If the project is already open,
           nothing is changed and the summary of the already open project
           is returned.
-        static: true
         params:
           - name: path
             type: string
@@ -590,12 +585,14 @@ classes:
 
       - name: get
         description: Get details about an open project.
-        params: []
+        params:
+          - name: obj
         result: ProjectEditorDetails
 
       - name: set
         description: Set project metadata and settings.
         params:
+          - name: obj
           - name: name
             type: string
             description: Project name.
@@ -621,14 +618,16 @@ classes:
 
       - name: save
         description: Save project to disk.
-        params: []
+        params:
+          - name: obj
         result: []
 
       - name: close
         description: >-
           Close project. Attention: If there were unsaved changes in the
           project, they will be discarded. Call `save` first, if desired.
-        params: []
+        params:
+          - name: obj
         result: []
 
 #  - name: ComponentInstance
@@ -669,7 +668,8 @@ classes:
     methods:
       - name: list
         description: List all symbol instances in a schematic.
-        params: []
+        params:
+          - name: obj
         result:
           - name: symbols
             description: Symbol summaries.
@@ -684,6 +684,7 @@ classes:
       - name: add
         description: Add a symbol to a schematic.
         params:
+          - name: obj
           - name: component
             description: Library component UUID.
             type: string
@@ -717,6 +718,7 @@ classes:
       - name: add_gate
         description: Add a symbol of an already existing component to a schematic.
         params:
+          - name: obj
           - name: component
             description: Component instance UUID.
             type: string
@@ -742,6 +744,7 @@ classes:
           Runs the check and return all emitted messages, together with
           their approved state.
         params:
+          - name: obj
           - name: quick
             type: bool
             default: false
@@ -761,6 +764,7 @@ classes:
           The handles of a previous `run()` call are only valid as long as
           the ERC messages did not change.
         params:
+          - name: obj
           - name: messages
             type: array
             items: handle
@@ -778,6 +782,7 @@ classes:
           Run a graphics export of a complete schematic, a single sheet, or
           a board.
         params:
+          - name: obj
           - name: path
             type: string
             description: >-
@@ -855,7 +860,6 @@ classes:
     methods:
       - name: get
         description: Get information about the workspace.
-        static: true
         params: []
         result: WorkspaceDetails
 
@@ -867,21 +871,24 @@ classes:
     methods:
       - name: get
         description: Get the state of the undo stack.
-        params: []
+        params:
+          - name: obj
         result: UndoStackDetails
 
       - name: undo
         description: >-
           Undo the last command, then return the new state. If there is nothing
           to undo, the command fails with an error.
-        params: []
+        params:
+          - name: obj
         result: UndoStackDetails
 
       - name: redo
         description: >-
           Redo the last undone the last command, then return the new state.
           If there is nothing to redo, the command fails with an error.
-        params: []
+        params:
+          - name: obj
         result: UndoStackDetails
 
   - name: RemoteLibrary
@@ -894,7 +901,6 @@ classes:
           ready, this method immediately returns all of them at once. If the
           list needs to be fetched from the configured servers first, this
           method streams the libraries in notifications.
-        static: true
         params: []
         result:
           - name: libraries
@@ -911,7 +917,6 @@ classes:
 
           IMPORTANT: After calling this method, use `WorkspaceDb.wait()` to
           wait for the library changes to appear in the database!
-        static: true
         params:
           - name: install
             type: array
@@ -925,7 +930,8 @@ classes:
 
       - name: get
         description: Get details about a remote library.
-        params: []
+        params:
+          - name: obj
         result: RemoteLibraryDetails
 
   - name: WorkspaceDb
@@ -944,14 +950,13 @@ classes:
           up-to-date, this method returns immediately. If a scan is currently
           in progress or scheduled, the method blocks until the scan finished.
           During the scan, progress notifications will be emitted.
-        static: true
         params: []
         result: WorkspaceDbDetails
 
       # not ready yet
       #- name: search
       #  description: Search library elements.
-      #  static: true
+
       #  params:
       #    - name: type
       #      type: LibraryElementType
@@ -1003,7 +1008,6 @@ classes:
           ATTENTION: This is a low-level, unstable method! The SQLite database
           scheme may change between LibrePCB releases without notice. This
           method may be removed in future.
-        static: true
         params:
           - name: query
             type: string
@@ -1023,7 +1027,6 @@ classes:
           on the same library element will be responded from memory, as long
           as no library rescan was started in the mean time (rescan invalidates
           the cache).
-        static: true
         params:
           - name: type
             type: string

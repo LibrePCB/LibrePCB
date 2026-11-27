@@ -15,7 +15,7 @@ templates from `rpc/templates/`:
   code. For now it contains only the error codes with their canonical
   messages; more parts of the API may follow later.
 - `libs/librepcb/editor/rpc/api/{classname}rpc.h` — the C++ command
-  declarations, one static-only class per spec class (the method
+  declarations, one command class per spec class (the method
   implementations are hand-written in the corresponding .cpp files).
 - `libs/librepcb/editor/rpc/api/rpcerrors.h` — the error codes and one
   exception class per error code (the C++ error handling).

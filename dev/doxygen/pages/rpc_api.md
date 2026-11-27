@@ -257,7 +257,7 @@ Details about a symbol instance.
 
 # Commands {#doc_rpc_api_commands}
 
-All commands below are dispatched to the application and executed on its GUI thread. Method names are `ClassName/method_name` (the protocol-level methods are named without a class prefix). Non-static methods receive their receiver handle in the reserved `obj` key of the params.
+All commands below are dispatched to the application and executed on its GUI thread. Method names are `ClassName/method_name` (the protocol-level methods are named without a class prefix). Methods which operate on an object instance declare the receiver handle explicitly as their first parameter `obj` (an opaque handle, see @ref doc_rpc_api_handles).
 
 ## Protocol-Level Methods {#doc_rpc_api_class_protocol_methods}
 
@@ -389,7 +389,11 @@ Open a project by file path. If the project is already open, nothing is changed 
 
 Get details about an open project.
 
-**Params:** None
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `obj` | `handle` | The opaque receiver handle of this method. |
 
 **Result:** [`ProjectEditorDetails`](@ref doc_rpc_api_type_ProjectEditorDetails)
 
@@ -405,6 +409,7 @@ Set project metadata and settings.
 
 | Name | Type | Description |
 |------|------|-------------|
+| `obj` | `handle` | The opaque receiver handle of this method. |
 | `name` | `string` | Project name. |
 | `author` | `string` | Project author. |
 | `version` | `string` | Project version. |
@@ -422,7 +427,11 @@ Set project metadata and settings.
 
 Save project to disk.
 
-**Params:** None
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `obj` | `handle` | The opaque receiver handle of this method. |
 
 **Result:** None
 
@@ -434,7 +443,11 @@ Save project to disk.
 
 Close project. Attention: If there were unsaved changes in the project, they will be discarded. Call `save` first, if desired.
 
-**Params:** None
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `obj` | `handle` | The opaque receiver handle of this method. |
 
 **Result:** None
 
@@ -450,7 +463,11 @@ Read/modify the symbol instances of a schematic. The object handle is a schemati
 
 List all symbol instances in a schematic.
 
-**Params:** None
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `obj` | `handle` | The opaque receiver handle of this method. |
 
 **Result:**
 
@@ -473,6 +490,7 @@ Add a symbol to a schematic.
 
 | Name | Type | Description |
 |------|------|-------------|
+| `obj` | `handle` | The opaque receiver handle of this method. |
 | `component` | `string` | Library component UUID. |
 | `representation` | `string` | Library component representation UUID. |
 | `gate` | `string` | Gate UUID. |
@@ -497,6 +515,7 @@ Add a symbol of an already existing component to a schematic.
 
 | Name | Type | Description |
 |------|------|-------------|
+| `obj` | `handle` | The opaque receiver handle of this method. |
 | `component` | `string` | Component instance UUID. |
 | `gate` | `string` | Gate UUID. |
 | `position` | `Point` |  |
@@ -521,6 +540,7 @@ Runs the check and return all emitted messages, together with their approved sta
 
 | Name | Type | Description |
 |------|------|-------------|
+| `obj` | `handle` | The opaque receiver handle of this method. |
 | `quick` | `bool` | Run only the most important checks, not the complete suite of checks. This is much faster than the full check, but will return only a partial result. This flag is only supported for the DRC, not for the other checks. |
 
 **Result:**
@@ -544,6 +564,7 @@ Set the approved state of multiple messages (bulk setter). The handles of a prev
 
 | Name | Type | Description |
 |------|------|-------------|
+| `obj` | `handle` | The opaque receiver handle of this method. |
 | `messages` | `array` of `handle` | The object handles of the messages to modify. |
 | `approved` | `bool` | The approved state to set on all given messages. |
 
@@ -565,6 +586,7 @@ Run a graphics export of a complete schematic, a single sheet, or a board.
 
 | Name | Type | Description |
 |------|------|-------------|
+| `obj` | `handle` | The opaque receiver handle of this method. |
 | `path` | `string` | Absolute destination file path. If not provided, the file(s) will be returned as binary blobs in the response. |
 | `format` | `string` (default: `png`) | Image format. Only respected if `path` is absent, If `path` is given, the format will be auto-detected from its file extension. |
 | `dpi` | `integer` (default: `300`) | Resolution. |
@@ -611,7 +633,11 @@ The undo stack of an open document. The handle may point to a project or a libra
 
 Get the state of the undo stack.
 
-**Params:** None
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `obj` | `handle` | The opaque receiver handle of this method. |
 
 **Result:** [`UndoStackDetails`](@ref doc_rpc_api_type_UndoStackDetails)
 
@@ -623,7 +649,11 @@ Get the state of the undo stack.
 
 Undo the last command, then return the new state. If there is nothing to undo, the command fails with an error.
 
-**Params:** None
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `obj` | `handle` | The opaque receiver handle of this method. |
 
 **Result:** [`UndoStackDetails`](@ref doc_rpc_api_type_UndoStackDetails)
 
@@ -635,7 +665,11 @@ Undo the last command, then return the new state. If there is nothing to undo, t
 
 Redo the last undone the last command, then return the new state. If there is nothing to redo, the command fails with an error.
 
-**Params:** None
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `obj` | `handle` | The opaque receiver handle of this method. |
 
 **Result:** [`UndoStackDetails`](@ref doc_rpc_api_type_UndoStackDetails)
 
@@ -688,7 +722,11 @@ IMPORTANT: After calling this method, use `WorkspaceDb.wait()` to wait for the l
 
 Get details about a remote library.
 
-**Params:** None
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `obj` | `handle` | The opaque receiver handle of this method. |
 
 **Result:** `RemoteLibraryDetails`
 
