@@ -17,6 +17,18 @@ set -euv -o pipefail
 # check if no file contains tabulators (with some exceptions)
 (git grep -Il $'\t' -- ':/' ':!/LICENSES/' ':!/libs/polyclipping/' ':!/share/librepcb/licenses/' ':!*.ui') && exit 1
 
+# check that all *.h and *.cpp files start with the license header,
+# including its trailing empty line (except 3rd-party or generated files)
+license_header_size=$(wc -c < dev/license_header_template.txt)
+for f in $(git ls-files -- '*.h' '*.cpp' \
+  ':!/libs/polyclipping/' \
+  ':!/libs/librepcb/rust-core/ffi.h' \
+  ':!/libs/librepcb/editor/editorcommandsetupdater.h'); do
+  cmp -s <(head -c $((license_header_size + 1)) "$f") \
+    <(cat dev/license_header_template.txt; echo) || \
+    { echo "ERROR: $f does not start with the license header!" >&2; exit 1; }
+done
+
 # check if no font weights are used that we don't bundle font files for
 (git grep -E 'font-weight: [0-9]+' -- '*.slint' | grep -vE 'font-weight: (300|400|700)') && exit 1
 
