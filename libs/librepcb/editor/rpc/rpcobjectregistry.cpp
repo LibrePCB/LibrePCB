@@ -45,7 +45,9 @@ static uint32_t getNextHandle() noexcept {
   // stale handles from RPC clients as valid after LibrePCB has been restarted.
   static uint32_t sHandle = static_cast<uint32_t>(std::rand());
   ++sHandle;
-  if (sHandle == 0) ++sHandle;  // Skip sHandle 0 to make QVariant::toInt() working
+  if (sHandle == 0) {
+    ++sHandle;  // Skip handle 0 to safely allow using QVariant::toInt().
+  }
   return sHandle;
 }
 

@@ -52,14 +52,14 @@ void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
                         RpcRequest& request) {
   using RpcCommand = void (*)(GuiApplication&, RpcObjectRegistry&,
                               RpcRequest&);
-  static const QHash<QString, RpcCommand> commands = {
+  static const QHash<QString, RpcCommand> sCommands = {
 {% for cls in spec.classes %}
 {%- for method in cls.methods %}
       {"{% if cls.name %}{{ cls.name }}/{% endif %}{{ method.name }}", &{{ cls.name or "Protocol" }}Rpc::{{ method.name }}},
 {% endfor %}
 {%- endfor %}
   };
-  if (auto func = commands.value(request.getMethod(), nullptr)) {
+  if (auto func = sCommands.value(request.getMethod(), nullptr)) {
     func(app, registry, request);
     return;
   }

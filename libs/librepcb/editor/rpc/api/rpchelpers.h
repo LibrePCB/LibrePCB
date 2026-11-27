@@ -527,7 +527,7 @@ struct RpcArgTraits<AttributeList> {
             RpcArgTraits<QList<std::shared_ptr<Attribute>>>::tryFromVariant(
                 v)) {
       AttributeList l;
-      for (const auto &item : *list) {
+      for (const auto& item : *list) {
         l.append(item);
       }
       return l;
