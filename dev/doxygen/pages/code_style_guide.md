@@ -81,13 +81,16 @@ This page describes the code style guide for LibrePCB developers.
 - Interfaces: Like classes, but with prefix `IF_`.
   Example: `librepcb::IF_GraphicsViewEventHandler`
 - Functions/Methods: lowerCamelCase
-- Member Variables: lowerCamelCase, beginning with a 'm'.
-  Example: `mSomeMemberVariable`
-- Static Variables: lowerCamelCase, beginning with a 's'.
+- Member Variables/Constants: lowerCamelCase, beginning with a 'm'.
+  Example: `mSomeMemberVariable`, `mSomeMemberConstant`
+- Static Constants: UPPER_SNAKE_CASE (consider sCamelCase constants as legacy).
+  Example: `SOME_STATIC_CONSTANT`
+- Static Variables: lowerCamelCase, beginning with a 's'. This also applies to
+  function-local statics (consider camelCase without prefix as legacy).
   Example: `sSomeStaticVariable`
 - Function Parameters: lowerCamelCase
 - Local Variables: lowerCamelCase
-- Enum values: PascalCase (consider UPPER_CASE enum values as legacy).
+- Enum values: PascalCase (consider UPPER_SNAKE_CASE enum values as legacy).
 - Macros: uppercase, with underline as separator
 
 
