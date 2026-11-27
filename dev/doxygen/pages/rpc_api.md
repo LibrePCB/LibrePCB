@@ -182,6 +182,57 @@ Information about the workspace library database.
 
 ---
 
+## Part {#doc_rpc_api_type_Part}
+
+A part of a component instance.
+
+**Fields:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `mpn` | `string` | Manufacturer part number. |
+| `manufacturer` | `string` | Manufacturer name. |
+
+---
+
+## SymbolInstanceSummary {#doc_rpc_api_type_SymbolInstanceSummary}
+
+A summary of a symbol instance.
+
+**Fields:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `obj` | `handle` | The opaque handle of the symbol instance. |
+| `uuid` | `string` | The symbol instance UUID. |
+| `component` | `string` | The UUID of the parent component instance. |
+| `name` | `string` | The symbol name (e.g. "R1"). |
+| `position` | `Point` | The symbol position. |
+| `rotation` | `Angle` | The symbol rotation. |
+| `mirror` | `bool` | Whether the symbol is mirrored. |
+
+---
+
+## SymbolInstanceDetails {#doc_rpc_api_type_SymbolInstanceDetails}
+
+Details about a symbol instance.
+
+**Fields:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `obj` | `handle` | The opaque handle of the symbol instance. |
+| `uuid` | `string` | The symbol instance UUID. |
+| `component` | `string` | The UUID of the parent component instance. |
+| `name` | `string` | The symbol name (e.g. "R1"). |
+| `value` | `string` | The value of the parent component instance. |
+| `position` | `Point` | The symbol position. |
+| `rotation` | `Angle` | The symbol rotation. |
+| `mirror` | `bool` | Whether the symbol is mirrored. |
+| `attributes` | `array` of [`Attribute`](@ref doc_rpc_api_type_Attribute) | The attributes of the parent component instance. |
+
+---
+
 ## AttributeType (Enum) {#doc_rpc_api_type_AttributeType}
 | Value | Description |
 |-------|-------------|
@@ -386,6 +437,73 @@ Close project. Attention: If there were unsaved changes in the project, they wil
 **Params:** None
 
 **Result:** None
+
+**Since:** 2.2.0
+
+---
+
+## Class SymbolInstance {#doc_rpc_api_class_SymbolInstance}
+
+Read/modify the symbol instances of a schematic. The object handle is a schematic handle, as returned by `ProjectEditor`.
+
+### SymbolInstance/list {#doc_rpc_api_method_SymbolInstance_list}
+
+List all symbol instances in a schematic.
+
+**Params:** None
+
+**Result:**
+
+**Fields:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `symbols` | `array` of [`SymbolInstanceSummary`](@ref doc_rpc_api_type_SymbolInstanceSummary) | Symbol summaries. |
+
+
+**Since:** 2.2.0
+
+---
+
+### SymbolInstance/add {#doc_rpc_api_method_SymbolInstance_add}
+
+Add a symbol to a schematic.
+
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `component` | `string` | Library component UUID. |
+| `representation` | `string` | Library component representation UUID. |
+| `gate` | `string` | Gate UUID. |
+| `device` | `string?` | Library device UUID. If provided, the component becomes a real (assembled) part. If omitted, the symbol is a schematic-only component. |
+| `part` | `Part?` | The part to add (only relevant together with `device`). |
+| `position` | `Point` |  |
+| `rotation` | `Angle` |  |
+| `mirror` | `bool` |  |
+| `attributes` | `array` of [`Attribute`](@ref doc_rpc_api_type_Attribute) |  |
+
+**Result:** [`SymbolInstanceDetails`](@ref doc_rpc_api_type_SymbolInstanceDetails)
+
+**Since:** 2.2.0
+
+---
+
+### SymbolInstance/add_gate {#doc_rpc_api_method_SymbolInstance_add_gate}
+
+Add a symbol of an already existing component to a schematic.
+
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `component` | `string` | Component instance UUID. |
+| `gate` | `string` | Gate UUID. |
+| `position` | `Point` |  |
+| `rotation` | `Angle` |  |
+| `mirror` | `bool` |  |
+
+**Result:** [`SymbolInstanceDetails`](@ref doc_rpc_api_type_SymbolInstanceDetails)
 
 **Since:** 2.2.0
 

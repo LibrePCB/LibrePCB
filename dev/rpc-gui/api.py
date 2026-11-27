@@ -11,6 +11,7 @@ PROTOCOL_VERSION = 1
 CLASSES = [
     "Protocol",
     "ProjectEditor",
+    "SymbolInstance",
     "RuleCheck",
     "GraphicsExport",
     "Workspace",

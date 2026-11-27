@@ -23,6 +23,7 @@ from pages.graphics_export import GraphicsExportPage
 from pages.undo_stack import UndoStackPage
 from pages.remote_library import RemoteLibraryPage
 from pages.workspace import WorkspacePage
+from pages.symbol_instance import SymbolInstancePage
 from pages.workspace_db import WorkspaceDbPage
 
 
@@ -86,6 +87,7 @@ PAGES = {
     "WorkspaceDb": 5,
     "GraphicsExport": 6,
     "Workspace": 7,
+    "SymbolInstance": 8,
 }
 
 ns = slint.load_file("app.slint")
@@ -116,6 +118,8 @@ class Gui(ns.AppWindow):
         self.ge_entries = slint.ListModel([])
         self.ge_status = ""
         self.workspace_details = ""
+        self.si_entries = slint.ListModel([])
+        self.si_details = ""
         self.db_details = ""
         self._pages = {
             "Protocol": ProtocolPage(self),
@@ -123,6 +127,7 @@ class Gui(ns.AppWindow):
             "RuleCheck": RuleCheckPage(self),
             "GraphicsExport": GraphicsExportPage(self),
             "Workspace": WorkspacePage(self),
+            "SymbolInstance": SymbolInstancePage(self),
             "UndoStack": UndoStackPage(self),
             "RemoteLibrary": RemoteLibraryPage(self),
             "WorkspaceDb": WorkspaceDbPage(self),
@@ -342,6 +347,28 @@ class Gui(ns.AppWindow):
     @slint.callback
     def ws_get_clicked(self):
         self._pages["Workspace"].get_clicked()
+
+    # --- SymbolInstance page -----------------------------------------------
+
+    @slint.callback
+    def si_select_schematic(self, value):
+        self._pages["SymbolInstance"].select_schematic(value)
+
+    @slint.callback
+    def si_refresh_clicked(self):
+        self._pages["SymbolInstance"].refresh_clicked()
+
+    @slint.callback
+    def si_list_clicked(self):
+        self._pages["SymbolInstance"].list_clicked()
+
+    @slint.callback
+    def si_add_clicked(self):
+        self._pages["SymbolInstance"].add_clicked()
+
+    @slint.callback
+    def si_add_gate_clicked(self):
+        self._pages["SymbolInstance"].add_gate_clicked()
 
     # --- GraphicsExport page -------------------------------------------------
 

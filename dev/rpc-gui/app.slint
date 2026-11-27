@@ -17,6 +17,7 @@ import {
 } from "pages/remote_library.slint";
 import { RuleCheckPage, RuleCheckMessageData } from "pages/rule_check.slint";
 import { WorkspacePage } from "pages/workspace.slint";
+import { SymbolInstancePage } from "pages/symbol_instance.slint";
 import { WorkspaceDbPage } from "pages/workspace_db.slint";
 
 export component AppWindow inherits Window {
@@ -116,6 +117,26 @@ export component AppWindow inherits Window {
     // --- Workspace page ----------------------------------------------------
     in property <string> workspace-details;
     callback ws-get-clicked();
+
+    // --- SymbolInstance page -----------------------------------------------
+    in property <[string]> si-entries;
+    in-out property <int> si-index: -1;
+    in-out property <string> si-component;
+    in-out property <string> si-representation;
+    in-out property <string> si-gate;
+    in-out property <string> si-device;
+    in-out property <string> si-mpn;
+    in-out property <string> si-manufacturer;
+    in-out property <string> si-x: "0";
+    in-out property <string> si-y: "0";
+    in-out property <string> si-rotation: "0";
+    in-out property <bool> si-mirror: false;
+    in property <string> si-details;
+    callback si-select-schematic(string);
+    callback si-refresh-clicked();
+    callback si-list-clicked();
+    callback si-add-clicked();
+    callback si-add-gate-clicked();
 
     // --- GraphicsExport page -----------------------------------------------
     in property <[string]> ge-entries;
@@ -330,6 +351,28 @@ export component AppWindow inherits Window {
                 authenticated: root.authenticated;
                 details: root.workspace-details;
                 get-clicked => { root.ws-get-clicked(); }
+            }
+            if root.current-page == 8: SymbolInstancePage {
+                vertical-stretch: 1;
+                authenticated: root.authenticated;
+                entries: root.si-entries;
+                current-index <=> root.si-index;
+                component <=> root.si-component;
+                representation <=> root.si-representation;
+                gate <=> root.si-gate;
+                device <=> root.si-device;
+                mpn <=> root.si-mpn;
+                manufacturer <=> root.si-manufacturer;
+                pos-x <=> root.si-x;
+                pos-y <=> root.si-y;
+                rotation <=> root.si-rotation;
+                mirror <=> root.si-mirror;
+                details: root.si-details;
+                select-schematic(value) => { root.si-select-schematic(value); }
+                refresh-clicked => { root.si-refresh-clicked(); }
+                list-clicked => { root.si-list-clicked(); }
+                add-clicked => { root.si-add-clicked(); }
+                add-gate-clicked => { root.si-add-gate-clicked(); }
             }
             if root.current-page < 0: Text {
                 vertical-stretch: 1;

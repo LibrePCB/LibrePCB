@@ -895,6 +895,8 @@ add_library(
   rpc/api/rpctypes.h
   rpc/api/rulecheckrpc.cpp
   rpc/api/rulecheckrpc.h
+  rpc/api/symbolinstancerpc.cpp
+  rpc/api/symbolinstancerpc.h
   rpc/api/undostackrpc.cpp
   rpc/api/undostackrpc.h
   rpc/api/workspacedbrpc.cpp

@@ -1,0 +1,142 @@
+import { Button, CheckBox, ComboBox, LineEdit, TextEdit } from "std-widgets.slint";
+
+export component SymbolInstancePage {
+    in property <bool> authenticated;
+    in property <[string]> entries;
+    in-out property <int> current-index: -1;
+    in-out property <string> component;
+    in-out property <string> representation;
+    in-out property <string> gate;
+    in-out property <string> device;
+    in-out property <string> mpn;
+    in-out property <string> manufacturer;
+    in-out property <string> pos-x: "0";
+    in-out property <string> pos-y: "0";
+    in-out property <string> rotation: "0";
+    in-out property <bool> mirror: false;
+    in property <string> details;
+    callback select-schematic(string);
+    callback refresh-clicked();
+    callback list-clicked();
+    callback add-clicked();
+    callback add-gate-clicked();
+
+    VerticalLayout {
+        spacing: 8px;
+
+        HorizontalLayout {
+            spacing: 6px;
+
+            ComboBox {
+                model: root.entries;
+                current-index <=> root.current-index;
+                selected(value) => { root.select-schematic(value); }
+                horizontal-stretch: 1;
+            }
+
+            Button {
+                text: "Refresh";
+                enabled: root.authenticated;
+                clicked => { root.refresh-clicked(); }
+            }
+
+            Button {
+                text: "List Symbols";
+                enabled: root.authenticated && (root.current-index >= 0);
+                clicked => { root.list-clicked(); }
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 6px;
+
+            LineEdit {
+                text <=> root.component;
+                placeholder-text: "Component UUID";
+                horizontal-stretch: 2;
+            }
+
+            LineEdit {
+                text <=> root.representation;
+                placeholder-text: "Representation UUID";
+                horizontal-stretch: 2;
+            }
+
+            LineEdit {
+                text <=> root.gate;
+                placeholder-text: "Gate UUID";
+                horizontal-stretch: 2;
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 6px;
+
+            LineEdit {
+                text <=> root.device;
+                placeholder-text: "Device UUID (optional)";
+                horizontal-stretch: 2;
+            }
+
+            LineEdit {
+                text <=> root.mpn;
+                placeholder-text: "MPN (optional)";
+                horizontal-stretch: 1;
+            }
+
+            LineEdit {
+                text <=> root.manufacturer;
+                placeholder-text: "Manufacturer (optional)";
+                horizontal-stretch: 1;
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 6px;
+
+            LineEdit {
+                text <=> root.pos-x;
+                placeholder-text: "X (nm)";
+                horizontal-stretch: 1;
+            }
+
+            LineEdit {
+                text <=> root.pos-y;
+                placeholder-text: "Y (nm)";
+                horizontal-stretch: 1;
+            }
+
+            LineEdit {
+                text <=> root.rotation;
+                placeholder-text: "Rotation (µdeg)";
+                horizontal-stretch: 1;
+            }
+
+            CheckBox {
+                text: "mirror";
+                checked <=> root.mirror;
+            }
+
+            Button {
+                text: "Add";
+                enabled: root.authenticated && (root.current-index >= 0);
+                clicked => { root.add-clicked(); }
+            }
+
+            Button {
+                text: "Add Gate";
+                enabled: root.authenticated && (root.current-index >= 0);
+                clicked => { root.add-gate-clicked(); }
+            }
+        }
+
+        TextEdit {
+            vertical-stretch: 3;
+            min-height: 180px;
+            text: root.details;
+            read-only: true;
+            font-family: "DejaVu Sans Mono";
+            font-size: 12px;
+        }
+    }
+}

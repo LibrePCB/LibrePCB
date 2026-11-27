@@ -31,6 +31,7 @@
 #include "remotelibraryrpc.h"
 #include "rpcerrors.h"
 #include "rulecheckrpc.h"
+#include "symbolinstancerpc.h"
 #include "undostackrpc.h"
 #include "workspacedbrpc.h"
 #include "workspacerpc.h"
@@ -67,6 +68,9 @@ void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
       {"ProjectEditor/set", &ProjectEditorRpc::set},
       {"ProjectEditor/save", &ProjectEditorRpc::save},
       {"ProjectEditor/close", &ProjectEditorRpc::close},
+      {"SymbolInstance/list", &SymbolInstanceRpc::list},
+      {"SymbolInstance/add", &SymbolInstanceRpc::add},
+      {"SymbolInstance/add_gate", &SymbolInstanceRpc::add_gate},
       {"RuleCheck/run", &RuleCheckRpc::run},
       {"RuleCheck/set", &RuleCheckRpc::set},
       {"GraphicsExport/run", &GraphicsExportRpc::run},

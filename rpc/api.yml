@@ -372,6 +372,73 @@ structs:
     description: Information about the workspace library database.
     fields: []
 
+  - name: Part
+    description: A part of a component instance.
+    fields:
+      - name: mpn
+        type: string
+        description: Manufacturer part number.
+      - name: manufacturer
+        type: string
+        description: Manufacturer name.
+
+  - name: SymbolInstanceSummary
+    description: A summary of a symbol instance.
+    fields:
+      - name: obj
+        type: handle
+        description: The opaque handle of the symbol instance.
+      - name: uuid
+        type: string
+        description: The symbol instance UUID.
+      - name: component
+        type: string
+        description: The UUID of the parent component instance.
+      - name: name
+        type: string
+        description: The symbol name (e.g. "R1").
+      - name: position
+        type: Point
+        description: The symbol position.
+      - name: rotation
+        type: Angle
+        description: The symbol rotation.
+      - name: mirror
+        type: bool
+        description: Whether the symbol is mirrored.
+
+  - name: SymbolInstanceDetails
+    description: Details about a symbol instance.
+    fields:
+      - name: obj
+        type: handle
+        description: The opaque handle of the symbol instance.
+      - name: uuid
+        type: string
+        description: The symbol instance UUID.
+      - name: component
+        type: string
+        description: The UUID of the parent component instance.
+      - name: name
+        type: string
+        description: The symbol name (e.g. "R1").
+      - name: value
+        type: string
+        description: The value of the parent component instance.
+      - name: position
+        type: Point
+        description: The symbol position.
+      - name: rotation
+        type: Angle
+        description: The symbol rotation.
+      - name: mirror
+        type: bool
+        description: Whether the symbol is mirrored.
+      - name: attributes
+        type: array
+        items: Attribute
+        description: The attributes of the parent component instance.
+
 # ---------------------------------------------------------------------------
 # Classes and their methods
 # ---------------------------------------------------------------------------
@@ -563,6 +630,106 @@ classes:
           project, they will be discarded. Call `save` first, if desired.
         params: []
         result: []
+
+#  - name: ComponentInstance
+#    description: Read/modify the circuit (netlist) of a project.
+#    since: "2.2.0"
+#    methods:
+#      - name: list
+#        description: List all component instances in a project.
+#        params: []
+#        result:
+#          - name: components
+#            description: Component summaries.
+#            type: array
+#            items: ComponentInstanceSummary
+#
+#      - name: get
+#        description: Get details about a component instance.
+#        params: []
+#        result: ComponentInstanceDetails
+#
+#      - name: add
+#        description: Add a component to the circuit.
+#        params:
+#          - name: component
+#            description: Library component UUID.
+#            type: string
+#          - name: representation
+#            description: Library component representation UUID.
+#            type: string
+#          - name:
+#        result: ComponentInstanceDetails
+
+  - name: SymbolInstance
+    description: >-
+      Read/modify the symbol instances of a schematic. The object handle
+      is a schematic handle, as returned by `ProjectEditor`.
+    since: "2.2.0"
+    methods:
+      - name: list
+        description: List all symbol instances in a schematic.
+        params: []
+        result:
+          - name: symbols
+            description: Symbol summaries.
+            type: array
+            items: SymbolInstanceSummary
+
+      #- name: get
+      #  description: Get details about a symbol instance.
+      #  params: []
+      #  result: SymbolInstanceDetails
+
+      - name: add
+        description: Add a symbol to a schematic.
+        params:
+          - name: component
+            description: Library component UUID.
+            type: string
+          - name: representation
+            description: Library component representation UUID.
+            type: string
+          - name: gate
+            description: Gate UUID.
+            type: string
+          - name: device
+            description: >-
+              Library device UUID. If provided, the component becomes a
+              real (assembled) part. If omitted, the symbol is a
+              schematic-only component.
+            type: string?
+          - name: part
+            type: Part?
+            description: The part to add (only relevant together with
+              `device`).
+          - name: position
+            type: Point
+          - name: rotation
+            type: Angle
+          - name: mirror
+            type: bool
+          - name: attributes
+            type: array
+            items: Attribute
+        result: SymbolInstanceDetails
+
+      - name: add_gate
+        description: Add a symbol of an already existing component to a schematic.
+        params:
+          - name: component
+            description: Component instance UUID.
+            type: string
+          - name: gate
+            description: Gate UUID.
+            type: string
+          - name: position
+            type: Point
+          - name: rotation
+            type: Angle
+          - name: mirror
+            type: bool
+        result: SymbolInstanceDetails
 
   - name: RuleCheck
     description: >-
