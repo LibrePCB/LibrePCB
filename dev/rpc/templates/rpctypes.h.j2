@@ -44,6 +44,12 @@ namespace rpc {
 template <typename T>
 struct RpcEnumTraits;
 
+/// The highest wire protocol version this server implements, as a
+/// monotonic integer (see the negotiation rules in the RPC server
+/// documentation). The oldest still-supported version is a server
+/// decision and thus specified manually, not generated.
+constexpr int PROTOCOL_VERSION = {{ spec.protocol }};
+
 /*******************************************************************************
  *  Enum Types
  ******************************************************************************/

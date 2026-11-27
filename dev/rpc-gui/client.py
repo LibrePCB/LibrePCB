@@ -26,8 +26,6 @@ def fmt_details(value):
 
 
 def _fmt(value):
-    if isinstance(value, umsgpack.Ext):
-        return _fmt_ext(value)
     if isinstance(value, dict):
         items = ", ".join(f"{key}: {_fmt(item)}" for key, item in value.items())
         return "{" + items + "}"
@@ -39,21 +37,9 @@ def _fmt(value):
         return f"<binary {len(value)} bytes>"
     if isinstance(value, str):
         # Strings are always printed with single quotes, so they can be
-        # distinguished from non-string objects (e.g. UUID ext values).
+        # distinguished from numbers.
         return "'" + value + "'"
     return str(value)
-
-
-def fmt_uuid(value):
-    """Format a UUID value into its canonical string form (e.g. for
-    displaying it in the UI)."""
-    return str(value)
-
-
-def _fmt_ext(ext):
-    # The protocol does not use msgpack extension types anymore, but they
-    # could still show up when connecting to an older server.
-    return f"ext {ext.type} <{ext.data.hex()}>"
 
 
 def _detail_lines(value, indent):

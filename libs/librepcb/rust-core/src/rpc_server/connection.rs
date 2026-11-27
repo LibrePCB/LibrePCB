@@ -16,7 +16,7 @@ use super::protocol::{
   build_response, classify_message, ParsedMessage, RpcError,
   METHOD_AUTHENTICATE, METHOD_INITIALIZE,
 };
-use super::{lock, Connection, Inner, RpcErrorCode};
+use super::{lock, Connection, Inner, RpcErrorCode, MAX_CONNECTIONS};
 
 /// Poll interval of the non-blocking accept loop.
 const ACCEPT_POLL_INTERVAL: Duration = Duration::from_millis(10);
@@ -29,6 +29,17 @@ pub(super) fn accept_loop(inner: Arc<Inner>, listener: TcpListener) {
     }
     match listener.accept() {
       Ok((stream, _addr)) => {
+        // Reject connections beyond the limit: Dropping the socket closes
+        // it, which the client sees as the connection being closed
+        // immediately (there is no protocol-level rejection message, since
+        // the connection was not even authenticated yet). Note that the
+        // counter is incremented *before* spawning, so it is accurate here.
+        if inner.active_connections.load(Ordering::SeqCst) >= MAX_CONNECTIONS {
+          eprintln!(
+            "librepcb-rust: Rejecting connection: limit of {MAX_CONNECTIONS} connections reached"
+          );
+          continue;
+        }
         // Note: The counter is incremented *before* spawning, to avoid an
         // underflow in case the thread finishes before the increment.
         inner.active_connections.fetch_add(1, Ordering::SeqCst);

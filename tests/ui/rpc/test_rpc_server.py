@@ -306,6 +306,13 @@ def test_rpc_server(librepcb, helpers):
             assert message[0:2] == [1, 11], message
             assert message[2] == 40, message  # Status: the error code.
 
+            # MessagePack ext values are not part of the value domain
+            # either → InvalidArgs (40), the connection stays open.
+            rpc.send([0, 12, "ping", {"foo": umsgpack.Ext(2, b"\x00" * 16)}])
+            message = rpc.receive()
+            assert message[0:2] == [1, 12], message
+            assert message[2] == 40, message  # Status: the error code.
+
             # A cancel for an unknown msgid is ignored (no response).
             rpc.send([3, 999])
             status, result = rpc.request(13, "ping", None)

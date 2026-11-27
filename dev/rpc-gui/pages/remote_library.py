@@ -2,7 +2,7 @@
 
 import slint
 
-from client import fmt_details, fmt_uuid
+from client import fmt_details
 
 
 class RemoteLibraryPage:
@@ -76,4 +76,4 @@ class RemoteLibraryPage:
         """The identifier shown in the list: The path if the library has
         one, otherwise its UUID."""
         path = library.get("path")
-        return path if path else fmt_uuid(library["uuid"])
+        return path if path else library["uuid"]

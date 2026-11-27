@@ -174,6 +174,46 @@ properties; see @ref doc_rpc_api_errors).
   to). Senders must not use msgid 0 yet, and it is currently rejected as
   an invalid request.
 
+Value Domain {#doc_rpc_api_value_domain}
+------------
+
+All values crossing the wire are built from the following MessagePack
+types:
+
+| Wire type | Notes |
+|-----------|-------|
+| `nil`     | Also used for absent/unknown values (e.g. optional fields without a value). |
+| `bool`    | |
+| `int`     | i64, or u64 for values above `i64::MAX`. |
+| `float`   | f64. |
+| `string`  | UTF-8. |
+| `binary`  | Raw bytes (e.g. images) — *not* base64 encoded. |
+| `array`   | |
+| `map`     | String keys only. |
+
+MessagePack extension types are *not* part of the value domain: Sending
+one is rejected with [error code 40](@ref doc_rpc_api_errors).
+
+LibrePCB's domain types are mapped onto these primitive types with fixed
+conventions. The exact type and unit of every field is documented in the
+[API specification](@ref doc_rpc_api_reference); the conventions are:
+
+| Domain type  | Wire representation |
+|--------------|---------------------|
+| `Length`     | `int`, nanometers (1 mm = 10⁶ nm). |
+| `Angle`      | `int`, microdegrees (1° = 10⁶ µdeg). |
+| `Point`      | `array` `[<Length>, <Length>]` — x, y in nanometers. |
+| `Vertex`     | `array` `[<Length>, <Length>, <Angle>]` — x, y in nanometers, angle in microdegrees (may be 0). |
+| `Ratio`      | `int`, parts per million (100 % = 10⁶ ppm). |
+| `Uuid`       | `string`, 36 characters, lowercase hexadecimal with hyphens (RFC 4122). Only version 4 (random, DCE variant) UUIDs are valid; any other version is rejected with [error code 40](@ref doc_rpc_api_errors). |
+| `Version`    | `string`, as documented per field (e.g. `1.2.3` or `v1`). |
+| `FilePath`   | `string`, forward slashes; absolute or workspace-relative as documented per argument. |
+| Enums        | `string`, carrying the lower_snake_case wire value listed in the API specification (unknown values are rejected). |
+
+Object handles are opaque values from this domain (currently plain
+integers); clients must not make any assumptions about their
+representation (see @ref doc_rpc_api_handles).
+
 Notifications {#doc_rpc_api_notifications}
 -------------
 
@@ -200,19 +240,32 @@ yet is simply omitted).
 
 Result data is delivered incrementally: The `result` member of every
 notification — as well as the response payload, which is not wrapped in
-a `result` member — is merged into a *rolling result*, using JSON Merge
-Patch semantics as defined in
-[RFC 7396](https://datatracker.ietf.org/doc/html/rfc7396), with these
-differences:
+a `result` member — is merged into a *rolling result* on the client
+side, with the following rules:
 
+- Members of maps are merged recursively: A fragment may carry any
+  subset of the map's members, and those which it does not carry are
+  left untouched.
 - Arrays are *appended*: A fragment only carries the items which were
   not delivered yet.
-- A `nil` value deletes the corresponding member from the rolling
-  result; a nil fragment (or a nil response payload) merges nothing.
+- Any other value — including `nil` — simply *overwrites* the
+  corresponding member of the rolling result.
+
+A nil fragment (or a nil response payload) merges nothing. There is no
+deletion semantics — `nil` is a regular value, so methods may well
+return `nil` members. Note the consequences: A scalar or map member can
+be refined by overwriting it, but items already delivered in an array
+cannot be revised or retracted — a method which may need to revise a
+member must not stream that member.
 
 The response therefore only carries data which has not been delivered by
 notifications yet (a fully streamed response carries nil) — data is
-never transferred twice.
+never transferred twice. Fragments always arrive in order, before the
+response. This has an important consequence for simple clients: **If no
+`result` fragment was received for a request, the response alone is the
+complete result** — a client which is not interested in partial data
+can rely on the response of every method which does not stream, and
+detects streaming simply by the arrival of a `result` fragment.
 
 ~~~{.msgpack}
 # ── Generic shape ──────────────────────────────────────────────
@@ -226,7 +279,7 @@ never transferred twice.
 }]
 
 # ── Example: streaming parts of the result ─────────────────────
-[2, 7, { "progress": 10, "status": "Fetching libraries…" }]
+[2, 7, { "progress": 10, "message": "Fetching libraries…" }]
 [2, 7, { "result": { "libraries": [ {…lib 1…} ] } }]
 [2, 7, { "result": { "libraries": [ {…lib 2…} ] } }]
 [2, 7, { "result": { "count": 5 } }]     # scalars may be refined later

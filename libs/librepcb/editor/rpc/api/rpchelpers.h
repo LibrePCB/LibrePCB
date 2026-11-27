@@ -43,7 +43,6 @@
 #include <librepcb/core/types/elementname.h>
 #include <librepcb/core/types/fileproofname.h>
 #include <librepcb/core/types/uuid.h>
-#include <librepcb/rust-core/rpcext.h>
 #include <type_traits>
 
 #include <QtCore>
@@ -109,7 +108,7 @@ inline QVariant toVariant(const FilePath& obj) noexcept {
 }
 
 inline QVariant toVariant(const Length& obj) noexcept {
-  return obj.toMm();
+  return static_cast<qint64>(obj.toNm());
 }
 
 inline QVariant toVariant(const Point& obj) noexcept {
@@ -120,26 +119,19 @@ inline QVariant toVariant(const Point& obj) noexcept {
 }
 
 inline QVariant toVariant(const Angle& obj) noexcept {
-  return obj.toDeg();
+  return obj.toMicroDeg();
 }
 
 inline QVariant toVariant(const Ratio& obj) noexcept {
-  return obj.toNormalized();
+  return obj.toPpm();
 }
 
 inline QVariant toVariant(const Vertex& obj) noexcept {
-  if (obj.getAngle() == 0) {
-    return QVariantList{
-        toVariant(obj.getPos().getX()),
-        toVariant(obj.getPos().getY()),
-    };
-  } else {
-    return QVariantList{
-        toVariant(obj.getPos().getX()),
-        toVariant(obj.getPos().getY()),
-        toVariant(obj.getAngle()),
-    };
-  }
+  return QVariantList{
+      toVariant(obj.getPos().getX()),
+      toVariant(obj.getPos().getY()),
+      toVariant(obj.getAngle()),
+  };
 }
 
 inline QVariant toVariant(const Attribute& obj) {

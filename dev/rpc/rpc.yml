@@ -21,7 +21,7 @@
 #   each method's `since` with the `version` reported by the
 #   server's `authenticate` method to know which ones are available on a
 #   given server (functions added after the revision of your spec file are
-#   unknown to you, which is fine — calling them results in error -32601).
+#   unknown to you, which is fine — calling them results in error 31).
 #
 # Schema notes:
 # - Types are from the protocol's value domain: null, bool, int (i64 or

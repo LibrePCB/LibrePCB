@@ -301,18 +301,6 @@ extern "C" {
     key: &mut QString,
     value: &mut QVariant,
   );
-  pub fn ffi_qvariant_set_ext(
-    obj: &mut QVariant,
-    ext_type: i8,
-    data: *const u8,
-    len: usize,
-  );
-  pub fn ffi_qvariant_get_ext(
-    obj: &QVariant,
-    ext_type: &mut i8,
-    len: &mut usize,
-  ) -> bool;
-  pub fn ffi_qvariant_get_ext_data(obj: &QVariant, out: *mut u8);
 }
 
 /// Allocate a new (nil) `QVariant` (to be freed with [qvariant_delete])

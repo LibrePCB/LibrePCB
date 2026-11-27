@@ -103,7 +103,7 @@ following message types:
 |------|--------------|---------------|------------------------------|---------|
 | 0    | Request      | both          | `[0, msgid, method, params]` | Call a function |
 | 1    | Response     | callee→caller | `[1, msgid, status, payload]`  | Exactly one per request; `status` is 0 on success (payload = result) or the error code (payload = error map) |
-| 2    | Notification | callee→caller | `[2, msgid, payload]`        | Progress and/or streamed (partial) result data, merged JSON-Merge-Patch-style into a rolling result; only while the request is pending (see the protocol docs) |
+| 2    | Notification | callee→caller | `[2, msgid, payload]`        | Progress and/or streamed (partial) result data, merged into a rolling result (maps recursively, arrays appended, everything else overwritten); only while the request is pending (see the protocol docs) |
 | 3    | Cancel       | caller→callee | `[3, msgid]`                 | The caller asks to cancel a pending request |
 
 - `msgid` is a u32, **unique per direction while pending** (a response
@@ -121,10 +121,12 @@ following message types:
   compatibility.
 - One emit primitive: The notification payload carries the reserved
   state members (`progress`, `step`, `steps`, `message`) and/or a
-  `result` member with partial result data, which is merged
-  JSON-Merge-Patch-style (RFC 7396; arrays appended, nil deletes) into
-  a rolling result on the client side — the final response payload
-  merges into it as well and only carries data not delivered yet.
+  `result` member with partial result data, which is merged into a
+  rolling result on the client side (maps recursively, arrays appended,
+  everything else — including nil — overwritten; no deletion
+  semantics) — the final response payload merges into it as well and
+  only carries data not delivered yet. Consequently the response alone
+  is the complete result if no `result` fragment was received.
   Notifications are only sent while the request is pending; progress
   is not monotonic and never a completion signal.
 
@@ -216,9 +218,9 @@ A request's `params` is a **string-keyed msgpack map**:
   `$XDG_RUNTIME_DIR` at startup; clients connect to the port from that
   file and may verify the `session` to confirm they reached exactly the
   process which wrote it.
-- `ping` is a protocol-level method (handled by the Rust server, no
-  dispatch): returns `{}`.
-- `ping` → nil result.
+- `ping` is a protocol-level method, but it is dispatched to the C++
+  handler like any other command (and thus requires authentication):
+  returns nil.
 - **No `rpc.discover`** (dropped): the spec is a file, not a method.
 
 ### 2.6 Asynchronous request semantics
@@ -256,11 +258,13 @@ A request's `params` is a **string-keyed msgpack map**:
 
 ### 2.7 Error codes
 
-The response `error` is a map `{"code": <int>, "message": <string>}` (+
-optional extra properties, see the error types in the spec). The codes
-are grouped: 10–19 transport, 20–29 protocol, 30–39 command, 100–
-command execution. The spec's `errors` section defines code, message
-and optional additional properties for each error type.
+An error response is a response whose `status` carries the numeric error
+code; its payload is then a map `{"message": <string>}` plus optional
+extra properties (see the error types in the spec) — the code is *not*
+part of the payload. The codes are grouped: 10–19 transport, 20–29
+protocol, 30–39 command, 100– command execution. The spec's `errors`
+section defines code, message and optional additional properties for
+each error type.
 
 The canonical `message` of an error code (from the spec) is always
 sent on the wire, optionally followed by an application-provided detail
@@ -282,8 +286,8 @@ libs/librepcb/rust-core/src/rpc_server.rs       (module root: RpcServer,
                                                   CancelFn, connection registry
                                                   incl. pending-msgid tracking)
 libs/librepcb/rust-core/src/rpc_server/
-  protocol.rs        — msgpack envelope: classify/build the 5 message types,
-                       token handshake handling (rewritten from JSON-RPC)
+  protocol.rs        — msgpack envelope: classify/build the message types
+                       (0–3), handshake handling (rewritten from JSON-RPC)
   codec.rs           — stream decoding: read one msgpack value from a
                        BufRead (rmpv), 32 MiB counting-Read cap, encode
                        values to bytes (rewritten from NDJSON)
@@ -332,7 +336,8 @@ bounded thread drain),
   type enum. The Rust side (`qmetatype` constants in `ffi/cpp_ffi.rs`,
   kept in sync with the ABI-stable `QMetaType::Type` values) matches the
   IDs of the value domain and rejects everything else.
-- `ext` types, non-string map keys and invalid UTF-8 strings →
+- Ext values (the API does not use any, and the FFI rejects them),
+  non-string map keys and invalid UTF-8 strings →
   payload-level errors ("invalid params"). Large u64 values are
   supported (stored as `QVariant::ULongLong`).
 - The C++ dispatch layer *normalizes* command results into the domain
@@ -366,13 +371,18 @@ ffi_rpc_server_start(s: &mut RpcServer, port: u16, out_port: &mut u16) -> bool;
 /// Reply to a request (exactly-once enforced server-side). ok=true: value
 /// is the result. ok=false: value is the error map — which is forwarded to
 /// the client *unchanged*, so it may carry additional error properties
-/// next to "code" and "message" (see the error types in the API spec).
+/// next to "message" and other members of the error type (see the error
+/// types in the API spec; the code itself is passed as the response
+/// status). The canonical error message is composed by the Rust server,
+/// so C++ only provides the application-specific detail.
 /// No return value: If the connection/msgid is unknown or already replied,
 /// the response is silently dropped; if the value is not convertible, an
 /// internal error is sent instead (the caller does not care).
 ffi_rpc_server_reply(s: &mut RpcServer, conn_id: u64, msgid: u32,
-                     ok: bool, value: &QVariant);
+                     status: u32, ok: bool, value: &QVariant);
 /// Broadcast an event (type 2) to all clients; never blocks.
+/// (Planned for application events like `project_opened`; not implemented
+/// yet.)
 ffi_rpc_server_notify_all(s: &mut RpcServer, method: &QString, params: &QVariant);
 /// Send a request-scoped message (type 2, e.g. progress) while the
 /// request is pending; returns false otherwise.
@@ -416,11 +426,10 @@ libs/librepcb/editor/rpc/api/commands.cpp         (100% generated dispatcher)
   marshals to the GUI thread with `QMetaObject::invokeMethod(...,
   Qt::QueuedConnection)` carrying `(conn_id, msgid, method, args)` —
   **no blocking, no deadlock hazard** (v1's `BlockingQueuedConnection`
-  design and its deadlock rule are obsolete). The trampoline itself
-  extracts the `"obj"` key from the params map (documented convention)
-  and rejects non-string values; unknown methods are answered with a
-  `-32601` error reply directly from the reader thread (the reply path is
-  thread-safe).
+  design and its deadlock rule are obsolete). The params map is passed
+  through opaquely; the reserved `"obj"` key is read by the command
+  handlers themselves (see 4.2c), and unknown methods are reported by
+  the generated dispatcher throwing `RpcMethodNotFound` (see 4.2b).
 - **Request context:** handlers receive `RpcRequest` (see 4.2a), which
   does *not* hold references to the application or the server anymore —
   it only wraps `(conn_id, msgid, method, args)` plus the reply/cancel
@@ -432,7 +441,7 @@ libs/librepcb/editor/rpc/api/commands.cpp         (100% generated dispatcher)
   command registry with lambdas anymore.
 - **Events:** connect existing `GuiApplication`/`ProjectEditor` signals →
   `ffi_rpc_server_notify_all(...)` (type 2), e.g. `project_opened`,
-  `project_closed`, `selection_changed`.
+  `project_closed`, `selection_changed`. *(Planned; not implemented yet.)*
 - **Cancel:** the cancel callback looks up the request context registry on
   the GUI thread (queued) and cancels if the handler supports it; minimal
   in v2 (ignore + still reply, e.g. with the result or a cancelled error).
@@ -443,18 +452,20 @@ The C++ command surface is **generated from the spec** by `dev/rpc/gen.py`
 (like the docs and `rpc_api.rs`; generated files are committed):
 
 - For each class in the spec, a header
-  `libs/librepcb/editor/rpc/{classname}rpc.h` with a static-only class
-  `{ClassName}Rpc` (default constructor deleted → no instantiation):
-  one `static void {method}(GuiApplication`static void {method}(GuiApplication& app, RpcObjectRegistry& objects, app, RpcObjectRegistry`static void {method}(GuiApplication& app, RpcObjectRegistry& objects, registry,
-  RpcRequest& request)` per spec method, with the spec description as doc comment. Static vs.
-  non-static (`obj` handle) does not change the generated signature —
-  handle extraction stays in the hand-written implementation.
+  `libs/librepcb/editor/rpc/api/{classname}rpc.h` with a static-only
+  class `{ClassName}Rpc` (default constructor deleted → no
+  instantiation): one
+  `static void {method}(GuiApplication& app, RpcObjectRegistry& registry,
+  RpcRequest& request)` per spec method, with the spec description as
+  doc comment. Static vs. non-static (`obj` handle) does not change the
+  generated signature — handle extraction stays in the hand-written
+  implementation.
 - One generated file `rpc/api/rpctypes.h`: the spec enums as C++ enum
-  classes, with generated argument readers
-  (per-enum traits with the string→value mapping, the default value and
-  the enum name — consumed by the generic request members
-  `getArg<E>(name)` / `tryGetArg<E>(name)`: nil → the enum's default
-  from the spec; invalid values throw `RpcInvalidArgs`).
+  classes, with generated argument readers (per-enum traits with the
+  string→value mapping and the enum name — consumed by the generic
+  request members `getArg<E>(name)` / `getOptionalArg<E>(name)`;
+  invalid values throw `RpcInvalidArgs`). The protocol version is
+  generated here as well (`kProtocolVersion`, see 2.5).
 - One generated file `commands.cpp` (no header, 100% generated): defines
   the free function
   `void rpcDispatchCommand(GuiApplication& app, const QString& method,
@@ -582,8 +593,8 @@ declares that the command returns nil on the wire.
 Structure sketch:
 
 ```yaml
-spec_version: 1
-protocol_version: 1
+format: "0.1"      # The format of this yml file itself ("MAJOR.MINOR").
+protocol: 1        # The wire protocol version described by this file.
 
 enums:
   - name: GridStyle            # illustrative
@@ -594,7 +605,7 @@ enums:
 
 errors:
   - name: InvalidHandle
-    code: 35
+    code: 41
     message: "Invalid object handle"
 
 classes:
@@ -617,7 +628,7 @@ classes:
         result: ProjectEditorDetails
         since: "2.2.0"
 
-events:
+events:                        # (reserved, not implemented yet)
   - name: project_opened
     description: A project was opened
     params: {type: ProjectEditorSummary}
@@ -674,8 +685,8 @@ specification. No CI stale-check.
   later if it grows.
 - **Python system test** (`tests/ui/rpc/`, *not* funq — funq tests are
   legacy): launch the app (the demo workspace settings enable the RPC
-  server) with a pinned port (`LIBREPCB_RPC_PORT`), connect a msgpack
-  socket client from the test, `initialize`, call commands, assert
+  server), connect a msgpack socket client from the test to the fixed
+  default port (19536), `initialize`, call commands, assert
   results — and thus implicitly verify the whole msgpack↔QVariant
   conversion, the async dispatch and the GUI-thread marshalling. The test
   uses the `u-msgpack-python` package for the MessagePack encoding.
@@ -686,7 +697,7 @@ specification. No CI stale-check.
 2. ~~v1: FFI + C++ `RpcServer` skeleton + `api.json` + docs pipeline~~
    **done, superseded.**
 3. **Protocol v2 in rust-core** — `rmp`/`rmpv` deps; new `protocol.rs`
-   (types 0–4, handshake), `codec.rs` (self-delimiting stream + 32 MiB
+   (types 0–3, handshake), `codec.rs` (self-delimiting stream + 32 MiB
    cap), async dispatch with reply/emit/cancel bookkeeping; rewrite the FFI
    module; delete `rpc.discover`/`set_api_schema`; cargo tests.
    **Status: Done.** 166 Rust tests pass, clippy clean (the FFI module
@@ -730,9 +741,38 @@ specification. No CI stale-check.
   completion are silently dropped.
 - **msgid scoping is per connection** — C++ must store the `conn_id` with
   every pending request.
-- **Hardcoded token is development-only:** any local process can connect.
-  Must be replaced by the random token + instance registry before
-  shipping (section 9).
+- **Access control is user-approval based:** any local process may
+  request a connection; the user decides per Ed25519 key (and revoking a
+  confirmed key currently requires editing QSettings by hand, see
+  below). Combined with the missing server verification (section 9) this
+  is not yet safe in multi-user environments — add the instance registry
+  (section 9) before shipping.
+- **Spawned-process tokens are not implemented:** the token path of
+  `authenticate` is currently always rejected, so the interactive
+  confirmation is the only working authentication mechanism. Add the
+  token mechanism + instance registry (section 9) to make plugins
+  (started by the application) work without user interaction.
+- **Connection limit:** at most 20 simultaneous connections are accepted
+  (`MAX_CONNECTIONS`); additional connections are closed immediately.
+  The limit bounds the resource usage of misbehaving clients and is
+  arbitrary — raise it if a use case needs more.
+- **No authentication timeout:** a connection may stay unauthenticated
+  forever, and the C++ nonce map grows with every connection which calls
+  `initialize` (bounded by the number of connections, but never shrunk).
+- **Unbounded writer queues:** replies/notifications are pushed into
+  per-connection queues without backpressure — a client which stops
+  reading its socket lets the server-side queue grow (only bounded by
+  what the application emits). Add backpressure/drop behavior before
+  shipping.
+- **No rate limiting:** a local process can pipeline arbitrary amounts
+  of `initialize`/`authenticate` requests (e.g. spamming
+  connection-request notifications with unknown keys). Revisit together
+  with the instance file.
+- **No key management UI:** confirmed Ed25519 keys are stored in
+  QSettings (`rpc/known_clients`) and can neither be listed nor revoked
+  from the application; concurrent confirmations of the same key can
+  even create duplicate entries. Add a management UI before the feature
+  becomes user-facing.
 - **Sandboxing (Flatpak/Snap):** TCP on 127.0.0.1 works because sandboxes
   share the host network namespace — *if* network permissions are granted
   (Flatpak `share=network`; Snap `network` + `network-bind` plugs —
@@ -740,9 +780,9 @@ specification. No CI stale-check.
   `QStandardPaths::RuntimeLocation` (the only sandbox-proof location);
   the recorded PID is sandbox-internal and informational only; liveness =
   connect + handshake. For web clients (if WS ever happens): browsers
-  allow localhost WS connections from *any* website, making the token
-  essential — and mixed content only allows it from `http://localhost` /
-  `file://` pages.
+  allow localhost WS connections from *any* website, making the
+  authentication essential — and mixed content only allows it from
+  `http://localhost` / `file://` pages.
 - cbindgen must handle the `RpcDispatchFn`/`RpcCancelFn` typedefs and the
   opaque `RpcServer` handle (already proven in v1).
 - Keep rust-core Qt-free (AGENTS.md): the `rpc_server` module uses only
@@ -819,19 +859,24 @@ only, see risks). The following is the agreed design for the follow-up.
 
 ### Server verification (follow-up)
 
-The current design leaves the client unable to authenticate the server:
-an attacker (other local user) can squat the RPC port before the app
-starts and harvest an access token by relaying the `initialize` request
-to the real app (the user approves the prompt, believing it's their own
-client), or impersonate the app. To be fixed with:
+The current design authenticates the *client* to the application, but
+not the other way around: A client connecting by port cannot verify that
+the peer is really LibrePCB. A malicious local process could squat the
+RPC port before the application starts and impersonate the application,
+or relay the handshake between a client and the real application (the
+user would then approve the client's key while the attacker sits in the
+middle). Note that Ed25519 authentication leaves no secret on the client
+side to harvest — the attacker can neither steal credentials nor replay
+a nonce-based proof — but a relayed connection can be observed and
+modified.
 
-- The instance file carries a random per-process `secret` (file mode 0600,
-  so other users cannot read it).
-- `initialize` becomes two-phase: phase 1 carries a fresh client `nonce`
-  and the server response proves knowledge of the secret with
-  `HMAC-SHA256(secret, nonce)`; the client disconnects on mismatch. The
-  token is only sent in phase 2, on a verified connection — phase 2 is
-  the existing token/approval logic, unchanged.
+To be fixed with: the instance file (see above) carries a random
+per-process `secret` (file mode 0600, so other users cannot read it),
+and `initialize` is extended to prove the server's knowledge of that
+secret with `HMAC-SHA256(secret, nonce)`. Clients disconnect on mismatch.
+Since the `initialize` structure is frozen forever, this is added
+additively as a *new result member* in a higher protocol version (old
+clients ignore unknown keys).
 
 Details (file layout, fallbacks, tests, GUI tool) to be worked out when
 implementing. Until then, clients connecting by port are unsafe in

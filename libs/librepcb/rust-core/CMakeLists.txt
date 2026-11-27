@@ -24,7 +24,7 @@ target_link_libraries(
 )
 
 # Add C++ sources
-target_sources(librepcb_rust_core PUBLIC ffi.cpp ffi.h rpcext.h)
+target_sources(librepcb_rust_core PUBLIC ffi.cpp ffi.h)
 
 # Alias to namespaced variant
 add_library(LibrePCB::RustCore ALIAS librepcb_rust_core)

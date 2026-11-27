@@ -22,8 +22,6 @@
  ******************************************************************************/
 #include "ffi.h"
 
-#include "rpcext.h"
-
 #include <QtCore>
 
 #include <cstring>
@@ -86,10 +84,10 @@ extern "C" void ffi_qstring_delete(QString* obj) {
 
 // QVariant interop for the RPC server. The RPC protocol only uses a
 // restricted subset of the QVariant data model (nil, bool, i64, f64,
-// string, bytearray, list, map with string keys, and ext values of type
-// MsgPackExt), so these functions operate on exactly that subset. Note
-// that all containers must be built up incrementally (insert/append)
-// since Rust can't construct QVariant containers directly.
+// string, bytearray, list, map with string keys), so these functions
+// operate on exactly that subset. Note that all containers must be built
+// up incrementally (insert/append) since Rust can't construct QVariant
+// containers directly.
 
 namespace {
 
@@ -251,31 +249,6 @@ extern "C" void ffi_qvariant_map_at(const QVariant* obj, std::size_t index,
   std::advance(it, static_cast<qsizetype>(index));
   *key = it.key();
   *out = it.value();
-}
-
-extern "C" void ffi_qvariant_set_ext(QVariant* obj, int8_t type,
-                                     const uint8_t* data, std::size_t len) {
-  *obj = QVariant::fromValue(
-      MsgPackExt(type,
-                 QByteArray(reinterpret_cast<const char*>(data),
-                            static_cast<qsizetype>(len))));
-}
-
-extern "C" bool ffi_qvariant_get_ext(const QVariant* obj, int8_t* type,
-                                     std::size_t* len) {
-  if (obj->userType() != QMetaType::fromType<MsgPackExt>().id()) {
-    return false;
-  }
-  const auto& ext = *static_cast<const MsgPackExt*>(obj->constData());
-  *type = ext.getType();
-  *len = static_cast<std::size_t>(ext.getData().size());
-  return true;
-}
-
-extern "C" void ffi_qvariant_get_ext_data(const QVariant* obj, uint8_t* out) {
-  const auto& ext = *static_cast<const MsgPackExt*>(obj->constData());
-  std::memcpy(out, ext.getData().constData(),
-              static_cast<std::size_t>(ext.getData().size()));
 }
 
 extern "C" std::size_t ffi_qstringlist_len(const QStringList* obj) {

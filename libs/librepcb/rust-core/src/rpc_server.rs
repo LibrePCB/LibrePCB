@@ -100,6 +100,17 @@ const DEFAULT_PORT: u16 = 19536; // "LP" = 0x4C50
 /// trying many ports is negligible.
 const MAX_PORT_ATTEMPTS: u16 = 100;
 
+/// Maximum number of *simultaneously active* connections. Additional
+/// connections are closed immediately (the client just sees the socket
+/// being closed). This bounds the number of connection threads and the
+/// amount of per-connection state, so that a (misbehaving or malicious)
+/// local process cannot make the application allocate an arbitrary amount
+/// of resources just by opening sockets. The limit is arbitrary, but
+/// generous: It comfortably exceeds the number of clients the
+/// application is intended to serve (dev tools, an MCP server, plugins,
+/// scripts).
+pub(super) const MAX_CONNECTIONS: usize = 20;
+
 /// Maximum time [RpcServer::stop] waits for connection threads to finish.
 /// They cannot be interrupted while blocked inside a dispatch callback, so
 /// after this timeout they are detached with a warning (which is fine
@@ -1018,5 +1029,35 @@ mod tests {
       // The server is dropped here (at the end of the block).
     }
     assert!(client.as_mut().unwrap().read().is_none());
+  }
+
+  /// Connections beyond the limit are rejected: The server closes the
+  /// socket immediately, without any protocol-level message (the
+  /// connection was not even authenticated, so there is no reply to
+  /// negotiate an error response with).
+  #[test]
+  fn test_connection_limit() {
+    let (server, port, _dispatch, _cancel) = spawn_server();
+    // Open clients up to the limit. Note that the accept loop polls, so
+    // wait until all of them were actually accepted before going beyond
+    // the limit.
+    let mut clients = Vec::new();
+    for _ in 0..MAX_CONNECTIONS {
+      clients.push(TestClient::new_unauthenticated(port));
+    }
+    let deadline = std::time::Instant::now() + Duration::from_secs(5);
+    while server.inner.active_connections.load(Ordering::SeqCst)
+      < MAX_CONNECTIONS
+    {
+      assert!(
+        std::time::Instant::now() < deadline,
+        "connections were not accepted in time"
+      );
+      thread::sleep(Duration::from_millis(10));
+    }
+    // The next connection is closed by the server right away, i.e. the
+    // client reads EOF without ever receiving a message.
+    let mut rejected = TestClient::new_unauthenticated(port);
+    assert!(rejected.read().is_none());
   }
 }

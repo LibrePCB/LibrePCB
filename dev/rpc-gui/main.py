@@ -15,7 +15,7 @@ import slint
 from nacl.signing import SigningKey
 
 import api
-from client import RpcClient, fmt_value, fmt_uuid
+from client import RpcClient, fmt_value
 from pages.protocol import ProtocolPage
 from pages.project_editor import ProjectEditorPage
 from pages.rule_check import RuleCheckPage
@@ -27,8 +27,8 @@ from pages.workspace_db import WorkspaceDbPage
 
 
 # The protocol version spoken by this client (see the negotiation rules
-# in the RPC server documentation).
-PROTOCOL = 1
+# in the RPC server documentation), generated from the API specification.
+PROTOCOL = api.PROTOCOL_VERSION
 
 
 def load_or_create_keypair():

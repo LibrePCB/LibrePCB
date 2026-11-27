@@ -52,12 +52,13 @@ using namespace rpc;
  ******************************************************************************/
 
 /// The range of protocol versions supported by this server (see the
-/// negotiation rules in the RPC server documentation). Raising the
-/// minimum drops support for older versions (breaking very old clients,
-/// detected on their side); raising the maximum adds new features. Every
-/// version N is a cumulative superset of all versions < N.
+/// negotiation rules in the RPC server documentation). The highest
+/// supported version is generated from the API specification; the lowest
+/// one is a server decision, specified manually (raising it drops
+/// support for older versions). Every version N is a cumulative superset
+/// of all versions < N.
 static constexpr int MIN_PROTOCOL = 1;
-static constexpr int MAX_PROTOCOL = 1;
+static constexpr int MAX_PROTOCOL = PROTOCOL_VERSION;
 
 /// The nonce of each connection, generated in `initialize` and consumed in
 /// `authenticate`. Connections which never authenticate leak an entry,
