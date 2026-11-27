@@ -124,16 +124,18 @@ void RpcServer::handleCancel(uint32_t connId, uint32_t msgId) noexcept {
 }
 
 void RpcServer::requestEvent(const RpcRequest& request, RpcRequest::Event event,
-                             uint32_t connId, uint32_t msgId, uint32_t status,
-                             const QVariant& value) noexcept {
+                             uint32_t status, const QVariant& value) noexcept {
   Q_UNUSED(request);
   switch (event) {
     case RpcRequest::Event::Notification:
-      rs::ffi_rpc_server_notify(*mHandle, connId, msgId, &value);
+      rs::ffi_rpc_server_notify(*mHandle, request.getConnId(),
+                                request.getMsgId(), &value);
       break;
     case RpcRequest::Event::Reply:
-      rs::ffi_rpc_server_reply(*mHandle, connId, msgId, status, &value);
-      mPendingRequests.remove(requestKey(connId, msgId));
+      rs::ffi_rpc_server_reply(*mHandle, request.getConnId(),
+                               request.getMsgId(), status, &value);
+      mPendingRequests.remove(
+          requestKey(request.getConnId(), request.getMsgId()));
       break;
   }
 }

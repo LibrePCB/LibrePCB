@@ -229,7 +229,6 @@ Handshake and version negotiation. The first message of a connection must be thi
 | Name | Type | Description |
 |------|------|-------------|
 | `format` | `string` | The negotiated format version of this connection. |
-| `host_key` | `string` | A value identifying this server installation (stable across restarts). Clients may persist it and verify it to detect a connection to the wrong server. |
 | `nonce` | `string` | A fresh random challenge for this connection, to be signed in the `proof` argument of the subsequent `authenticate` request. |
 
 
@@ -239,7 +238,7 @@ Handshake and version negotiation. The first message of a connection must be thi
 
 ### authenticate {#doc_rpc_api_method_authenticate}
 
-Authenticate the connection. Must be called after `initialize`, before any other request. Two mechanisms are supported: External clients prove possession of an Ed25519 private key whose public key the user has confirmed in the application (unknown keys are confirmed interactively, known keys are accepted silently), and processes spawned by the application itself simply pass the token they received out-of-band (e.g. by an environment variable).
+Authenticate the connection. Must be called after `initialize`, before any other request. Two mechanisms are planned: External clients prove possession of an Ed25519 private key whose public key the user has confirmed in the application (unknown keys are confirmed interactively, known keys are accepted silently), and processes spawned by the application itself simply pass the token they received out-of-band (e.g. by an environment variable). The spawned-process mechanism is not implemented yet, i.e. the token argument is currently always rejected.
 
 **Params:**
 
@@ -248,7 +247,7 @@ Authenticate the connection. Must be called after `initialize`, before any other
 | `name` | `string` | An arbitrary name identifying the client application. |
 | `pubkey` | `string?` | The Ed25519 public key of an external client, as 64 hex characters. If provided, `proof` must contain the signature of the `nonce` from the `initialize` response (64 bytes, hex encoded). |
 | `proof` | `string?` | The Ed25519 signature (128 hex characters) over the `nonce`, proving possession of the private key belonging to `pubkey`. |
-| `token` | `string?` | The token received out-of-band from the application which spawned this process. Only valid for the lifetime of the spawning application instance. |
+| `token` | `string?` | The token received out-of-band from the application which spawned this process. Only valid for the lifetime of the spawning application instance. Not implemented yet: The argument is currently always rejected. |
 
 **Result:**
 

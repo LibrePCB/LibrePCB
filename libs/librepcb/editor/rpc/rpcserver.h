@@ -32,7 +32,6 @@
 
 #include <QtCore>
 
-#include <functional>
 #include <memory>
 
 /*******************************************************************************
@@ -68,9 +67,11 @@ class ProjectEditor;
  *   request-scoped messages (e.g. progress) in the meantime.
  * - It pushes application events (e.g. "project_opened") to all clients.
  *
- * @note The token is currently hardcoded (development only!) and thus the
- *       server accepts any local process. To be replaced by a random token
- *       together with the instance registry, see the plan section 9.
+ * @note The authentication of external clients (Ed25519 keys confirmed by
+ *       the user) is implemented in the `authenticate` handler, see
+ *       `api/protocolrpc.cpp`. The spawned-process token mechanism and the
+ *       endpoint file for discovery are planned, see the RPC server
+ *       documentation.
  */
 class RpcServer final : public QObject {
   Q_OBJECT
@@ -103,20 +104,6 @@ public:
    */
   RpcObjectRegistry& getObjectRegistry() noexcept { return mObjectRegistry; }
 
-  /**
-   * @brief Send a request-scoped message (e.g. progress) to the client
-   *
-   * Called by the #RpcRequest while it is pending. Never blocks. The
-   * message is silently dropped by the Rust server if the request is not
-   * (or no longer) pending.
-   *
-   * @param connId  The connection ID of the request.
-   * @param msgId   The msg_id of the request.
-   * @param payload The message payload.
-   */
-  void sendNotification(uint32_t connId, uint32_t msgId,
-                        const QVariant& payload) noexcept;
-
 private:  // Methods
   /// Called on the GUI thread: Extract the "obj" key, look up the command
   /// handler and execute it (or reply with an error).
@@ -126,10 +113,9 @@ private:  // Methods
   /// Called on the GUI thread: Mark a pending request as cancelled.
   void handleCancel(uint32_t connId, uint32_t msgId) noexcept;
 
-  /// Called by an #RpcRequest on any event
+  /// Called by an ::librepcb::editor::RpcRequest on any event
   void requestEvent(const RpcRequest& request, RpcRequest::Event event,
-                    uint32_t connId, uint32_t msgId, uint32_t status,
-                    const QVariant& value) noexcept;
+                    uint32_t status, const QVariant& value) noexcept;
 
   /// Key for a pending request in the registry.
   static uint64_t requestKey(uint32_t connId, uint32_t msgId) noexcept {

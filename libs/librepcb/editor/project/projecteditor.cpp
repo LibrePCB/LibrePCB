@@ -31,7 +31,6 @@
 #include "../undostack.h"
 #include "../utils/slinthelpers.h"
 #include "../utils/standardeditorcommandhandler.h"
-#include "../utils/uihelpers.h"
 #include "../workspace/desktopservices.h"
 #include "board/boardeditor.h"
 #include "bomreviewdialog.h"
@@ -393,9 +392,6 @@ void ProjectEditor::redo() noexcept {
   } catch (const Exception& e) {
     QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
   }
-}
-
-RuleCheckMessageList runErc() {
 }
 
 bool ProjectEditor::requestClose() noexcept {

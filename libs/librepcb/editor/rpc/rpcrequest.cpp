@@ -89,8 +89,7 @@ void RpcRequest::makeAsync(QObject& supervisor) noexcept {
 
 void RpcRequest::send(const RpcNotification& notification) noexcept {
   if (!mReplied) {
-    onEvent.notify(Event::Notification, mConnId, mMsgid, 0,
-                   notification.toVariant());
+    onEvent.notify(Event::Notification, 0, notification.toVariant());
   }
 }
 
@@ -110,7 +109,7 @@ void RpcRequest::send(const RpcError& error) noexcept {
 void RpcRequest::reply(uint32_t status, const QVariant& payload) noexcept {
   if (!mReplied) {
     mReplied = true;
-    onEvent.notify(Event::Reply, mConnId, mMsgid, status, payload);
+    onEvent.notify(Event::Reply, status, payload);
   }
 }
 

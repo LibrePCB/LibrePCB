@@ -504,6 +504,20 @@ extern void ffi_qvariant_get_ext_data(const QVariant * NONNULL obj,
                                       uint8_t *out);
 
 /**
+ * Verify an Ed25519 signature (see the RPC server documentation).
+ *
+ * - `pubkey`: 32 raw bytes of the public key.
+ * - `message`: The signed message (the nonce of the connection).
+ * - `signature`: 64 raw bytes of the signature.
+ *
+ * Returns whether the signature is valid.
+ */
+bool ffi_ed25519_verify(const uint8_t *pubkey,
+                        const uint8_t *message,
+                        size_t message_len,
+                        const uint8_t *signature);
+
+/**
  * Create a new [InteractiveHtmlBom] object
  */
 InteractiveHtmlBom *ffi_ibom_new(const QString * NONNULL title,

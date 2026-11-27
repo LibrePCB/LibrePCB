@@ -74,22 +74,22 @@ struct RpcEnumTraits<{{ enum.name }}> {
 
   /// The map from wire strings to enum values.
   static const QHash<QString, {{ enum.name }}>& mapFromString() noexcept {
-    static const QHash<QString, {{ enum.name }}> map = {
+    static const QHash<QString, {{ enum.name }}> sMap = {
 {% for value in enum.get("values") %}
         {"{{ value.name }}", {{ enum.name }}::{{ value.name | cpp_pascal }}},
 {% endfor %}
     };
-    return map;
+    return sMap;
   }
 
   /// The map from enum values to wire strings.
   static const QHash<{{ enum.name }}, QString>& mapToString() noexcept {
-    static const QHash<{{ enum.name }}, QString> map = {
+    static const QHash<{{ enum.name }}, QString> sMap = {
 {% for value in enum.get("values") %}
         { {{ enum.name }}::{{ value.name | cpp_pascal }}, "{{ value.name }}"},
 {% endfor %}
     };
-    return map;
+    return sMap;
   }
 };
 

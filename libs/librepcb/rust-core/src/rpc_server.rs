@@ -29,12 +29,12 @@
 //!   command to the GUI thread, so command handlers can safely access
 //!   editor state, and long-running commands can report progress with
 //!   [RpcServer::notify_conn] before finally replying.
-//! * This includes the `initialize` request: The authentication (token
-//!   validation) is implemented on the C++ side, and the reply to an
-//!   `initialize` request implicitly (un-)authenticates the connection
-//!   (success/error). While a connection is not authenticated, requests
-//!   other than `initialize` are rejected with an error instead of being
-//!   dispatched.
+//! * This includes the `initialize` and `authenticate` requests: The
+//!   authentication (key/token validation) is implemented on the C++ side,
+//!   and the reply to an `authenticate` request implicitly
+//!   (un-)authenticates the connection (success/error). While a connection
+//!   is not authenticated, requests other than those two are rejected with
+//!   an error instead of being dispatched.
 //! * The msg_id is only unique per connection, so all reply functions
 //!   require the connection ID in addition to the msg_id.
 //! * The server tracks pending requests (dispatched, but not yet replied)
@@ -165,14 +165,14 @@ struct Connection {
   stream: TcpStream,
   /// The msg_ids of requests which were dispatched but not yet replied.
   pending: Arc<Mutex<HashSet<u32>>>,
-  /// The msg_ids of dispatched `initialize` requests which were not yet
+  /// The msg_ids of dispatched `authenticate` requests which were not yet
   /// replied. The reply to such a request authenticates the connection
   /// (success) or un-authenticates it (error) — see the reply path.
-  pending_initializes: Arc<Mutex<HashSet<u32>>>,
+  pending_authentications: Arc<Mutex<HashSet<u32>>>,
   /// Whether the connection is authenticated. Updated when a reply to an
-  /// `initialize` request is sent (see the reply path). While this is
-  /// `false`, requests other than `initialize` are rejected with an error
-  /// instead of being dispatched.
+  /// `authenticate` request is sent (see the reply path). While this is
+  /// `false`, requests other than `initialize`/`authenticate` are rejected
+  /// with an error instead of being dispatched.
   authenticated: Arc<AtomicBool>,
 }
 
@@ -298,8 +298,8 @@ impl RpcServer {
   /// queue the encoded message on its writer thread (see [RpcServer::reply]).
   ///
   /// `status` is the response status: If the replied msg_id belongs to a
-  /// dispatched `initialize` request (see
-  /// [Connection::pending_initializes]), the connection is authenticated
+  /// dispatched `authenticate` request (see
+  /// [Connection::pending_authentications]), the connection is authenticated
   /// (status 0) or un-authenticated (error code). The state update happens
   /// under the same lock as queueing the response, so the ordering of
   /// concurrent `initialize` replies is preserved.
@@ -316,12 +316,13 @@ impl RpcServer {
         (
           conn.tx.clone(),
           Arc::clone(&conn.pending),
-          Arc::clone(&conn.pending_initializes),
+          Arc::clone(&conn.pending_authentications),
           Arc::clone(&conn.authenticated),
         )
       })
     };
-    let Some((tx, pending, pending_initializes, authenticated)) = conn else {
+    let Some((tx, pending, pending_authentications, authenticated)) = conn
+    else {
       return false;
     };
     // Removing the msg_id from the pending set must happen atomically with
@@ -331,7 +332,7 @@ impl RpcServer {
     if !pending.remove(&msg_id) {
       return false; // Already replied (or never dispatched).
     }
-    if lock(&pending_initializes).remove(&msg_id) {
+    if lock(&pending_authentications).remove(&msg_id) {
       authenticated.store(status == 0, Ordering::SeqCst);
     }
     drop(pending);
@@ -437,7 +438,7 @@ fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use protocol::METHOD_INITIALIZE;
+  use protocol::{METHOD_AUTHENTICATE, METHOD_INITIALIZE};
   use std::io::{BufReader, Write};
   use std::sync::mpsc;
 
@@ -470,18 +471,22 @@ mod tests {
       }
     }
 
-    /// Connect and authenticate: Send the `initialize` request with the
-    /// test token, emulate the C++ initialize handler on the forwarded
-    /// request (validate token, mark authenticated, reply) and read the
-    /// response.
+    /// Connect and authenticate: Send the `initialize` request, emulate
+    /// the C++ handshake handler on the forwarded request (reply), then
+    /// send the `authenticate` request with the test token, emulate the
+    /// C++ authentication handler (validate token, mark authenticated,
+    /// reply) and read the responses.
     fn new(port: u16, server: &RpcServer, dispatch: &TestDispatch) -> Self {
       let mut client = Self::new_unauthenticated(port);
-      client.send_initialize(TOKEN);
-      assert!(
-        emulate_cpp_initialize(server, dispatch, TOKEN),
-        "initialize failed"
-      );
+      client.send_initialize();
+      emulate_cpp_initialize(server, dispatch);
       assert!(client.read_ok(1).is_map(), "initialize failed");
+      client.send_authenticate(TOKEN);
+      assert!(
+        emulate_cpp_authenticate(server, dispatch, TOKEN),
+        "authenticate failed"
+      );
+      assert!(client.read_ok(2).is_map(), "authenticate failed");
       client
     }
 
@@ -503,13 +508,25 @@ mod tests {
       self.send_raw(&bytes);
     }
 
-    /// Send an `initialize` request with the given token.
-    fn send_initialize(&mut self, token: &str) {
-      self.send(&Self::request_value(
+    /// Send an `initialize` request (handshake, no authentication).
+    fn send_initialize(&mut self) {
+      self.request(
         1,
         METHOD_INITIALIZE,
-        Value::Map(vec![(Value::from("token"), Value::from(token))]),
-      ));
+        Value::Map(vec![(Value::from("format"), Value::from("1.0"))]),
+      );
+    }
+
+    /// Send an `authenticate` request with the given token (msgid 2).
+    fn send_authenticate(&mut self, token: &str) {
+      self.request(
+        2,
+        METHOD_AUTHENTICATE,
+        Value::Map(vec![
+          (Value::from("name"), Value::from("test")),
+          (Value::from("token"), Value::from(token)),
+        ]),
+      );
     }
 
     /// Build a request message.
@@ -620,18 +637,32 @@ mod tests {
     (server, port, dispatch_rx, cancel_rx)
   }
 
-  /// Emulate the C++ initialize handler on a forwarded request: Validate
-  /// the token and reply. The server authenticates the connection
-  /// implicitly from the reply (success/error).
+  /// Emulate the C++ handshake handler on a forwarded `initialize`
+  /// request: Reply with the negotiated version (does not authenticate).
+  fn emulate_cpp_initialize(server: &RpcServer, dispatch: &TestDispatch) {
+    let (conn_id, msg_id, method, params) =
+      dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
+    assert_eq!(method, METHOD_INITIALIZE);
+    assert_eq!(field(&params, "format"), Some(&Value::from("1.0")));
+    server.reply(
+      conn_id,
+      msg_id,
+      &Value::Map(vec![(Value::from("format"), Value::from("1.0"))]),
+    );
+  }
+
+  /// Emulate the C++ authentication handler on a forwarded `authenticate`
+  /// request: Validate the token and reply. The server authenticates the
+  /// connection implicitly from the reply (success/error).
   /// Returns whether the token was accepted.
-  fn emulate_cpp_initialize(
+  fn emulate_cpp_authenticate(
     server: &RpcServer,
     dispatch: &TestDispatch,
     expected_token: &str,
   ) -> bool {
     let (conn_id, msg_id, method, params) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
-    assert_eq!(method, METHOD_INITIALIZE);
+    assert_eq!(method, METHOD_AUTHENTICATE);
     let token = params
       .as_map()
       .unwrap()
@@ -669,73 +700,96 @@ mod tests {
   }
 
   #[test]
-  fn test_initialize() {
+  fn test_initialize_and_authenticate() {
     let (server, port, dispatch, _cancel) = spawn_server();
     let mut client = TestClient::new_unauthenticated(port);
-    client.send_initialize(TOKEN);
-    // The request is dispatched to the handler, with the token in the
-    // params (the whole authentication is up to the C++ side):
+    // The handshake is dispatched to the handler, with the format in the
+    // params. Its reply does NOT authenticate the connection:
+    client.send_initialize();
     let (conn_id, msg_id, method, params) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
     assert_eq!(method, METHOD_INITIALIZE);
+    assert_eq!(field(&params, "format"), Some(&Value::from("1.0")));
+    server.reply(
+      conn_id,
+      msg_id,
+      &Value::Map(vec![(Value::from("format"), Value::from("1.0"))]),
+    );
+    assert!(client.read_ok(1).is_map());
+    client.request(2, METHOD_PING, Value::Map(Vec::new()));
+    client.read_error(2, RpcErrorCode::Unauthenticated);
+    // The authentication is dispatched with the token in the params (the
+    // whole validation is up to the C++ side) — its reply authenticates:
+    client.send_authenticate(TOKEN);
+    let (conn_id, msg_id, method, params) =
+      dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
+    assert_eq!(method, METHOD_AUTHENTICATE);
     assert_eq!(field(&params, "token"), Some(&Value::from(TOKEN)));
-    // The C++ side validates the token and replies with the application
-    // information — the reply itself authenticates the connection:
     server.reply(conn_id, msg_id, &Value::Map(Vec::new()));
-    assert!(client.read_ok(1).is_map());
+    assert!(client.read_ok(2).is_map());
     // The connection is now usable:
-    client.request(2, METHOD_PING, Value::Map(Vec::new()));
+    client.request(3, METHOD_PING, Value::Map(Vec::new()));
     emulate_cpp_ping(&server, &dispatch);
-    assert!(client.read_ok(2).is_nil());
+    assert!(client.read_ok(3).is_nil());
   }
 
   #[test]
-  fn test_initialize_with_wrong_token() {
+  fn test_authenticate_with_wrong_token() {
     let (server, port, dispatch, _cancel) = spawn_server();
     let mut client = TestClient::new_unauthenticated(port);
-    client.send_initialize("wrong");
+    client.send_initialize();
+    emulate_cpp_initialize(&server, &dispatch);
+    assert!(client.read_ok(1).is_map());
     // The C++ side rejects the wrong token. The connection stays open,
-    // but non-initialize requests are rejected:
-    assert!(!emulate_cpp_initialize(&server, &dispatch, TOKEN));
-    client.read_error(1, RpcErrorCode::Unauthenticated);
-    client.request(2, METHOD_PING, Value::Map(Vec::new()));
+    // but any other request is rejected:
+    client.send_authenticate("wrong");
+    assert!(!emulate_cpp_authenticate(&server, &dispatch, TOKEN));
     client.read_error(2, RpcErrorCode::Unauthenticated);
+    client.request(3, METHOD_PING, Value::Map(Vec::new()));
+    client.read_error(3, RpcErrorCode::Unauthenticated);
   }
 
   #[test]
-  fn test_initialize_with_wrong_token_after_auth() {
+  fn test_authenticate_with_wrong_token_after_auth() {
     let (server, port, dispatch, _cancel) = spawn_server();
     let mut client = TestClient::new_unauthenticated(port);
-    client.send_initialize(TOKEN);
-    assert!(emulate_cpp_initialize(&server, &dispatch, TOKEN));
+    client.send_initialize();
+    emulate_cpp_initialize(&server, &dispatch);
     assert!(client.read_ok(1).is_map());
-    // Re-initialize with a wrong token → the C++ side un-authenticates the
-    // connection and replies with an error. The connection stays open, but
-    // further (non-initialize) requests are rejected:
-    client.send_initialize("wrong");
-    assert!(!emulate_cpp_initialize(&server, &dispatch, TOKEN));
-    client.read_error(1, RpcErrorCode::Unauthenticated);
-    client.request(2, METHOD_PING, Value::Map(Vec::new()));
+    client.send_authenticate(TOKEN);
+    assert!(emulate_cpp_authenticate(&server, &dispatch, TOKEN));
+    assert!(client.read_ok(2).is_map());
+    // Re-authenticate with a wrong token → the C++ side un-authenticates
+    // the connection and replies with an error. The connection stays
+    // open, but further requests are rejected:
+    client.send_authenticate("wrong");
+    assert!(!emulate_cpp_authenticate(&server, &dispatch, TOKEN));
     client.read_error(2, RpcErrorCode::Unauthenticated);
-    // However, initializing correctly again works:
-    client.send_initialize(TOKEN);
-    assert!(emulate_cpp_initialize(&server, &dispatch, TOKEN));
-    assert!(client.read_ok(1).is_map());
+    client.request(3, METHOD_PING, Value::Map(Vec::new()));
+    client.read_error(3, RpcErrorCode::Unauthenticated);
+    // However, authenticating correctly again works:
+    client.send_authenticate(TOKEN);
+    assert!(emulate_cpp_authenticate(&server, &dispatch, TOKEN));
+    assert!(client.read_ok(2).is_map());
   }
 
   #[test]
   fn test_first_request_not_initialize() {
     let (server, port, dispatch, _cancel) = spawn_server();
     let mut client = TestClient::new_unauthenticated(port);
-    // A non-initialize request on an unauthenticated connection is rejected
-    // without being dispatched, and the connection stays open:
+    // A request other than initialize/authenticate on an unauthenticated
+    // connection is rejected without being dispatched, and the connection
+    // stays open:
     client.request(1, METHOD_PING, Value::Map(Vec::new()));
     client.read_error(1, RpcErrorCode::Unauthenticated);
     assert!(dispatch.try_recv().is_err());
-    // Initializing afterwards works:
-    client.send_initialize(TOKEN);
-    assert!(emulate_cpp_initialize(&server, &dispatch, TOKEN));
+    // Handshaking and authenticating afterwards works:
+    client.send_initialize();
+    emulate_cpp_initialize(&server, &dispatch);
     assert!(client.read_ok(1).is_map());
+    client.send_authenticate(TOKEN);
+    assert!(emulate_cpp_authenticate(&server, &dispatch, TOKEN));
+    assert!(client.read_ok(2).is_map());
   }
 
   #[test]
@@ -779,15 +833,15 @@ mod tests {
   fn test_dispatch_immediate_error() {
     // A handler which rejects every request with an error (e.g. params
     // conversion failures at the FFI boundary). Since `initialize` is
-    // rejected as well, the connection can't be authenticated — which is
-    // fine for this test.
+    // rejected as well, the connection can never be authenticated — which
+    // is fine for this test.
     let dispatch: DispatchFn = Arc::new(|_, _, _, _| {
       Err(RpcError::canonical(RpcErrorCode::InvalidArgs))
     });
     let cancel: CancelFn = Arc::new(|_, _| {});
     let (_server, port) = spawn_server_with_handlers(dispatch, cancel);
     let mut client = TestClient::new_unauthenticated(port);
-    client.send_initialize(TOKEN);
+    client.send_initialize();
     client.read_error(1, RpcErrorCode::InvalidArgs);
   }
 

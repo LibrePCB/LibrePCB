@@ -72,12 +72,14 @@ public:
 
   /**
    * @brief Authenticate the connection. Must be called after `initialize`,
-   *        before any other request. Two mechanisms are supported: External
+   *        before any other request. Two mechanisms are planned: External
    *        clients prove possession of an Ed25519 private key whose public
    *        key the user has confirmed in the application (unknown keys are
    *        confirmed interactively, known keys are accepted silently), and
    *        processes spawned by the application itself simply pass the token
-   *        they received out-of-band (e.g. by an environment variable).
+   *        they received out-of-band (e.g. by an environment variable). The
+   *        spawned-process mechanism is not implemented yet, i.e. the token
+   *        argument is currently always rejected.
    */
   static void authenticate(GuiApplication& app, RpcObjectRegistry& registry,
                            RpcRequest& request);

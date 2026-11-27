@@ -65,10 +65,11 @@ with the *negotiated version*, which the whole connection then speaks:
 >    server never emits anything the client's offered version does not
 >    cover.
 
-The `initialize` response carries a `host_key` identifying the server
-installation (stable across restarts) — clients may persist it and verify it
-to detect a connection to the wrong server (trust on first use, like SSH) —
-and a fresh `nonce` for authenticating.
+The `initialize` response carries a fresh `nonce` for authenticating.
+Host verification is deliberately not part of the protocol yet — clients
+transmit nothing reusable, so a wrong server gains nothing but fabricated
+responses; a later version may add it (unknown result keys are ignored by
+old clients, so the frozen handshake stays intact).
 
 **Authentication** is a separate request, so the handshake stays minimal
 and frozen while the authentication flow may evolve:
@@ -88,8 +89,9 @@ and frozen while the authentication flow may evolve:
   simply pass the `token` they received out-of-band (e.g. by an
   environment variable). The application issued that token itself, so no
   user interaction is needed. The token is only valid for the lifetime of
-  the issuing application instance. This path requires no cryptography at
-  all in the client.
+  the issuing application instance, and this path requires no cryptography
+  at all in the client. *Not implemented yet: No tokens are issued, so
+  this argument is currently always rejected.*
 
 Connections stay open on all errors; the client closes them.
 
@@ -105,13 +107,13 @@ The `authenticate` success result is a map with application information:
 - `session`: A UUID identifying the application *process*: It changes
   whenever the application is restarted, so clients can detect that.
 
-**Endpoint discovery:** At startup the server writes `{pid, port,
-host_key}` to a file with 0600 permissions in `$XDG_RUNTIME_DIR` (the
-`DISPLAY`/`SSH_AUTH_SOCK` pattern). Clients should connect to the port
-from that file — a process squatting the default port then never receives
-a connection — and may verify the `host_key` against the file, which
-detects a wrong server even on the very first connection. The file is
-removed when the server stops.
+**Endpoint discovery** *(planned, not implemented yet)*: At startup the
+server shall write `{pid, port, session}` to a file with 0600 permissions
+in `$XDG_RUNTIME_DIR` (the `DISPLAY`/`SSH_AUTH_SOCK` pattern). Clients
+shall connect to the port from that file — a process squatting the
+default port then never receives a connection — and may verify the
+`session` against the file, which confirms they reached exactly the
+process which wrote it. The file is removed when the server stops.
 
 Clients use `version` together with the per-method `since`
 from the specification file to determine which methods the server

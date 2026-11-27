@@ -56,7 +56,7 @@ namespace rpc {
 void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
                         RpcRequest& request) {
   using RpcCommand = void (*)(GuiApplication&, RpcObjectRegistry&, RpcRequest&);
-  static const QHash<QString, RpcCommand> commands = {
+  static const QHash<QString, RpcCommand> sCommands = {
       {"initialize", &ProtocolRpc::initialize},
       {"authenticate", &ProtocolRpc::authenticate},
       {"ping", &ProtocolRpc::ping},
@@ -82,7 +82,7 @@ void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
       {"WorkspaceDb/query_sql", &WorkspaceDbRpc::query_sql},
       {"WorkspaceDb/get", &WorkspaceDbRpc::get},
   };
-  if (auto func = commands.value(request.getMethod(), nullptr)) {
+  if (auto func = sCommands.value(request.getMethod(), nullptr)) {
     func(app, registry, request);
     return;
   }

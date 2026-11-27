@@ -33,8 +33,8 @@
 # - Numeric conventions: Lengths are in nanometers (i64), angles in
 #   microdegrees (i64), if not stated otherwise.
 
-format: "1.0"
-protocol: "1.0"
+format: "0.1"
+protocol: "0.1"
 
 # ---------------------------------------------------------------------------
 # Errors
@@ -395,12 +395,6 @@ classes:
           - name: format
             type: string
             description: The negotiated format version of this connection.
-          - name: host_key
-            type: string
-            description: >-
-              A value identifying this server installation (stable across
-              restarts). Clients may persist it and verify it to detect
-              a connection to the wrong server.
           - name: nonce
             type: string
             description: >-
@@ -412,12 +406,14 @@ classes:
         static: true
         description: >-
           Authenticate the connection. Must be called after `initialize`,
-          before any other request. Two mechanisms are supported: External
+          before any other request. Two mechanisms are planned: External
           clients prove possession of an Ed25519 private key whose public
           key the user has confirmed in the application (unknown keys are
           confirmed interactively, known keys are accepted silently), and
           processes spawned by the application itself simply pass the token
-          they received out-of-band (e.g. by an environment variable).
+          they received out-of-band (e.g. by an environment variable). The
+          spawned-process mechanism is not implemented yet, i.e. the token
+          argument is currently always rejected.
         params:
           - name: name
             type: string
@@ -439,7 +435,8 @@ classes:
             description: >-
               The token received out-of-band from the application which
               spawned this process. Only valid for the lifetime of the
-              spawning application instance.
+              spawning application instance. Not implemented yet: The
+              argument is currently always rejected.
         result:
           - name: server
             type: string

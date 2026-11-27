@@ -2,6 +2,7 @@
 
 mod angle_ffi;
 mod cpp_ffi;
+mod ed25519_ffi;
 mod ibom_ffi;
 mod length_ffi;
 mod math_ffi;

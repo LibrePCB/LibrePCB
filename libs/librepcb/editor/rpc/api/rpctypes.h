@@ -78,7 +78,7 @@ struct RpcEnumTraits<AttributeType> {
 
   /// The map from wire strings to enum values.
   static const QHash<QString, AttributeType>& mapFromString() noexcept {
-    static const QHash<QString, AttributeType> map = {
+    static const QHash<QString, AttributeType> sMap = {
         {"string", AttributeType::String},
         {"resistance", AttributeType::Resistance},
         {"capacitance", AttributeType::Capacitance},
@@ -88,12 +88,12 @@ struct RpcEnumTraits<AttributeType> {
         {"power", AttributeType::Power},
         {"frequency", AttributeType::Frequency},
     };
-    return map;
+    return sMap;
   }
 
   /// The map from enum values to wire strings.
   static const QHash<AttributeType, QString>& mapToString() noexcept {
-    static const QHash<AttributeType, QString> map = {
+    static const QHash<AttributeType, QString> sMap = {
         {AttributeType::String, "string"},
         {AttributeType::Resistance, "resistance"},
         {AttributeType::Capacitance, "capacitance"},
@@ -103,7 +103,7 @@ struct RpcEnumTraits<AttributeType> {
         {AttributeType::Power, "power"},
         {AttributeType::Frequency, "frequency"},
     };
-    return map;
+    return sMap;
   }
 };
 
@@ -132,22 +132,22 @@ struct RpcEnumTraits<BackupRestoreMode> {
 
   /// The map from wire strings to enum values.
   static const QHash<QString, BackupRestoreMode>& mapFromString() noexcept {
-    static const QHash<QString, BackupRestoreMode> map = {
+    static const QHash<QString, BackupRestoreMode> sMap = {
         {"abort", BackupRestoreMode::Abort},
         {"discard", BackupRestoreMode::Discard},
         {"restore", BackupRestoreMode::Restore},
     };
-    return map;
+    return sMap;
   }
 
   /// The map from enum values to wire strings.
   static const QHash<BackupRestoreMode, QString>& mapToString() noexcept {
-    static const QHash<BackupRestoreMode, QString> map = {
+    static const QHash<BackupRestoreMode, QString> sMap = {
         {BackupRestoreMode::Abort, "abort"},
         {BackupRestoreMode::Discard, "discard"},
         {BackupRestoreMode::Restore, "restore"},
     };
-    return map;
+    return sMap;
   }
 };
 

@@ -176,26 +176,30 @@ A request's `params` is a **string-keyed msgpack map**:
 
 ### 2.5 Handshake & protocol-level methods
 
+- Protocol format version is currently **"0.1"** (early development
+  state); bumping to 1.0 later is a pure label change since the server
+  may support both versions in parallel.
 - First message of a connection **must** be an `initialize` request, the
   second an `authenticate` request. Any other message while
   unauthenticated → error response (code 30), connection stays open.
-- `initialize` params `{"format": "1.0"}` (the client's highest supported
+- `initialize` params `{"format": "0.1"}` (the client's highest supported
   format version). Success result: `{"format": "<negotiated>",
-  "host_key": "<string>", "nonce": "<string>"}`.
+  "nonce": "<string>"}`.
   - The negotiated version is `min(client_format, server_format)`; the
     server never rejects on version grounds. Higher minors mean additive,
     backward-compatible changes relative to the negotiated version. The
     `initialize` structure is frozen forever.
-  - `host_key` identifies the server installation (stable across
-    restarts); clients may pin it (TOFU).
   - `nonce` is a fresh per-connection challenge.
+  - Host verification is not part of the protocol yet (clients transmit
+    nothing reusable); a later version may add it additively.
 - `authenticate` params `{"name": "<string>", ...}` with one of:
   - **External client:** `{"pubkey": "<hex>", "proof": "<sig over nonce>"}`
     (Ed25519). Unknown key → interactive confirmation; the user's
     acceptance is remembered, so later connections are silent. Known key
     → silent. Invalid proof → `AccessDenied`.
-  - **Spawned process:** `{"token": "<out-of-band token>"}` (no crypto
-    needed). Valid only for the lifetime of the issuing instance.
+  - **Spawned process** *(not implemented yet)*: `{"token": "<out-of-band
+    token>"}` (no crypto needed). Valid only for the lifetime of the
+    issuing instance.
   - Success result: `{"server": "librepcb", "version": "<app version>",
     "session": "<uuid>"}`. The reply authenticates the connection.
   - `session` is a per-process UUID: It changes when the application is
@@ -204,9 +208,11 @@ A request's `params` is a **string-keyed msgpack map**:
     to determine availability: functions added after the revision of the
     client's spec are unknown to the client, which is fine (unknown
     method → RPC error).
-- **Endpoint discovery:** the server writes `{pid, port, host_key}` to a
-  0600 file in `$XDG_RUNTIME_DIR` at startup; clients connect to the port
-  from that file.
+- **Endpoint discovery** *(planned, not implemented yet)*: the server
+  shall write `{pid, port, session}` to a 0600 file in
+  `$XDG_RUNTIME_DIR` at startup; clients connect to the port from that
+  file and may verify the `session` to confirm they reached exactly the
+  process which wrote it.
 - `ping` is a protocol-level method (handled by the Rust server, no
   dispatch): returns `{}`.
 - `ping` → nil result.

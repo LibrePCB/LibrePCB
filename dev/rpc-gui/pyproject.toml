@@ -5,4 +5,5 @@ requires-python = ">=3.12"
 dependencies = [
     "slint==1.17.1b2",
     "u-msgpack-python>=2.8",
+    "pynacl>=1.6",
 ]

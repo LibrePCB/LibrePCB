@@ -45,7 +45,8 @@ namespace editor {
  * object is destroyed, its handle becomes invalid automatically (the
  * `destroyed()` signal removes the registration).
  *
- * The registry has the same lifetime as the #RpcServer, i.e. all handles
+ * The registry has the same lifetime as the ::librepcb::editor::RpcServer,
+ * i.e. all handles
  * become invalid when the server is stopped. The handle counter is static,
  * so handle values are never reused, not even across server restarts. Handle
  * value 0 is reserved (null handle).

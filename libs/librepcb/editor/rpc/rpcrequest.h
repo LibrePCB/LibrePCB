@@ -46,16 +46,18 @@ class RpcNotification;
 /**
  * @brief A command request, as handed to the command handlers
  *
- * A request object is created by the #RpcServer (on the GUI thread) when a
+ * A request object is created by the ::librepcb::editor::RpcServer (on the GUI
+ * thread) when a
  * command is dispatched. The handler must ensure that it is replied exactly
  * once, either synchronously (by calling #send()) or asynchronously (by
  * keeping the object alive and calling one of the #send() methods later).
  * If a handler forgets to reply, no response is sent at all
  * — the request stays pending and the client will run into a timeout.
  *
- * @note The class is fully decoupled from the #RpcServer: Responses and
+ * @note The class is fully decoupled from the ::librepcb::editor::RpcServer:
+ *       Responses and
  *       request-scoped messages are sent through its public API, and the
- *       server is notified about the reply through the #onFinished signal
+ *       server is notified about the reply through the #onEvent signal
  *       (it removes the request from its pending-request registry then).
  *
  * @note The QObject base class does not serve the RPC internals, but
@@ -80,10 +82,8 @@ public:
     Notification,
     Reply,
   };
-  Signal<RpcRequest, Event, uint32_t, uint32_t, uint32_t, const QVariant&>
-      onEvent;
-  typedef Slot<RpcRequest, Event, uint32_t, uint32_t, uint32_t, const QVariant&>
-      OnEventSlot;
+  Signal<RpcRequest, Event, uint32_t, const QVariant&> onEvent;
+  typedef Slot<RpcRequest, Event, uint32_t, const QVariant&> OnEventSlot;
 
   // Constructors / Destructor
   RpcRequest() = delete;
@@ -93,6 +93,8 @@ public:
              const QVariantMap& args) noexcept;
 
   // Getters
+  uint32_t getConnId() const noexcept { return mConnId; }
+  uint32_t getMsgId() const noexcept { return mMsgid; }
   const QString& getMethod() const noexcept { return mMethod; }
   const QVariantMap& getArgs() const noexcept { return mArgs; }
   QVariant getArg(const QString& key,
@@ -119,8 +121,8 @@ public:
   /**
    * @brief Mark the request as cancelled
    *
-   * Called by the #RpcServer when the client cancelled this request. See
-   * #isCancelled() for the cooperative cancellation semantics.
+   * Called by the ::librepcb::editor::RpcServer when the client cancelled this
+   * request. See #isCancelled() for the cooperative cancellation semantics.
    */
   void cancel() noexcept;
 

@@ -12,8 +12,7 @@ import time
 from datetime import timedelta
 
 import slint
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+from nacl.signing import SigningKey
 
 import api
 from client import RpcClient, fmt_value, fmt_uuid
@@ -38,23 +37,19 @@ def load_or_create_keypair():
     try:
         with open(path, "r") as f:
             data = json.load(f)
-        key = Ed25519PrivateKey.from_private_bytes(
-            bytes.fromhex(data["private_key"]))
+        # The stored value is the raw 32-byte Ed25519 seed (hex encoded).
+        key = SigningKey(bytes.fromhex(data["private_key"]))
     except (OSError, ValueError, KeyError):
-        key = Ed25519PrivateKey.generate()
+        key = SigningKey.generate()
         try:
             os.makedirs(os.path.dirname(path), exist_ok=True)
             with open(path, "w") as f:
-                json.dump({"private_key": key.private_bytes(
-                    serialization.Encoding.Raw,
-                    serialization.PrivateFormat.Raw,
-                    serialization.NoEncryption()).hex()}, f)
+                json.dump({"private_key": key.encode().hex()}, f)
             print(f"Generated new client key: {path}")
         except OSError as e:
             print(f"Warning: Could not persist the client key ({e}), "
                   "using an ephemeral key.")
-    pub = key.public_key().public_bytes(
-        serialization.Encoding.Raw, serialization.PublicFormat.Raw)
+    pub = key.verify_key.encode()
     return key, pub.hex()
 
 
@@ -185,7 +180,7 @@ class Gui(ns.AppWindow):
             self._log(f"⊗ cancel: {self.client.pending_msgid}")
             return
         try:
-            self.call("initialize", {"format": "1.0"}, self._on_initialize)
+            self.call("initialize", {"format": "0.1"}, self._on_initialize)
         except OSError as e:
             self._log(f"  Send failed: {e}")
 
@@ -194,7 +189,7 @@ class Gui(ns.AppWindow):
         if status != 0:
             return
         key, pubkey_hex = KEYPAIR
-        proof = key.sign(str(payload["nonce"]).encode()).hex()
+        proof = key.sign(str(payload["nonce"]).encode()).signature.hex()
         try:
             self.client.pending_msgid = self.call(
                 "authenticate",

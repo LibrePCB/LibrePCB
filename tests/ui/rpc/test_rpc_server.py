@@ -26,10 +26,9 @@ PORT = 19536
 
 def handshake(rpc, msgid):
     """Send the initialize request and return its result."""
-    status, result = rpc.request(msgid, "initialize", {"format": "1.0"})
+    status, result = rpc.request(msgid, "initialize", {"format": "0.1"})
     assert status == 0, f"initialize failed: {result!r}"
-    assert result["format"] == "1.0", result
-    assert isinstance(result["host_key"], str) and result["host_key"], result
+    assert result["format"] == "0.1", result
     assert isinstance(result["nonce"], str) and result["nonce"], result
     return result
 

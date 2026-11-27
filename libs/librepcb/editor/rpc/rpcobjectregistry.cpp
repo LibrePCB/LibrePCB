@@ -43,10 +43,10 @@ using namespace rpc;
 static uint32_t getNextHandle() noexcept {
   // Start with a random handle, to reduce the risk of accidentally considering
   // stale handles from RPC clients as valid after LibrePCB has been restarted.
-  static uint32_t handle = static_cast<uint32_t>(std::rand());
-  ++handle;
-  if (handle == 0) ++handle;  // Skip handle 0 to make QVariant::toInt() working
-  return handle;
+  static uint32_t sHandle = static_cast<uint32_t>(std::rand());
+  ++sHandle;
+  if (sHandle == 0) ++sHandle;  // Skip sHandle 0 to make QVariant::toInt() working
+  return sHandle;
 }
 
 RpcObjectRegistry::RpcObjectRegistry(QObject* parent) noexcept
