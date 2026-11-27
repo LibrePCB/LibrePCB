@@ -7,6 +7,14 @@
 # dev/doxygen/pages/rpc_server.md (protocol) and
 # dev/doxygen/pages/rpc_api.md (generated API reference).
 #
+# Top-level keys:
+# - `format`: The format of this yml file itself, as "MAJOR.MINOR" (only
+#   bumped when the file structure changes in a way which requires
+#   consumers like dev/rpc/gen.py to be adapted).
+# - `protocol`: The version of the wire protocol which this file describes,
+#   as a monotonic integer (see the negotiation rules in
+#   dev/doxygen/pages/rpc_server.md).
+#
 # Consumers:
 # - The documentation generator (dev/rpc/gen.py).
 # - Client authors: Read this file to know which methods exist, and compare
@@ -34,7 +42,7 @@
 #   microdegrees (i64), if not stated otherwise.
 
 format: "0.1"
-protocol: "0.1"
+protocol: 1
 
 # ---------------------------------------------------------------------------
 # Errors
@@ -385,16 +393,16 @@ classes:
           (see the transport protocol documentation). It does not
           authenticate the connection — call `authenticate` afterwards.
         params:
-          - name: format
-            type: string
+          - name: protocol
+            type: int
             description: >-
-              The highest protocol format version supported by the client,
-              as "MAJOR.MINOR" (see the transport protocol documentation
-              for the negotiation rules).
+              The highest protocol version supported by the client, as a
+              non-negative integer (see the transport protocol
+              documentation for the negotiation rules).
         result:
-          - name: format
-            type: string
-            description: The negotiated format version of this connection.
+          - name: protocol
+            type: int
+            description: The negotiated protocol version of this connection.
           - name: nonce
             type: string
             description: >-

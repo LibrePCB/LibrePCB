@@ -26,6 +26,11 @@ from pages.workspace import WorkspacePage
 from pages.workspace_db import WorkspaceDbPage
 
 
+# The protocol version spoken by this client (see the negotiation rules
+# in the RPC server documentation).
+PROTOCOL = 1
+
+
 def load_or_create_keypair():
     """The persistent Ed25519 keypair identifying this client, generated on
     first use and stored in the user's config directory (see the RPC
@@ -180,13 +185,25 @@ class Gui(ns.AppWindow):
             self._log(f"⊗ cancel: {self.client.pending_msgid}")
             return
         try:
-            self.call("initialize", {"format": "0.1"}, self._on_initialize)
+            self.call("initialize", {"protocol": PROTOCOL},
+                      self._on_initialize)
         except OSError as e:
             self._log(f"  Send failed: {e}")
 
     def _on_initialize(self, status, payload):
-        """The initialize response: Sign the nonce and authenticate."""
+        """The initialize response: Verify the negotiated protocol version
+        (the server never rejects on version grounds, so this check is
+        purely client-side), then sign the nonce and authenticate."""
         if status != 0:
+            return
+        if payload.get("protocol") != PROTOCOL:
+            self._log(f"⊗ Server speaks protocol {payload.get('protocol')!r}, "
+                      "which this client does not support.")
+            self.client.close()
+            self.client = None
+            self.connected = False
+            self.authenticated = False
+            self.pending = False
             return
         key, pubkey_hex = KEYPAIR
         proof = key.sign(str(payload["nonce"]).encode()).signature.hex()

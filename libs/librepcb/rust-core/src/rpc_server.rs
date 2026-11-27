@@ -513,7 +513,7 @@ mod tests {
       self.request(
         1,
         METHOD_INITIALIZE,
-        Value::Map(vec![(Value::from("format"), Value::from("1.0"))]),
+        Value::Map(vec![(Value::from("protocol"), Value::from(1))]),
       );
     }
 
@@ -643,11 +643,11 @@ mod tests {
     let (conn_id, msg_id, method, params) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
     assert_eq!(method, METHOD_INITIALIZE);
-    assert_eq!(field(&params, "format"), Some(&Value::from("1.0")));
+    assert_eq!(field(&params, "protocol"), Some(&Value::from(1)));
     server.reply(
       conn_id,
       msg_id,
-      &Value::Map(vec![(Value::from("format"), Value::from("1.0"))]),
+      &Value::Map(vec![(Value::from("protocol"), Value::from(1))]),
     );
   }
 
@@ -709,11 +709,11 @@ mod tests {
     let (conn_id, msg_id, method, params) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
     assert_eq!(method, METHOD_INITIALIZE);
-    assert_eq!(field(&params, "format"), Some(&Value::from("1.0")));
+    assert_eq!(field(&params, "protocol"), Some(&Value::from(1)));
     server.reply(
       conn_id,
       msg_id,
-      &Value::Map(vec![(Value::from("format"), Value::from("1.0"))]),
+      &Value::Map(vec![(Value::from("protocol"), Value::from(1))]),
     );
     assert!(client.read_ok(1).is_map());
     client.request(2, METHOD_PING, Value::Map(Vec::new()));

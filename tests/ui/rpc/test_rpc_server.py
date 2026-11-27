@@ -24,11 +24,11 @@ PORT = 19536
 # --- A minimal RPC client ---------------------------------------------------
 
 
-def handshake(rpc, msgid):
+def handshake(rpc, msgid, protocol=1):
     """Send the initialize request and return its result."""
-    status, result = rpc.request(msgid, "initialize", {"format": "0.1"})
+    status, result = rpc.request(msgid, "initialize", {"protocol": protocol})
     assert status == 0, f"initialize failed: {result!r}"
-    assert result["format"] == "0.1", result
+    assert result["protocol"] == 1, result
     assert isinstance(result["nonce"], str) and result["nonce"], result
     return result
 
@@ -158,6 +158,27 @@ def test_rpc_server(librepcb, helpers):
                 assert result["server"] == "librepcb", result
             finally:
                 rpc2.close()
+
+            # Version negotiation: The server never rejects on version
+            # grounds. It clamps the client's offer into its supported
+            # range (currently [1, 1]), so a client newer or older than
+            # the server detects the mismatch from the negotiated version
+            # in the response and closes the connection on its own.
+            for offer in (99, 0):
+                rpc_v = RpcClient(PORT)
+                try:
+                    handshake(rpc_v, 1, protocol=offer)
+                finally:
+                    rpc_v.close()
+
+            # A missing, mistyped or negative protocol version is
+            # rejected as invalid arguments.
+            for params in ({}, {"protocol": "1"}, {"protocol": -1}):
+                rpc_v = RpcClient(PORT)
+                try:
+                    rpc_v.expect_error(1, "initialize", params, 40)
+                finally:
+                    rpc_v.close()
 
             # An invalid proof is rejected, and the connection stays
             # unauthenticated.

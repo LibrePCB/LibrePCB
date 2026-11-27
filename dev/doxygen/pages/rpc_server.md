@@ -44,23 +44,26 @@ The first message of a connection must be an
 message is answered with an error response (without being dispatched) and
 the connection stays open, but stays unauthenticated.
 
-**Version negotiation:** The client passes the highest format version it
-supports in the `format` argument (`"MAJOR.MINOR"`). The server replies
-with the *negotiated version*, which the whole connection then speaks:
+**Version negotiation:** The client passes the highest protocol version it
+supports in the `protocol` argument (a non-negative integer). The server
+replies with the *negotiated version*, which the whole connection then
+speaks:
 
-> 1. Versions are `"MAJOR.MINOR"`. Within a major, higher versions are
->    backwards compatible (strict supersets). Majors may drop features.
+> 1. Protocol versions are monotonic integers; every version N is a
+>    cumulative superset of all versions < N. Versions may drop features
+>    of older versions (then the server still serves them in parallel, see
+>    below).
 > 2. `initialize` is the mandatory first message and its structure never
->    changes. A missing or unparsable `format` argument is answered with
+>    changes. A missing or unparsable `protocol` argument is answered with
 >    [error code 40](@ref doc_rpc_api_errors).
-> 3. The negotiated version is `min(client_format, server_format)`. The
->    server supports every version between its minimum and its
->    `server_format`; if the client's offer is below that minimum, the
->    server responds with its minimum. The server never rejects on version
->    grounds — a client which cannot speak the negotiated version simply
->    closes the connection.
+> 3. The negotiated version is `min(client_protocol, server_protocol)`,
+>    clamped to the range of versions the server still supports: If the
+>    client's offer is below the oldest version still supported, the
+>    server responds with that oldest version. The server never rejects
+>    on version grounds — a client which cannot speak the negotiated
+>    version simply closes the connection.
 > 4. All messages on the connection conform to the negotiated version, in
->    both directions. A higher minor version therefore means additive,
+>    both directions. A higher version therefore only means additive,
 >    backward-compatible changes *relative to the negotiated version*: A
 >    server never emits anything the client's offered version does not
 >    cover.

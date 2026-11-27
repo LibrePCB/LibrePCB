@@ -37,6 +37,8 @@
 #include <QSettings>
 #include <QtCore>
 
+#include <algorithm>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -49,23 +51,13 @@ using namespace rpc;
  *  Helper Functions
  ******************************************************************************/
 
-/// The format version supported by this server. Since the whole supported
-/// range is "0.1", the negotiated version is always "0.1" (see the
-/// negotiation rules in the RPC server documentation).
-static constexpr const char* MAX_FORMAT = "0.1";
-
-/// Parse a "MAJOR.MINOR" format version. Returns (major, minor) or nothing
-/// if the string is not well-formed.
-static std::optional<QPair<int, int>> parseFormatVersion(
-    const QString& value) noexcept {
-  const auto parts = value.split('.');
-  if (parts.count() != 2) return std::nullopt;
-  bool ok1 = false, ok2 = false;
-  const int major = parts[0].toInt(&ok1);
-  const int minor = parts[1].toInt(&ok2);
-  if ((!ok1) || (!ok2) || (major < 0) || (minor < 0)) return std::nullopt;
-  return qMakePair(major, minor);
-}
+/// The range of protocol versions supported by this server (see the
+/// negotiation rules in the RPC server documentation). Raising the
+/// minimum drops support for older versions (breaking very old clients,
+/// detected on their side); raising the maximum adds new features. Every
+/// version N is a cumulative superset of all versions < N.
+static constexpr int MIN_PROTOCOL = 1;
+static constexpr int MAX_PROTOCOL = 1;
 
 /// The nonce of each connection, generated in `initialize` and consumed in
 /// `authenticate`. Connections which never authenticate leak an entry,
@@ -125,24 +117,31 @@ void ProtocolRpc::initialize(GuiApplication& app, RpcObjectRegistry& registry,
   Q_UNUSED(app);
   Q_UNUSED(registry);
 
-  // Parse and negotiate the format version. The server never rejects on
+  // Parse and negotiate the protocol version. The server never rejects on
   // version grounds: Whatever the client offers, the connection speaks
-  // the negotiated version from the response.
-  const QString clientFormat = getArg<QString>(request, "format");
-  if (!parseFormatVersion(clientFormat)) {
-    throw RpcInvalidArgs(
-        QString("Invalid value '%1' for argument 'format' (expected "
-                "\"MAJOR.MINOR\").")
-            .arg(clientFormat));
+  // the negotiated version from the response. If the offer is below the
+  // oldest version still supported, the response carries that oldest
+  // version, and it is up to the client to detect that it cannot speak
+  // it and to close the connection.
+  const qint64 clientProtocol = getArg<qint64>(request, "protocol");
+  if (clientProtocol < 0) {
+    throw RpcInvalidArgs(QString("Invalid value '%1' for argument "
+                                 "'protocol' (expected a non-negative "
+                                 "integer).")
+                             .arg(clientProtocol));
   }
-  qInfo().noquote() << "RPC connection (format" << clientFormat << ").";
+  const int negotiated = static_cast<int>(
+      std::clamp(clientProtocol, static_cast<qint64>(MIN_PROTOCOL),
+                 static_cast<qint64>(MAX_PROTOCOL)));
+  qInfo().noquote() << "RPC connection (protocol" << clientProtocol << "->"
+                    << negotiated << ").";
 
   // Issue the nonce for this connection, consumed by `authenticate`.
   const QString nonce = Uuid::createRandom().toStr();
   getConnectionNonces().insert(request.getConnId(), nonce);
 
   request.send({
-      {"format", MAX_FORMAT},
+      {"protocol", negotiated},
       {"nonce", nonce},
   });
 }

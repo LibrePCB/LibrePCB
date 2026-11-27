@@ -220,7 +220,7 @@ Handshake and version negotiation. The first message of a connection must be thi
 
 | Name | Type | Description |
 |------|------|-------------|
-| `format` | `string` | The highest protocol format version supported by the client, as "MAJOR.MINOR" (see the transport protocol documentation for the negotiation rules). |
+| `protocol` | `int` | The highest protocol version supported by the client, as a non-negative integer (see the transport protocol documentation for the negotiation rules). |
 
 **Result:**
 
@@ -228,7 +228,7 @@ Handshake and version negotiation. The first message of a connection must be thi
 
 | Name | Type | Description |
 |------|------|-------------|
-| `format` | `string` | The negotiated format version of this connection. |
+| `protocol` | `int` | The negotiated protocol version of this connection. |
 | `nonce` | `string` | A fresh random challenge for this connection, to be signed in the `proof` argument of the subsequent `authenticate` request. |
 
 

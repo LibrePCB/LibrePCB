@@ -176,19 +176,22 @@ A request's `params` is a **string-keyed msgpack map**:
 
 ### 2.5 Handshake & protocol-level methods
 
-- Protocol format version is currently **"0.1"** (early development
-  state); bumping to 1.0 later is a pure label change since the server
-  may support both versions in parallel.
+- Protocol versions are monotonic integers starting at **1**. Every
+  version N is a cumulative superset of all versions < N; dropping
+  features is expressed by raising the oldest still-supported version
+  (the server serves the supported range in parallel, so this only
+  breaks clients older than that range).
 - First message of a connection **must** be an `initialize` request, the
   second an `authenticate` request. Any other message while
   unauthenticated → error response (code 30), connection stays open.
-- `initialize` params `{"format": "0.1"}` (the client's highest supported
-  format version). Success result: `{"format": "<negotiated>",
+- `initialize` params `{"protocol": 1}` (the client's highest supported
+  protocol version). Success result: `{"protocol": <negotiated>,
   "nonce": "<string>"}`.
-  - The negotiated version is `min(client_format, server_format)`; the
-    server never rejects on version grounds. Higher minors mean additive,
-    backward-compatible changes relative to the negotiated version. The
-    `initialize` structure is frozen forever.
+  - The negotiated version is `min(client_protocol, server_protocol)`,
+    clamped to the range of versions the server still supports; the
+    server never rejects on version grounds. A client which cannot speak
+    the negotiated version closes the connection locally.
+  - The `initialize` structure is frozen forever.
   - `nonce` is a fresh per-connection challenge.
   - Host verification is not part of the protocol yet (clients transmit
     nothing reusable); a later version may add it additively.
