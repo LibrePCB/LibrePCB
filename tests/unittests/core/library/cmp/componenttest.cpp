@@ -1,4 +1,4 @@
-﻿/*
+/*
  * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2013 LibrePCB Developers, see AUTHORS.md for contributors.
  * https://librepcb.org/
